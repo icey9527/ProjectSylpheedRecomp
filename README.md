@@ -1,7 +1,8 @@
 # Project Sylpheed Recomp
 
 使用 ReXGlue v0.10.0 的 Project Sylpheed Xbox 360 静态重编译初始工程。
-已完成 Windows x64 Debug 宿主编译与链接，尚未验证游戏运行。
+Windows x64 Debug 宿主已编译，开发版镜像已实际加载并执行到声音初始化与 `GP_TEST` 启动。
+已修复首个运行时缺失函数入口；目前仍因访问 `0x0000000C` 异常退出，尚未验证菜单或可玩。
 
 双击 `Start-Progress.bat` 打开本地实时进度面板（Python 3.11+，无需额外依赖）。
 显示实际 Git 提交、当前阶段、文件中的验收清单完成率、外层计划与 AI 交接，每 5 秒刷新。
@@ -73,6 +74,7 @@ cmake --build --preset win-amd64-debug
 ## 项目文档
 
 - [Windows 安装与编译入门](docs/building-windows.md)
+- [开发版受控启动与首次运行修复](docs/running-development.md)
 - [符号对应、验证范围与查询方法](docs/symbols.md)
 - [代码结构与模块目录规则](docs/architecture.md)
 - [修改、返工、验证和 Git 提交规则](docs/contributing.md)
@@ -88,4 +90,7 @@ cmake --build --preset win-amd64-debug
 最新验证：codegen 成功，生成 269 个文件；生成 C++ 中未解析调用的致命占位代码为 0。
 首次构建还修复了 17 个重新抛出异常的 catch funclet 边界，并检查函数内 goto 标签完整性。
 Windows x64 Debug 编译、链接已通过；输出为 `out/build/win-amd64-debug/project_sylpheed.exe`。
-仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 指令语义，游戏运行尚未验证。
+实际启动后又发现 XAudio 共享入口 `0x82546298` 未注册，已通过 MAP/PDB 核实并在
+`config/runtime-functions.toml` 补充，重新生成/编译后越过该阻塞。生成函数索引现为 34,580 个。
+仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 指令语义；
+下一步定位访问 `0x0000000C` 的崩溃线程与故障指令，不能仅根据附近资源错误猜测原因。

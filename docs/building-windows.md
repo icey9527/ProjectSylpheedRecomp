@@ -90,10 +90,11 @@ SDK 配置会查找 fmt、spdlog、utf8cpp、SDL3 等包；完整包应携带兼
 Windows x64 Debug 编译和链接已通过。CMake 会部署 runtime、Tracy 及运行时加载的 xenos GPU 插件。
 插件需要明确请求 `GPU_PLUGINS xenos`，因为它不是链接依赖，自动扫描链接 DLL 不会把它复制出来。
 
-构建通过不代表游戏启动正确：原始资源还需准备并指定 `--game_data_root`，
-当前默认宿主加载 `game:\\default.xex`，而分析输入叫 Xacalite_ScriptTeam.exe，
-还需核对正确的游戏镜像路径。GPU 后端运行时用 `--gpu_plugin=xenos` 选择。
-这些是下一阶段配置和运行验证的任务，不能仅靠双击当前 EXE 判断重编译是否正确。
+宿主已通过 OnLoadXexImage 选择开发镜像 Xacalite_ScriptTeam.exe。
+运行脚本检查开发镜像 SHA256，并设置资源目录、隔离用户数据、xenos 插件、日志和超时。
+使用方法及实际运行证据见 [开发版启动说明](running-development.md)。
+当前已加载并执行游戏初始化，但仍崩溃，菜单、画面、输入和声音播放尚未验收。
+构建通过或双击出现窗口不能证明重编译语义正确。
 SDK 宿主没有工具版 rexglue 的 `--help` 退出行为，不能用该参数作为无窗口 smoke test。
 
 ## 若只有 SDK 源码

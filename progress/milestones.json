@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "project": "Project Sylpheed Recomp",
-  "headline": "开发版宿主已编译，正在准备首次游戏加载",
+  "headline": "开发版已执行到声音初始化与 GP_TEST；首个运行入口已修复，下一步定位访问异常",
   "scope": "当前验收清单完成率；所有验收项等权。不是可玩程度、工时比例或发布日期预测。新增任务会改变分母。",
-  "updated_at": "2026-10-01",
-  "current_task": "dev-paths",
-  "next_tasks": ["dev-paths", "dev-load", "float-semantics", "pdb-identity", "retail-entries"],
+  "updated_at": "2026-10-02",
+  "current_task": "dev-crash",
+  "next_tasks": ["dev-crash", "float-semantics", "pdb-identity", "menu-frame", "retail-entries"],
   "versions": [
     {"name": "开发版", "role": "当前诊断基线 / 符号参考", "note": "保留原输入和已有调试能力；游戏调试菜单与实际可用性待验证。"},
     {"name": "零售版", "role": "最终行为与内容目标", "note": "独立地址与配置；修复按功能迁移，并保留开发版对应实现。"},
@@ -23,7 +23,7 @@
     {
       "id": "analysis", "title": "开发版分析与符号", "description": "已完成部分修复，语义与身份调查继续推进。",
       "tasks": [
-        {"id": "dev-codegen", "title": "补充 44 个入口并完成代码生成", "status": "done", "verified_at": "2026-10-01", "note": "入口来自开发版 MAP/PDB；生成未解析调用致命占位检查通过。", "evidence": [{"base": "repo", "path": "config/map-functions.toml"}, {"base": "workspace", "path": "logs/codegen-catch-boundaries-console.txt"}]},
+        {"id": "dev-codegen", "title": "补充分析与运行入口并完成代码生成", "status": "done", "verified_at": "2026-10-01", "note": "原有 44 个入口及运行发现的 XAudio 0x82546298 均经开发版 MAP/PDB 核实；检查通过，30 条指令警告仍在。", "evidence": [{"base": "repo", "path": "config/map-functions.toml"}, {"base": "repo", "path": "config/runtime-functions.toml"}, {"base": "workspace", "path": "logs/codegen-runtime-entry.log"}]},
         {"id": "symbol-index", "title": "建立名字、地址与生成位置索引", "status": "done", "verified_at": "2026-10-01", "note": "生成函数仍为 sub_ADDRESS；789 条 MAP 记录尚未定位，不等于符号已全量恢复。", "evidence": [{"base": "workspace", "path": "symbols/functions.summary.json"}, {"base": "workspace", "path": "symbols/functions.csv"}]},
         {"id": "catch-bounds", "title": "修复 17 个终止重抛 funclet 边界", "status": "done", "verified_at": "2026-10-01", "note": "按 _CxxThrowException 调用限制扫描；函数内 goto 检查通过。", "evidence": [{"base": "repo", "path": "config/catch-boundaries.toml"}, {"base": "repo", "path": "docs/build-fixes.md"}]},
         {"id": "float-semantics", "title": "核实 30 条 float16_4 指令警告", "status": "pending", "note": "首地址 0x82526328；需对应 PPC 指令与运行时语义证据。", "evidence": [{"base": "workspace", "path": "logs/codegen-catch-boundaries.log"}]},
@@ -39,10 +39,11 @@
       ]
     },
     {
-      "id": "dev-runtime", "title": "首次加载与基本运行", "description": "下一阶段重点：取得实际游戏加载日志。",
+      "id": "dev-runtime", "title": "首次加载与基本运行", "description": "已加载并进入初始化；下一阶段重点是定位访问异常，再取得画面。",
       "tasks": [
-        {"id": "dev-paths", "title": "配置开发版资源与虚拟镜像路径", "status": "in_progress", "note": "目录已提供；需配置 game_data_root、Xacalite_ScriptTeam.exe 的虚拟路径和 xenos。", "evidence": [{"base": "repo", "path": "src/app/project_sylpheed_app.h"}]},
-        {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "pending", "note": "尚无实际游戏加载成功证据；SDK 的资源路径提示不算游戏启动。", "evidence": []},
+        {"id": "dev-paths", "title": "配置开发版资源与虚拟镜像路径", "status": "done", "verified_at": "2026-10-01", "note": "选择开发镜像；脚本核对 hash，配置资源、xenos、日志、隔离用户数据并禁止游戏写入原资源。", "evidence": [{"base": "repo", "path": "src/app/project_sylpheed_app.h"}, {"base": "repo", "path": "scripts/run_development.py"}, {"base": "workspace", "path": "assets/runtime.local.json"}]},
+        {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "done", "verified_at": "2026-10-01", "note": "image_loaded 和真实声音初始化/GP_TEST 日志已取得；修复首个缺失入口并重测。仍异常退出，不代表菜单或可玩。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}, {"base": "workspace", "path": "logs/run-development-20261001-235121-414380/result.json"}, {"base": "repo", "path": "docs/running-development.md"}]},
+        {"id": "dev-crash", "title": "定位并修复读取 0x0000000C 的访问异常", "status": "pending", "note": "线程 0xF8000124 访问异常，退出码 0xC0000005；先捕获故障 PC/栈/guest 上下文，再核实根因。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}]},
         {"id": "menu-frame", "title": "菜单与首帧显示", "status": "pending", "note": "需实际画面与运行日志。", "evidence": []},
         {"id": "input-audio", "title": "控制器输入与音频", "status": "pending", "note": "需可重现交互和声音检查。", "evidence": []},
         {"id": "mission-save", "title": "任务、场景切换与存档", "status": "pending", "note": "需实际任务流程和读写存档验证。", "evidence": []}

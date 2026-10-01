@@ -4,10 +4,11 @@ param(
     [string]$OutputPath = "$PSScriptRoot/../config/map-functions.toml"
 )
 $ErrorActionPreference = 'Stop'
-# Import only unresolved destinations validated as function starts by the MAP.
+# Import analysis/runtime destinations validated as function starts by the MAP.
 # MAP does not contain reliable function lengths: leave size unset for discovery.
-$targets = [regex]::Matches((Get-Content -LiteralPath $LogPath -Raw), '0x([0-9A-Fa-f]{8}) from 0x[0-9A-Fa-f]{8}(?::|\s|$)') |
-    ForEach-Object { $_.Groups[1].Value.ToUpperInvariant() } | Sort-Object -Unique
+$targetPattern = '(?:0x(?<Target>[0-9A-Fa-f]{8}) from 0x[0-9A-Fa-f]{8}(?::|\s|$)|invalid or unregistered function at guest address 0x(?<Target>[0-9A-Fa-f]{8})(?:\s|$))'
+$targets = [regex]::Matches((Get-Content -LiteralPath $LogPath -Raw), $targetPattern) |
+    ForEach-Object { $_.Groups['Target'].Value.ToUpperInvariant() } | Sort-Object -Unique
 if (!$targets) { throw 'No unresolved call destinations found.' }
 $symbols = @{}
 foreach ($line in Get-Content -LiteralPath $MapPath) {

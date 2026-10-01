@@ -1,0 +1,6 @@
+# MAP-validated function entry seeds for ReXGlue v0.10.0.
+# No guessed lengths; analyzer discovers the function bodies.
+[functions]
+# ?QueryInterface@CEffectManager@XAUDIO@@UAAXPAPAUIXAudioEffectManager@@@Z
+# ?QueryInterface@CFrameBuffer@XAUDIO@@UAAXPAPAUIXAudioFrameBuffer@@@Z
+"0x82546298" = {}

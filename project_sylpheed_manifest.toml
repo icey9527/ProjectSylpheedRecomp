@@ -8,4 +8,4 @@ game_root = "../assets"
 [entrypoint]
 file_path = "../assets/Xacalite_ScriptTeam.exe"
 out_directory_path = "generated/xacalite_scriptteam"
-includes = ["config/map-functions.toml", "config/catch-boundaries.toml"]
+includes = ["config/map-functions.toml", "config/catch-boundaries.toml", "config/runtime-functions.toml"]
