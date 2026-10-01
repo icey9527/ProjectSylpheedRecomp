@@ -3,6 +3,10 @@
 使用 ReXGlue v0.10.0 的 Project Sylpheed Xbox 360 静态重编译初始工程。
 已完成 Windows x64 Debug 宿主编译与链接，尚未验证游戏运行。
 
+双击 `Start-Progress.bat` 打开本地实时进度面板（Python 3.11+，无需额外依赖）。
+显示实际 Git 提交、当前阶段、文件中的验收清单完成率、外层计划与 AI 交接，每 5 秒刷新。
+详细说明见 [进度面板](docs/progress-dashboard.md)。
+
 ## 本地目录
 
 将仓库克隆到工作区的 `repo/`，在同级 `assets/` 放置自己的游戏输入：
@@ -75,6 +79,8 @@ cmake --build --preset win-amd64-debug
 - [分阶段实施路线](docs/roadmap.md)
 - [首次编译的异常处理边界修复](docs/build-fixes.md)
 - [三版本比较、符号基线与运行阶段](docs/versions.md)
+- [双版本修复、调试能力与新增功能](docs/version-maintenance.md)
+- [本地进度面板与验收记录维护](docs/progress-dashboard.md)
 
 快速查询：`python scripts/symbols.py query TextObj`。完整索引生成命令：`python scripts/symbols.py build`。
 手写宿主代码位于 `src/app/`；后续补丁按职责分模块，生成代码保持由 ReXGlue 管理。

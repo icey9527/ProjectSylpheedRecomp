@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "project": "Project Sylpheed Recomp",
+  "headline": "开发版宿主已编译，正在准备首次游戏加载",
+  "scope": "当前验收清单完成率；所有验收项等权。不是可玩程度、工时比例或发布日期预测。新增任务会改变分母。",
+  "updated_at": "2026-10-01",
+  "current_task": "dev-paths",
+  "next_tasks": ["dev-paths", "dev-load", "float-semantics", "pdb-identity", "retail-entries"],
+  "versions": [
+    {"name": "开发版", "role": "当前诊断基线 / 符号参考", "note": "保留原输入和已有调试能力；游戏调试菜单与实际可用性待验证。"},
+    {"name": "零售版", "role": "最终行为与内容目标", "note": "独立地址与配置；修复按功能迁移，并保留开发版对应实现。"},
+    {"name": "试玩版", "role": "仅参考，退出日常管线", "note": "仅在难以定位问题且具有具体收益时取用；不建立常规构建/运行任务。"}
+  ],
+  "stages": [
+    {
+      "id": "foundation", "title": "工作区与工具链", "description": "让每次修改可追踪、可重现、可交接。",
+      "tasks": [
+        {"id": "workspace", "title": "仓库边界与提交规则", "status": "done", "verified_at": "2026-10-01", "note": "游戏原件、计划、AI 交接留外层；修改已使用 Git 提交推送。", "evidence": [{"base": "repo", "path": "docs/contributing.md"}, {"base": "workspace", "path": "AGENTS.md"}]},
+        {"id": "toolchain", "title": "Windows x64 工具链与完整 SDK", "status": "done", "verified_at": "2026-10-01", "note": "Clang、MSVC、Windows SDK、CMake/Ninja 已实际用于构建。", "evidence": [{"base": "workspace", "path": "logs/configure-win-amd64-debug.log"}, {"base": "repo", "path": "scripts/Build.ps1"}]},
+        {"id": "versions", "title": "版本隔离与资源比较", "status": "done", "verified_at": "2026-10-01", "note": "开发版/零售版独立；试玩版只保留历史比较和参考价值。", "evidence": [{"base": "workspace", "path": "logs/three-version-comparison.json"}, {"base": "repo", "path": "docs/versions.md"}]}
+      ]
+    },
+    {
+      "id": "analysis", "title": "开发版分析与符号", "description": "已完成部分修复，语义与身份调查继续推进。",
+      "tasks": [
+        {"id": "dev-codegen", "title": "补充 44 个入口并完成代码生成", "status": "done", "verified_at": "2026-10-01", "note": "入口来自开发版 MAP/PDB；生成未解析调用致命占位检查通过。", "evidence": [{"base": "repo", "path": "config/map-functions.toml"}, {"base": "workspace", "path": "logs/codegen-catch-boundaries-console.txt"}]},
+        {"id": "symbol-index", "title": "建立名字、地址与生成位置索引", "status": "done", "verified_at": "2026-10-01", "note": "生成函数仍为 sub_ADDRESS；789 条 MAP 记录尚未定位，不等于符号已全量恢复。", "evidence": [{"base": "workspace", "path": "symbols/functions.summary.json"}, {"base": "workspace", "path": "symbols/functions.csv"}]},
+        {"id": "catch-bounds", "title": "修复 17 个终止重抛 funclet 边界", "status": "done", "verified_at": "2026-10-01", "note": "按 _CxxThrowException 调用限制扫描；函数内 goto 检查通过。", "evidence": [{"base": "repo", "path": "config/catch-boundaries.toml"}, {"base": "repo", "path": "docs/build-fixes.md"}]},
+        {"id": "float-semantics", "title": "核实 30 条 float16_4 指令警告", "status": "pending", "note": "首地址 0x82526328；需对应 PPC 指令与运行时语义证据。", "evidence": [{"base": "workspace", "path": "logs/codegen-catch-boundaries.log"}]},
+        {"id": "pdb-identity", "title": "核对 XEX / PDB 严格身份及符号缺口", "status": "pending", "note": "加载镜像 CodeView GUID/age 尚未核对；不能用 MAP/PDB 位置匹配替代身份认证。", "evidence": [{"base": "workspace", "path": "symbols/functions.summary.json"}]}
+      ]
+    },
+    {
+      "id": "host", "title": "Windows 宿主构建", "description": "宿主编译通过与游戏运行通过分开验收。",
+      "tasks": [
+        {"id": "debug-build", "title": "x64 Debug 编译与链接", "status": "done", "verified_at": "2026-10-01", "note": "Windows EXE machine=0x8664；尚不能据此声称游戏可运行。", "evidence": [{"base": "workspace", "path": "logs/build-win-amd64-debug.log"}, {"base": "repo", "path": "out/build/win-amd64-debug/project_sylpheed.exe"}]},
+        {"id": "runtime-dlls", "title": "部署运行时与 xenos GPU 插件", "status": "done", "verified_at": "2026-10-01", "note": "runtime / Tracy / xenos DLL 已部署，插件与固定 SDK hash 对照完成。", "evidence": [{"base": "workspace", "path": "plans/2026-10-01-first-host-build.md"}, {"base": "workspace", "path": "logs/build-win-amd64-debug.log"}]},
+        {"id": "release-build", "title": "验证 x64 Release 构建", "status": "pending", "note": "尚未验证；宿主 Release 不会把开发版游戏变成零售版。", "evidence": []}
+      ]
+    },
+    {
+      "id": "dev-runtime", "title": "首次加载与基本运行", "description": "下一阶段重点：取得实际游戏加载日志。",
+      "tasks": [
+        {"id": "dev-paths", "title": "配置开发版资源与虚拟镜像路径", "status": "in_progress", "note": "目录已提供；需配置 game_data_root、Xacalite_ScriptTeam.exe 的虚拟路径和 xenos。", "evidence": [{"base": "repo", "path": "src/app/project_sylpheed_app.h"}]},
+        {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "pending", "note": "尚无实际游戏加载成功证据；SDK 的资源路径提示不算游戏启动。", "evidence": []},
+        {"id": "menu-frame", "title": "菜单与首帧显示", "status": "pending", "note": "需实际画面与运行日志。", "evidence": []},
+        {"id": "input-audio", "title": "控制器输入与音频", "status": "pending", "note": "需可重现交互和声音检查。", "evidence": []},
+        {"id": "mission-save", "title": "任务、场景切换与存档", "status": "pending", "note": "需实际任务流程和读写存档验证。", "evidence": []}
+      ]
+    },
+    {
+      "id": "retail", "title": "零售版目标与修复迁移", "description": "借助开发版理解功能，逐项验证零售对应位置。",
+      "tasks": [
+        {"id": "retail-entries", "title": "核实零售版 12 个未解析目标", "status": "pending", "note": "22 条调用涉及 12 个目标；原始分析未套开发版符号或配置。", "evidence": [{"base": "workspace", "path": "logs/retail-probe.log"}]},
+        {"id": "retail-build", "title": "独立零售配置、生成与编译", "status": "pending", "note": "地址和生成目录独立，不能直接复制开发版修复配置。", "evidence": []},
+        {"id": "function-map", "title": "建立关键功能跨版本对应记录", "status": "pending", "note": "记录两版镜像 hash、地址、名字线索、调用/数据证据和置信度。", "evidence": []},
+        {"id": "retail-runtime", "title": "零售资源与主要游戏流程验证", "status": "pending", "note": "以零售行为为最终目标，需实际加载和场景证据。", "evidence": []}
+      ]
+    },
+    {
+      "id": "maintenance", "title": "调试能力与交付质量", "description": "保留可维护的代码层次和可复现验证。",
+      "tasks": [
+        {"id": "debug-features", "title": "清点并验证开发版调试功能", "status": "pending", "note": "原开发镜像保留；有哪些调试模式、菜单或热键及是否可用仍待运行确认。", "evidence": []},
+        {"id": "module-patches", "title": "实际补丁按职责和版本组织", "status": "pending", "note": "目录规则已写；有真实功能补丁后验证接入，避免手改或重排 generated。", "evidence": [{"base": "repo", "path": "docs/architecture.md"}]},
+        {"id": "regressions", "title": "关键场景的可重现回归检查", "status": "pending", "note": "已通过场景在迁移/改功能后仍需复查。", "evidence": []},
+        {"id": "delivery", "title": "稳定运行与启动说明验收", "status": "pending", "note": "验证干净环境启动、性能及稳定性；分发工程不包含游戏原件。", "evidence": []}
+      ]
+    }
+  ]
+}
