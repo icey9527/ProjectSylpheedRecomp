@@ -12,7 +12,7 @@ include(generated/rexglue.cmake)
 
 # Sources
 set(PROJECTSYLPHEED_SOURCES
-    src/main.cpp
+    src/app/main.cpp
 )
 
 if(WIN32)

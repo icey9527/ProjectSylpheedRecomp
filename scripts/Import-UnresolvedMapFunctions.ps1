@@ -13,13 +13,15 @@ $symbols = @{}
 foreach ($line in Get-Content -LiteralPath $MapPath) {
     if ($line -match '^\s+[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\S+)\s+([0-9a-fA-F]{8})\s+f\s') {
         $address = $Matches[2].ToUpperInvariant()
-        if (!$symbols.ContainsKey($address)) { $symbols[$address] = $Matches[1] }
+        $symbolName = $Matches[1]
+        if (!$symbols.ContainsKey($address)) { $symbols[$address] = @() }
+        if ($symbols[$address] -cnotcontains $symbolName) { $symbols[$address] += $symbolName }
     }
 }
 $lines = @('# MAP-validated function entry seeds for ReXGlue v0.10.0.', '# No guessed lengths; analyzer discovers the function bodies.', '[functions]')
 foreach ($address in $targets) {
     if (!$symbols.ContainsKey($address)) { throw "Destination 0x$address is not a MAP function start." }
-    $lines += "# $($symbols[$address])"
+    foreach ($symbolName in ($symbols[$address] | Sort-Object)) { $lines += "# $symbolName" }
     $lines += "`"0x$address`" = {}"
 }
 [IO.File]::WriteAllLines([IO.Path]::GetFullPath($OutputPath), $lines, [Text.UTF8Encoding]::new($false))

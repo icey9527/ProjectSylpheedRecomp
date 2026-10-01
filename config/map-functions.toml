@@ -3,8 +3,10 @@
 [functions]
 # XapiFiberSwapContext
 "0x8233AB90" = {}
+# ??_ECRouterEffect@XAUDIO@@UAAPAXI@Z
 # ??_GCRouterEffect@XAUDIO@@UAAPAXI@Z
 "0x8254F0F0" = {}
+# ?SetParam@CPCMSourceEffect@XAUDIO@@UAAJEEPBTXAUDIOFXPARAM@@@Z
 # ?SetParam@CXMASourceEffect@XAUDIO@@UAAJEEPBTXAUDIOFXPARAM@@@Z
 "0x82553608" = {}
 # ?IsShow@TextObj@Lib2D@@UBAHXZ

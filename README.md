@@ -21,7 +21,9 @@ workspace/
 ```
 
 源码、manifest、分析修复和脚本使用 Git 管理。游戏输入、符号原件、生成代码和构建产物不纳入仓库。
-PDB 保留供后续调查；本阶段没有自动导入 PDB。
+本地符号索引已读取 MAP 和 PDB 公共/模块函数及标签，并连接生成代码位置。
+生成函数仍使用地址名字，符号名字通过索引查询；没有将 PDB 全量灌入生成器。
+原始符号和完整索引留在仓库外层。
 
 ## 代码生成
 
@@ -32,6 +34,7 @@ PDB 保留供后续调查；本阶段没有自动导入 PDB。
 ```
 
 `generated/` 可重新生成，不直接修改。官方 init 生成的 CMakeLists、presets 和宿主入口保存在仓库中。
+Codegen.ps1 默认保存外层日志、检查未解析调用致命占位，并在有 Python/MAP/PDB 时刷新符号索引。
 
 ## 分析修复
 
@@ -57,7 +60,19 @@ cmake --preset win-amd64-debug -DCMAKE_PREFIX_PATH="<SDK安装目录>"
 cmake --build --preset win-amd64-debug
 ```
 
-本次初始化环境 PATH 未找到 CMake、Ninja 和 Clang，宿主构建尚未执行。
+本机有 VS 2022 Build Tools，但尚缺 C++ 工具集、Windows SDK、Clang、CMake、Ninja 和完整 ReXGlue 开发包。
+宿主构建尚未执行；现有 32 位 TDM-GCC 不作为本项目编译器。
+
+## 项目文档
+
+- [Windows 安装与编译入门](docs/building-windows.md)
+- [符号对应、验证范围与查询方法](docs/symbols.md)
+- [代码结构与模块目录规则](docs/architecture.md)
+- [修改、返工、验证和 Git 提交规则](docs/contributing.md)
+- [分阶段实施路线](docs/roadmap.md)
+
+快速查询：`python scripts/symbols.py query TextObj`。完整索引生成命令：`python scripts/symbols.py build`。
+手写宿主代码位于 `src/app/`；后续补丁按职责分模块，生成代码保持由 ReXGlue 管理。
 
 最新验证：codegen 成功，生成 269 个文件；生成 C++ 中未解析调用的致命占位代码为 0。
 仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 的指令语义；宿主编译和游戏运行尚未验证。

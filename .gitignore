@@ -15,3 +15,6 @@
 *.obj
 *.lib
 *.log
+__pycache__/
+*.pyc
+/symbols/
