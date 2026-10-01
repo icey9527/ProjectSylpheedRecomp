@@ -5,9 +5,11 @@ foreach ($tool in @('rexglue.exe', 'clang++', 'cmake', 'ninja')) {
     $command = Get-Command $tool -ErrorAction SilentlyContinue
     if ($command) {
         Write-Host "[OK] $tool : $($command.Source)"
-        & $command.Source --version | Select-Object -First 1
+        $versionOutput = & $command.Source --version
+        $versionExitCode = $LASTEXITCODE
+        $versionOutput | Select-Object -First 1
         # v0.10.0 rexglue prints its version but returns 1; presence is sufficient here.
-        if ($LASTEXITCODE -ne 0 -and $tool -ne 'rexglue.exe') { $missing.Add("$tool --version failed") }
+        if ($versionExitCode -ne 0 -and $tool -ne 'rexglue.exe') { $missing.Add("$tool --version failed") }
     } else {
         Write-Host "[MISSING] $tool"
         $missing.Add($tool)

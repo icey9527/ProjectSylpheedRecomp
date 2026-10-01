@@ -1,7 +1,7 @@
 # Project Sylpheed Recomp
 
 使用 ReXGlue v0.10.0 的 Project Sylpheed Xbox 360 静态重编译初始工程。
-当前目标是完成代码生成及宿主构建准备，尚未验证游戏运行。
+已完成 Windows x64 Debug 宿主编译与链接，尚未验证游戏运行。
 
 ## 本地目录
 
@@ -55,13 +55,16 @@ Codegen.ps1 默认保存外层日志、检查未解析调用致命占位，并�
 还需要包含开发文件与 CMake package 的完整 ReXGlue SDK、CMake、Ninja、Clang 和 Windows 开发环境。
 通过本地 CMakeUserPresets.json 或 CMAKE_PREFIX_PATH 配置 SDK，不将本机绝对路径写进共享配置。
 
+日常编译入口：`./scripts/Build.ps1`。脚本自动加载 VS x64 环境；优先发现外层 tools 中的完整 SDK，
+其他位置可用 `-SdkRoot` 指定。详细步骤见下面的 Windows 教程。
+
 ```powershell
 cmake --preset win-amd64-debug -DCMAKE_PREFIX_PATH="<SDK安装目录>"
 cmake --build --preset win-amd64-debug
 ```
 
-本机有 VS 2022 Build Tools，但尚缺 C++ 工具集、Windows SDK、Clang、CMake、Ninja 和完整 ReXGlue 开发包。
-宿主构建尚未执行；现有 32 位 TDM-GCC 不作为本项目编译器。
+本机安装后的工具已核实：Clang 19.1.5、CMake 3.31.6、Ninja 1.12.1、MSVC 14.44、Windows SDK 10.0.26100.0。
+完整官方 SDK 已补齐，CMake 配置通过。现有 32 位 TDM-GCC 不作为本项目编译器。
 
 ## 项目文档
 
@@ -70,9 +73,12 @@ cmake --build --preset win-amd64-debug
 - [代码结构与模块目录规则](docs/architecture.md)
 - [修改、返工、验证和 Git 提交规则](docs/contributing.md)
 - [分阶段实施路线](docs/roadmap.md)
+- [首次编译的异常处理边界修复](docs/build-fixes.md)
 
 快速查询：`python scripts/symbols.py query TextObj`。完整索引生成命令：`python scripts/symbols.py build`。
 手写宿主代码位于 `src/app/`；后续补丁按职责分模块，生成代码保持由 ReXGlue 管理。
 
 最新验证：codegen 成功，生成 269 个文件；生成 C++ 中未解析调用的致命占位代码为 0。
-仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 的指令语义；宿主编译和游戏运行尚未验证。
+首次构建还修复了 17 个重新抛出异常的 catch funclet 边界，并检查函数内 goto 标签完整性。
+Windows x64 Debug 编译、链接已通过；输出为 `out/build/win-amd64-debug/project_sylpheed.exe`。
+仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 指令语义，游戏运行尚未验证。

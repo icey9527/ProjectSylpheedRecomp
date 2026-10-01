@@ -17,11 +17,12 @@ v0.10.0 的 SDK CMake 明确要求 Clang；官方 Windows 自动构建使用 LLV
 
 ## 本机检查结果（2026-10-01）
 
-已安装 VS 2022 Build Tools，但 vswhere 未发现 VC x64/x86 C++ 工具集。
-未找到 Windows SDK 的头文件与 x64 系统库。PATH 未找到 clang++、CMake、Ninja。
+用户安装 C++ 工作负载后已确认 VS 2022 Build Tools 17.14、MSVC 14.44、Windows SDK 10.0.26100.0，
+以及 VS 内的 Clang 19.1.5（x86_64-pc-windows-msvc）、CMake 3.31.6、Ninja 1.12.1。
+普通终端不一定包含 VS 工具目录；构建脚本会为当前进程加载 x64 开发环境，不修改系统 PATH。
 现有 GCC 目标为 `mingw32`，不作为本工程的工具链。
-ReXGlue 安装目录目前只有 `bin/`，还不是可以链接的完整开发 SDK。
-这些结果来自当前发现环境；安装后在新的开发者终端重新检查。
+完整官方 SDK 已补齐到仓库外层 `tools/rexglue-sdk-0.10.0-win-amd64/win-amd64/`，含开发文件与依赖。
+原 F 盘的 bin-only 安装保留。实际工具和 SDK 发现仍以检查脚本及 CMake 结果为准。
 
 ## 安装步骤
 
@@ -40,13 +41,31 @@ ReXGlue 安装目录目前只有 `bin/`，还不是可以链接的完整开发 S
    至少应有 `include/rex/rex_app.h`、`lib/cmake/rexglue/rexglueConfig.cmake`、导入库及依赖配置。
    仅有 rexglue.exe 和 DLL 可用于生成，不足以编译项目；不要从零散来源随意凑库。
 
-本次只检查并记录，没有替你安装或修改系统环境。
+上述系统工具由用户安装；首次构建时补齐的是官方 SDK 开发包，没有修改系统 PATH。
 
 ## 安装后怎样编译
 
-打开 **x64 Native Tools Command Prompt for VS 2022**，在其中输入 `powershell` 或 `pwsh`。
-这样微软工具集环境会传给 PowerShell；普通终端仅能找到文件不一定具备链接环境。
-确认 `clang++ --version` 的目标是 Windows x64/MSVC，而不是 MinGW。
+日常编译可以直接在 PowerShell 执行：
+
+```powershell
+cd E:\ProjectSylpheedRecomp\repo
+./scripts/Build.ps1
+```
+
+脚本自动加载 VS x64 工具、检查完整 SDK、配置 CMake 并以两个并行任务编译 Debug。
+生成标签检查通过后，有 Python 和本地 MAP/PDB 时还会刷新符号索引。
+默认优先使用上面外层 tools 中的完整 SDK；其他位置通过 `-SdkRoot` 或进程环境变量
+`REXGLUE_SDK_ROOT` 指定。可用 `-Configuration Release` 或 `-Parallel 2` 调整。
+Windows PowerShell 5.1 和 PowerShell 7 均采用同一套脚本；执行策略阻止脚本时可用
+`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Build.ps1`，只作用于该进程。
+
+完整原生 configure/build 输出分别保存到外层 `logs/configure-win-amd64-debug.log`、
+`logs/compile-win-amd64-debug.log`，过程摘要位于 `logs/build-win-amd64-debug.log`。
+日志采用追加模式保留返工记录。
+
+需要手动控制时，先开 **x64 Native Tools Command Prompt for VS 2022**，在里面进入 PowerShell。
+还可在现有 PowerShell 点源 `. ./scripts/Initialize-WindowsToolchain.ps1`，然后执行以下命令。
+确认 clang++ 的目标是 Windows x64/MSVC，而不是 MinGW。
 
 ```powershell
 cd E:\ProjectSylpheedRecomp\repo
@@ -64,6 +83,18 @@ cmake --build --preset win-amd64-debug
 SDK 提供 Debug/Release/RelWithDebInfo 对应的库和 DLL，保持配置一致。
 由 SDK CMake 配置处理依赖和运行时部署，不要手动把不同版本 DLL 混进构建目录。
 SDK 配置会查找 fmt、spdlog、utf8cpp、SDL3 等包；完整包应携带兼容依赖，配置失败时根据报错定位。
+首次编译遇到的 catch funclet 边界问题及配置修复见 [build-fixes.md](build-fixes.md)。
+
+## 当前构建结果与运行限制
+
+Windows x64 Debug 编译和链接已通过。CMake 会部署 runtime、Tracy 及运行时加载的 xenos GPU 插件。
+插件需要明确请求 `GPU_PLUGINS xenos`，因为它不是链接依赖，自动扫描链接 DLL 不会把它复制出来。
+
+构建通过不代表游戏启动正确：原始资源还需准备并指定 `--game_data_root`，
+当前默认宿主加载 `game:\\default.xex`，而分析输入叫 Xacalite_ScriptTeam.exe，
+还需核对正确的游戏镜像路径。GPU 后端运行时用 `--gpu_plugin=xenos` 选择。
+这些是下一阶段配置和运行验证的任务，不能仅靠双击当前 EXE 判断重编译是否正确。
+SDK 宿主没有工具版 rexglue 的 `--help` 退出行为，不能用该参数作为无窗口 smoke test。
 
 ## 若只有 SDK 源码
 

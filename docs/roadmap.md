@@ -6,12 +6,15 @@
 - 44 个 MAP/PDB 公共符号匹配的函数入口补充，codegen 可完成。
 - 地址、MAP/PDB 名称、对象归属及生成位置的本地查询索引。
 - 手写宿主代码归入 `src/app/`，并建立提交及交接规则。
+- Windows x64 工具链与完整 SDK 已确认，Debug 宿主编译/链接通过。
+- 17 个终止重抛异常的 catch funclet 边界修复，生成局部 goto 标签检查通过。
 
-## 第一步：完成开发环境并首次构建
+## 第一步：完成开发环境并首次构建（已完成 Debug）
 
 按 building-windows.md 配置 C++ Build Tools、Windows SDK、Clang、CMake、Ninja 和完整 ReXGlue 开发包。
 验证每个工具的版本、x64 目标、SDK CMake package 及依赖；随后 configure/build。
 验收：有可重复构建命令与构建日志，明确输出位置及剩余诊断。
+日常入口为 `scripts/Build.ps1`，构建日志留外层 logs；Release 尚未验证。
 
 ## 第二步：解决生成语义与符号身份问题
 

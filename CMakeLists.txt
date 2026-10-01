@@ -21,4 +21,5 @@ else()
     add_executable(project_sylpheed ${PROJECTSYLPHEED_SOURCES})
 endif()
 
-rexglue_setup_target(project_sylpheed)
+# The GPU plugin is loaded at runtime, so request explicit DLL deployment.
+rexglue_setup_target(project_sylpheed GPU_PLUGINS xenos)

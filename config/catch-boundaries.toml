@@ -1,0 +1,38 @@
+# Terminal rethrow catch funclets: stop after bl _CxxThrowException (0x82832618).
+# Ends are next-instruction addresses observed in the PPC emission, not adjacent-symbol guesses.
+# MAP catch names and PDB module labels agree at every start. See docs/build-fixes.md.
+[functions]
+# __catch$156217 / GamePart_MovieTheater.obj
+"0x821EE4B8" = { end = 0x821EE504 }
+# __catch$158121 / GamePart_Selector.obj
+"0x821F5AB4" = { end = 0x821F5B00 }
+# __catch$166190 / commu_tbl_text.obj
+"0x8227A2F4" = { end = 0x8227A340 }
+# __catch$266772 / StageScriptPhase.obj
+"0x822DE56C" = { end = 0x822DE5B0 }
+# __catch$183734 / SaveLoad.obj
+"0x822FB1D4" = { end = 0x822FB220 }
+# __catch$186614 / SaveLoad.obj
+"0x822FB680" = { end = 0x822FB6CC }
+# __catch$187326 / HangarUI.obj
+"0x8231468C" = { end = 0x823146D8 }
+# __catch$188509 / HangarUI.obj
+"0x82314A84" = { end = 0x82314AD0 }
+# __catch$172671 / Leaderboard.obj
+"0x8232DAB0" = { end = 0x8232DAFC }
+# __catch$175035 / Leaderboard.obj
+"0x8232E2C8" = { end = 0x8232E314 }
+# __catch$229987 / SilpheedXenon:CStageSpecification.obj
+"0x826C4788" = { end = 0x826C47D4 }
+# __catch$231280 / SilpheedXenon:CStageSpecification.obj
+"0x826C4B80" = { end = 0x826C4BCC }
+# __catch$237344 / SilpheedXenon:CStageSpecification.obj
+"0x826C62A8" = { end = 0x826C62F4 }
+# __catch$188284 / SilpheedXenon:C2DResourceManager.obj
+"0x826D8614" = { end = 0x826D8660 }
+# __catch$210988 / SilpheedXenon:CUnitManager.obj
+"0x826F8F40" = { end = 0x826F8F8C }
+# __catch$114279 / 2DGrpLib:BitmapReader.obj
+"0x827B3F20" = { end = 0x827B3F6C }
+# __catch$135468 / ISL_Release:ISL_Engine.obj
+"0x82807148" = { end = 0x82807194 }
