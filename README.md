@@ -74,7 +74,7 @@ cmake --build --preset win-amd64-debug
 - [修改、返工、验证和 Git 提交规则](docs/contributing.md)
 - [分阶段实施路线](docs/roadmap.md)
 - [首次编译的异常处理边界修复](docs/build-fixes.md)
-- [开发版基线、代码规模与运行阶段](docs/versions.md)
+- [三版本比较、符号基线与运行阶段](docs/versions.md)
 
 快速查询：`python scripts/symbols.py query TextObj`。完整索引生成命令：`python scripts/symbols.py build`。
 手写宿主代码位于 `src/app/`；后续补丁按职责分模块，生成代码保持由 ReXGlue 管理。
