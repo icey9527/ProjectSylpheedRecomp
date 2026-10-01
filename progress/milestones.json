@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "project": "Project Sylpheed Recomp",
-  "headline": "开发版已修复 Fiber 崩溃并显示调试菜单；下一步验证输入与场景",
+  "headline": "开发版已支持窗口、键盘映射与配置双击启动；菜单交互和异常退出仍待核验",
   "scope": "开发版当前验收清单等权完成率；零售四项已按用户要求无限期延后并移出当前清单。不是可玩程度、工时比例或发布日期预测。",
   "updated_at": "2026-10-02",
   "current_task": "input-audio",
@@ -45,7 +45,7 @@
         {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "done", "verified_at": "2026-10-01", "note": "首次加载与实际初始化已验证；后续修复 Fiber 崩溃后显示调试菜单，见 dev-crash/menu-frame。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}, {"base": "workspace", "path": "logs/run-development-20261001-235121-414380/result.json"}, {"base": "repo", "path": "docs/running-development.md"}]},
         {"id": "dev-crash", "title": "定位并修复读取 0x0000000C 的访问异常", "status": "done", "note": "捕获 DeleteFiber(0) 的 0x82338978 读取；接入 SDK 原生 Fiber 五函数，三次 30 秒重测均无原异常，并显示调试菜单。", "evidence": [{"base": "repo", "path": "config/fiber-rexcrt.toml"}, {"base": "workspace", "path": "logs/crash-probe-20261002-002909/capture.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/result.json"}, {"base": "repo", "path": "docs/fiber-fix.md"}], "verified_at": "2026-10-02"},
         {"id": "menu-frame", "title": "菜单与首帧显示", "status": "done", "note": "PrintWindow 捕获真实 GP_TEST 调试菜单：Test UI、Mission Select、Tutorial、Model Viewer 等。只验收菜单首帧，未验收任务玩法。", "evidence": [{"base": "workspace", "path": "logs/game-client-20261002-004232.png"}, {"base": "workspace", "path": "logs/game-client-20261002-004232.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/runtime.log"}], "verified_at": "2026-10-02"},
-        {"id": "input-audio", "title": "控制器输入与音频", "status": "pending", "note": "需可重现交互和声音检查。", "evidence": []},
+        {"id": "input-audio", "title": "控制器输入与音频", "status": "in_progress", "note": "已接入 SDK 键盘映射、1280×720 窗口和 EXE 旁资源配置。自动界面观察失败且用户停止；交互与声音尚未验收。无参数运行有一次 0x80000003 退出，原因待定位。", "evidence": [{"base": "repo", "path": "docs/running-development.md"}, {"base": "workspace", "path": "logs/direct-start-window-keyboard/result.json"}, {"base": "workspace", "path": "logs/game-client-20261002-011739.json"}]},
         {"id": "mission-save", "title": "任务、场景切换与存档", "status": "pending", "note": "需实际任务流程和读写存档验证。", "evidence": []}
       ]
     },

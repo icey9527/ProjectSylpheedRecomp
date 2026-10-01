@@ -36,6 +36,7 @@ try {
     Invoke-BuildCommand -Command 'cmake' -Arguments @('--preset', $preset, "-DCMAKE_PREFIX_PATH=$SdkRoot") -LogFile "$logDirectory/configure-$preset.log"
     Invoke-BuildCommand -Command 'cmake' -Arguments @('--build', '--preset', $preset, '--parallel', "$Parallel") -LogFile "$logDirectory/compile-$preset.log"
     & "$PSScriptRoot/Check-GeneratedCode.ps1"
+    & "$PSScriptRoot/Configure-Startup.ps1" -Configuration $Configuration
     $python = Get-Command python -ErrorAction SilentlyContinue
     if ($python -and (Test-Path '../assets/Xacalite_ScriptTeam.map') -and
         (Test-Path '../assets/Xacalite_ScriptTeam.pdb')) {

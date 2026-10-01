@@ -5,6 +5,10 @@ Windows x64 Debug 宿主已编译，开发版已实际显示 `GP_TEST` 调试菜
 XAudio 缺失入口与 Fiber 访问异常已修复；三次 30 秒受控测试通过原崩溃点。
 当前仅推进开发版，零售无限期延后。菜单操作、实际声音播放、3D 任务和存档尚未验收。
 
+日常可双击构建目录中的 `project_sylpheed.exe`；同目录 `project_sylpheed.toml` 配置资源路径，
+默认 1280×720 窗口和键盘手柄映射。Enter/空格确认、Backspace 返回、方向键导航。
+配置和验证限制见 [运行说明](docs/running-development.md)。
+
 双击 `Start-Progress.bat` 打开本地实时进度面板（Python 3.11+，无需额外依赖）。
 显示实际 Git 提交、当前阶段、文件中的验收清单完成率、外层计划与 AI 交接，每 5 秒刷新。
 详细说明见 [进度面板](docs/progress-dashboard.md)。

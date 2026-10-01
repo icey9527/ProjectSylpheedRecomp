@@ -6,10 +6,15 @@
 
 #include <rex/rex_app.h>
 #include <rex/logging.h>
+#include "startup_config.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
   using rex::ReXApp::ReXApp;
+
+  void OnConfigurePaths(rex::PathConfig& paths) override {
+    sylpheed::ConfigureStartup(paths);
+  }
 
   static std::unique_ptr<rex::ui::WindowedApp> Create(
       rex::ui::WindowedAppContext& ctx) {

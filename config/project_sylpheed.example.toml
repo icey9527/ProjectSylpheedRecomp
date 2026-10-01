@@ -1,0 +1,23 @@
+# Copy beside project_sylpheed.exe as project_sylpheed.toml.
+# Use forward slashes. Relative paths are relative to the EXE directory.
+game_data_root = "game-data"
+fullscreen = false
+window_width = 1280
+window_height = 720
+video_mode_width = 1280
+video_mode_height = 720
+gpu_plugin = "xenos"
+allow_game_relative_writes = false
+mnk_mode = true
+mnk_mouse = false
+keybind_a = "Return,Space"
+keybind_b = "Backspace"
+keybind_start = "X"
+keybind_dpad_up = "Up"
+keybind_dpad_down = "Down"
+keybind_dpad_left = "Left"
+keybind_dpad_right = "Right"
+keybind_rstick_up = "Numpad8"
+keybind_rstick_down = "Numpad2"
+keybind_rstick_left = "Numpad4"
+keybind_rstick_right = "Numpad6"

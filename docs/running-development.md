@@ -2,6 +2,49 @@
 
 ## 怎样启动
 
+### 日常双击启动
+
+构建后直接双击 `out/build/win-amd64-debug/project_sylpheed.exe`。
+`Build.ps1` 自动创建 EXE 同目录的 `project_sylpheed.toml`，已有文件会保留。
+首次创建时从工作区 `assets/runtime.local.json` 读取资源目录；也可运行：
+
+```powershell
+./scripts/Configure-Startup.ps1 -GameDataRoot "<开发版完整资源目录>"
+```
+
+之后用文本编辑器修改 EXE 旁 TOML 中的 `game_data_root` 即可。使用正斜杠，
+例如 `game_data_root = "game-data"` 表示 EXE 旁的 game-data 目录。
+模板见 [project_sylpheed.example.toml](../config/project_sylpheed.example.toml)。
+不要修改资源包自身的 `config.ini`；游戏仍读取原来的资源配置。
+日常运行不需要 Python；默认用户数据放在 SDK 选择的系统用户目录，日志在 EXE 旁 `logs/`。
+可在 TOML 指定 `user_data_root`，缓存默认位于该用户目录的 `cache/`。
+命令行优先于 TOML；TOML 优先于宿主默认。相对路径统一以 EXE 目录为基准。
+宿主适配代码在 `src/app/startup_config.h`，没有改动生成游戏代码或 SDK。
+
+默认窗口 1280×720，模板同时指定 guest video mode 1280×720。
+`fullscreen = true` 可启用全屏；`window_width` / `window_height` 可改窗口大小，
+其他分辨率的画面比例与 UI 适配尚未验收。
+
+键盘通过 SDK 模拟手柄，窗口需要获得焦点：
+
+| 手柄功能 | 键盘 |
+| --- | --- |
+| 方向键 | ↑ ↓ ← → |
+| A（一般为确认） | Enter / 空格 |
+| B（一般为返回） | Backspace |
+| Start / Back | X / Tab 或 Z |
+| 左摇杆 / 按下 | WASD / F |
+| 右摇杆 / 按下 | 小键盘 8、2、4、6 / K |
+| X / Y | L / P |
+| 左右肩键 | 1 / 3 |
+| 左右扳机 | Q / E（也可 I / O） |
+
+鼠标摇杆保持关闭。每个游戏菜单采用哪种手柄按钮，仍以实际交互为准。
+这些是输入配置，不代表全部菜单、任务和声音已经通过验证。
+直接启动不会进行 Python 脚本的 SHA256 核对，必须使用匹配的开发版输入；诊断时优先使用下述受控脚本。
+
+### 受控验证
+
 先按 [Windows 构建说明](building-windows.md) 生成并编译。在仓库目录执行（Python 3.11+，无需 pip）：
 
 ```powershell
@@ -78,3 +121,13 @@ python scripts/run_development.py
 缓存设备拒绝/找不到文件、部分效果资源注册失败、`ShaderDumpxe:` 未映射是独立线索，尚非已确认崩溃原因。
 `dxcompiler.dll` 缺失日志指向调试反汇编不可用，也不能直接称渲染阻塞。
 菜单首帧已验证；控制器、实际声音播放、3D 任务和存档仍未验证。
+
+## 2026-10-02 窗口与启动适配验证
+
+Debug 增量编译/链接通过，重复构建保留已有 TOML。
+从其他工作目录启动宿主，不传资源参数，已进入游戏资源加载与渲染。
+本地窗口截图的客户区为 1280×720，并显示 Mission Select。
+Windows 自动观察失败（`FrameArrived timed out`、前台窗口未提供 PID），随后用户按 Esc 停止 Computer Use；
+自动化没有发送菜单按键，不将截图当成完整按键验收。
+一次无参数运行约 30 秒后返回 `0x80000003`，末尾没有明确故障栈，原因未定位；
+窗口配置交付不代表稳定性已完成。声音、任务、存档与该退出原因留待后续计划。
