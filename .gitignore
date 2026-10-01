@@ -1,0 +1,17 @@
+/generated/
+/out/
+/build/
+/.vs/
+/.vscode/
+/CMakeUserPresets.json
+/assets/
+/logs/
+*.exe
+*.xex
+*.pdb
+*.map
+*.iso
+*.dll
+*.obj
+*.lib
+*.log
