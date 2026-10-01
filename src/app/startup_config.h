@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <string_view>
+#include "game_config.h"
 
 namespace sylpheed {
 
@@ -54,6 +55,11 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   paths.update_data_root = resolve("update_data_root", paths.update_data_root);
   paths.cache_root = resolve("cache_root", paths.user_data_root / "cache");
   paths.metadata_root = resolve("metadata_root", paths.metadata_root);
+  // XTLGetLanguage reads this SDK flag via ExGetXConfigSetting. Keep explicit
+  // TOML/environment/CLI overrides, otherwise use the game's own default.
+  if (const auto language = ReadDefaultLanguage(paths.game_data_root)) {
+    DefaultFlag("user_language", std::to_string(*language));
+  }
 }
 
 }  // namespace sylpheed

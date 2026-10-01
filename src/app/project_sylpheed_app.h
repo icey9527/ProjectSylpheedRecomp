@@ -7,6 +7,7 @@
 #include <rex/rex_app.h>
 #include <rex/logging.h>
 #include "startup_config.h"
+#include "input_diagnostics.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -32,6 +33,22 @@ class ProjectSylpheedApp : public rex::ReXApp {
     REXLOG_INFO("SYLPHEED_STAGE image_loaded");
   }
 
+  void OnPostSetup() override {
+    REXLOG_INFO("SYLPHEED_CONFIG user_language={} mnk_mode={}",
+                rex::cvar::GetFlagByName("user_language"),
+                rex::cvar::GetFlagByName("mnk_mode"));
+    input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>(
+        static_cast<rex::input::InputSystem*>(runtime()->input_system()));
+    window()->AddInputListener(input_diagnostics_.get(), 1);
+  }
+
+  void OnShutdown() override {
+    if (input_diagnostics_) {
+      window()->RemoveInputListener(input_diagnostics_.get());
+      input_diagnostics_.reset();
+    }
+  }
+
   void OnPostLaunchModule(rex::system::XThread* thread) override {
     // SDK invokes this hook before resuming the guest thread. It is not a
     // claim that guest initialization or the first rendered frame succeeded.
@@ -48,4 +65,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
   // CreateAchievementNotificationDialog() override;
   // void OnShutdown() override {}
   // void OnConfigurePaths(rex::PathConfig& paths) override {}
+ private:
+  std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
 };

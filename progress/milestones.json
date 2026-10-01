@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "project": "Project Sylpheed Recomp",
-  "headline": "用户实测 UI 与音效可用；零售资源组合已加载，下一轮定位教程 abort",
+  "headline": "手柄与音效可用；INI 语言已接入，键盘事件缺口与教程 abort 留待续修",
   "scope": "开发版当前验收清单等权完成率；零售四项已按用户要求无限期延后并移出当前清单。不是可玩程度、工时比例或发布日期预测。",
   "updated_at": "2026-10-02",
-  "current_task": "mission-save",
-  "next_tasks": ["mission-save", "input-audio", "debug-features", "float-semantics", "pdb-identity"],
+  "current_task": "input-audio",
+  "next_tasks": ["input-audio", "mission-save", "debug-features", "float-semantics", "pdb-identity"],
   "versions": [
     {"name": "开发版", "role": "唯一当前开发与运行主线", "note": "调试菜单已显示，具体选项与玩法尚待验证；保留原输入和符号。"},
     {"name": "零售版", "role": "无限期延后，非当前目标", "note": "按用户选择可不实施；历史分析资料保留，移出当前验收清单。"},
@@ -45,7 +45,7 @@
         {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "done", "verified_at": "2026-10-01", "note": "首次加载与实际初始化已验证；后续修复 Fiber 崩溃后显示调试菜单，见 dev-crash/menu-frame。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}, {"base": "workspace", "path": "logs/run-development-20261001-235121-414380/result.json"}, {"base": "repo", "path": "docs/running-development.md"}]},
         {"id": "dev-crash", "title": "定位并修复读取 0x0000000C 的访问异常", "status": "done", "note": "捕获 DeleteFiber(0) 的 0x82338978 读取；接入 SDK 原生 Fiber 五函数，三次 30 秒重测均无原异常，并显示调试菜单。", "evidence": [{"base": "repo", "path": "config/fiber-rexcrt.toml"}, {"base": "workspace", "path": "logs/crash-probe-20261002-002909/capture.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/result.json"}, {"base": "repo", "path": "docs/fiber-fix.md"}], "verified_at": "2026-10-02"},
         {"id": "menu-frame", "title": "菜单与首帧显示", "status": "done", "note": "PrintWindow 捕获真实 GP_TEST 调试菜单：Test UI、Mission Select、Tutorial、Model Viewer 等。只验收菜单首帧，未验收任务玩法。", "evidence": [{"base": "workspace", "path": "logs/game-client-20261002-004232.png"}, {"base": "workspace", "path": "logs/game-client-20261002-004232.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/runtime.log"}], "verified_at": "2026-10-02"},
-        {"id": "input-audio", "title": "控制器输入与音频", "status": "in_progress", "note": "用户实测反馈多个 UI 交互与音效正确，已补充人工菜单/声音验证。窗口、键盘映射和配置启动已交付；全键位、任务中操作及音频覆盖仍需验收。", "evidence": [{"base": "repo", "path": "docs/running-development.md"}, {"base": "workspace", "path": "plans/2026-10-02-retail-resources-and-tutorial.md"}, {"base": "workspace", "path": "logs/game-client-20261002-011739.json"}]},
+        {"id": "input-audio", "title": "控制器输入与音频", "status": "in_progress", "note": "用户更正此前成功交互仅手柄；键盘全部无效。最新日志证明W/S与方向键到达玩家0状态，但菜单仍无反应；SDK keyboard keystroke队列缺口已确认，按用户要求明日续修。音效人工反馈正常，不代表全覆盖。", "evidence": [{"base": "repo", "path": "docs/language-and-input.md"}, {"base": "workspace", "path": "plans/2026-10-02-keyboard-language.md"}, {"base": "workspace", "path": "logs/sdk-input-probe.txt"}, {"base": "repo", "path": "out/build/win-amd64-debug/logs/project_sylpheed_022.log"}]},
         {"id": "mission-save", "title": "任务、场景切换与存档", "status": "in_progress", "note": "用户进入教程触发 Visual C++ abort 弹窗，尚无栈。按要求明日定位，不绕过异常。开发代码+零售资源短时加载通过，不代表教程/任务兼容。", "evidence": [{"base": "workspace", "path": "plans/2026-10-02-retail-resources-and-tutorial.md"}, {"base": "workspace", "path": "logs/retail-resource-load-20261002/result.json"}]}
       ]
     },
