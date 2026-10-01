@@ -93,7 +93,7 @@ Windows x64 Debug 编译和链接已通过。CMake 会部署 runtime、Tracy 及
 宿主已通过 OnLoadXexImage 选择开发镜像 Xacalite_ScriptTeam.exe。
 运行脚本检查开发镜像 SHA256，并设置资源目录、隔离用户数据、xenos 插件、日志和超时。
 使用方法及实际运行证据见 [开发版启动说明](running-development.md)。
-当前已加载并执行游戏初始化，但仍崩溃，菜单、画面、输入和声音播放尚未验收。
+当前已修复 Fiber 崩溃并显示开发调试菜单，见 [修复证据](fiber-fix.md)；输入、声音播放和任务仍待验收。
 构建通过或双击出现窗口不能证明重编译语义正确。
 SDK 宿主没有工具版 rexglue 的 `--help` 退出行为，不能用该参数作为无窗口 smoke test。
 

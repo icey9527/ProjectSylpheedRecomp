@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "project": "Project Sylpheed Recomp",
-  "headline": "开发版已执行到声音初始化与 GP_TEST；首个运行入口已修复，下一步定位访问异常",
-  "scope": "当前验收清单完成率；所有验收项等权。不是可玩程度、工时比例或发布日期预测。新增任务会改变分母。",
+  "headline": "开发版已修复 Fiber 崩溃并显示调试菜单；下一步验证输入与场景",
+  "scope": "开发版当前验收清单等权完成率；零售四项已按用户要求无限期延后并移出当前清单。不是可玩程度、工时比例或发布日期预测。",
   "updated_at": "2026-10-02",
-  "current_task": "dev-crash",
-  "next_tasks": ["dev-crash", "float-semantics", "pdb-identity", "menu-frame", "retail-entries"],
+  "current_task": "input-audio",
+  "next_tasks": ["input-audio", "mission-save", "debug-features", "float-semantics", "pdb-identity"],
   "versions": [
-    {"name": "开发版", "role": "当前诊断基线 / 符号参考", "note": "保留原输入和已有调试能力；游戏调试菜单与实际可用性待验证。"},
-    {"name": "零售版", "role": "最终行为与内容目标", "note": "独立地址与配置；修复按功能迁移，并保留开发版对应实现。"},
+    {"name": "开发版", "role": "唯一当前开发与运行主线", "note": "调试菜单已显示，具体选项与玩法尚待验证；保留原输入和符号。"},
+    {"name": "零售版", "role": "无限期延后，非当前目标", "note": "按用户选择可不实施；历史分析资料保留，移出当前验收清单。"},
     {"name": "试玩版", "role": "仅参考，退出日常管线", "note": "仅在难以定位问题且具有具体收益时取用；不建立常规构建/运行任务。"}
   ],
   "stages": [
@@ -23,7 +23,7 @@
     {
       "id": "analysis", "title": "开发版分析与符号", "description": "已完成部分修复，语义与身份调查继续推进。",
       "tasks": [
-        {"id": "dev-codegen", "title": "补充分析与运行入口并完成代码生成", "status": "done", "verified_at": "2026-10-01", "note": "原有 44 个入口及运行发现的 XAudio 0x82546298 均经开发版 MAP/PDB 核实；检查通过，30 条指令警告仍在。", "evidence": [{"base": "repo", "path": "config/map-functions.toml"}, {"base": "repo", "path": "config/runtime-functions.toml"}, {"base": "workspace", "path": "logs/codegen-runtime-entry.log"}]},
+        {"id": "dev-codegen", "title": "补充分析与运行入口并完成代码生成", "status": "done", "verified_at": "2026-10-02", "note": "原 44 + XAudio 入口修复保留；Fiber 五函数接入 SDK rexcrt，42 输出更新/227 未变，检查通过；30 条警告仍在。", "evidence": [{"base": "repo", "path": "config/map-functions.toml"}, {"base": "repo", "path": "config/runtime-functions.toml"}, {"base": "workspace", "path": "logs/codegen-runtime-entry.log"}, {"base": "repo", "path": "config/fiber-rexcrt.toml"}, {"base": "workspace", "path": "logs/codegen-fiber-rexcrt.log"}]},
         {"id": "symbol-index", "title": "建立名字、地址与生成位置索引", "status": "done", "verified_at": "2026-10-01", "note": "生成函数仍为 sub_ADDRESS；789 条 MAP 记录尚未定位，不等于符号已全量恢复。", "evidence": [{"base": "workspace", "path": "symbols/functions.summary.json"}, {"base": "workspace", "path": "symbols/functions.csv"}]},
         {"id": "catch-bounds", "title": "修复 17 个终止重抛 funclet 边界", "status": "done", "verified_at": "2026-10-01", "note": "按 _CxxThrowException 调用限制扫描；函数内 goto 检查通过。", "evidence": [{"base": "repo", "path": "config/catch-boundaries.toml"}, {"base": "repo", "path": "docs/build-fixes.md"}]},
         {"id": "float-semantics", "title": "核实 30 条 float16_4 指令警告", "status": "pending", "note": "首地址 0x82526328；需对应 PPC 指令与运行时语义证据。", "evidence": [{"base": "workspace", "path": "logs/codegen-catch-boundaries.log"}]},
@@ -33,35 +33,26 @@
     {
       "id": "host", "title": "Windows 宿主构建", "description": "宿主编译通过与游戏运行通过分开验收。",
       "tasks": [
-        {"id": "debug-build", "title": "x64 Debug 编译与链接", "status": "done", "verified_at": "2026-10-01", "note": "Windows EXE machine=0x8664；尚不能据此声称游戏可运行。", "evidence": [{"base": "workspace", "path": "logs/build-win-amd64-debug.log"}, {"base": "repo", "path": "out/build/win-amd64-debug/project_sylpheed.exe"}]},
+        {"id": "debug-build", "title": "x64 Debug 编译与链接", "status": "done", "verified_at": "2026-10-02", "note": "Fiber 原生适配配置接入后，Debug 增量编译/链接通过；菜单已显示，稳定玩法另行验收。", "evidence": [{"base": "workspace", "path": "logs/build-win-amd64-debug.log"}, {"base": "repo", "path": "out/build/win-amd64-debug/project_sylpheed.exe"}]},
         {"id": "runtime-dlls", "title": "部署运行时与 xenos GPU 插件", "status": "done", "verified_at": "2026-10-01", "note": "runtime / Tracy / xenos DLL 已部署，插件与固定 SDK hash 对照完成。", "evidence": [{"base": "workspace", "path": "plans/2026-10-01-first-host-build.md"}, {"base": "workspace", "path": "logs/build-win-amd64-debug.log"}]},
         {"id": "release-build", "title": "验证 x64 Release 构建", "status": "pending", "note": "尚未验证；宿主 Release 不会把开发版游戏变成零售版。", "evidence": []}
       ]
     },
     {
-      "id": "dev-runtime", "title": "首次加载与基本运行", "description": "已加载并进入初始化；下一阶段重点是定位访问异常，再取得画面。",
+      "id": "dev-runtime", "title": "首次加载与基本运行", "description": "已显示开发版调试菜单；下一阶段验证输入、音频播放和实际场景。",
       "tasks": [
         {"id": "dev-paths", "title": "配置开发版资源与虚拟镜像路径", "status": "done", "verified_at": "2026-10-01", "note": "选择开发镜像；脚本核对 hash，配置资源、xenos、日志、隔离用户数据并禁止游戏写入原资源。", "evidence": [{"base": "repo", "path": "src/app/project_sylpheed_app.h"}, {"base": "repo", "path": "scripts/run_development.py"}, {"base": "workspace", "path": "assets/runtime.local.json"}]},
-        {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "done", "verified_at": "2026-10-01", "note": "image_loaded 和真实声音初始化/GP_TEST 日志已取得；修复首个缺失入口并重测。仍异常退出，不代表菜单或可玩。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}, {"base": "workspace", "path": "logs/run-development-20261001-235121-414380/result.json"}, {"base": "repo", "path": "docs/running-development.md"}]},
-        {"id": "dev-crash", "title": "定位并修复读取 0x0000000C 的访问异常", "status": "pending", "note": "线程 0xF8000124 访问异常，退出码 0xC0000005；先捕获故障 PC/栈/guest 上下文，再核实根因。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}]},
-        {"id": "menu-frame", "title": "菜单与首帧显示", "status": "pending", "note": "需实际画面与运行日志。", "evidence": []},
+        {"id": "dev-load", "title": "有日志与超时的首次镜像加载", "status": "done", "verified_at": "2026-10-01", "note": "首次加载与实际初始化已验证；后续修复 Fiber 崩溃后显示调试菜单，见 dev-crash/menu-frame。", "evidence": [{"base": "workspace", "path": "logs/run-development-20261001-235121-414380/runtime.log"}, {"base": "workspace", "path": "logs/run-development-20261001-235121-414380/result.json"}, {"base": "repo", "path": "docs/running-development.md"}]},
+        {"id": "dev-crash", "title": "定位并修复读取 0x0000000C 的访问异常", "status": "done", "note": "捕获 DeleteFiber(0) 的 0x82338978 读取；接入 SDK 原生 Fiber 五函数，三次 30 秒重测均无原异常，并显示调试菜单。", "evidence": [{"base": "repo", "path": "config/fiber-rexcrt.toml"}, {"base": "workspace", "path": "logs/crash-probe-20261002-002909/capture.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/result.json"}, {"base": "repo", "path": "docs/fiber-fix.md"}], "verified_at": "2026-10-02"},
+        {"id": "menu-frame", "title": "菜单与首帧显示", "status": "done", "note": "PrintWindow 捕获真实 GP_TEST 调试菜单：Test UI、Mission Select、Tutorial、Model Viewer 等。只验收菜单首帧，未验收任务玩法。", "evidence": [{"base": "workspace", "path": "logs/game-client-20261002-004232.png"}, {"base": "workspace", "path": "logs/game-client-20261002-004232.json"}, {"base": "workspace", "path": "logs/run-development-20261002-004215-830388/runtime.log"}], "verified_at": "2026-10-02"},
         {"id": "input-audio", "title": "控制器输入与音频", "status": "pending", "note": "需可重现交互和声音检查。", "evidence": []},
         {"id": "mission-save", "title": "任务、场景切换与存档", "status": "pending", "note": "需实际任务流程和读写存档验证。", "evidence": []}
       ]
     },
     {
-      "id": "retail", "title": "零售版目标与修复迁移", "description": "借助开发版理解功能，逐项验证零售对应位置。",
-      "tasks": [
-        {"id": "retail-entries", "title": "核实零售版 12 个未解析目标", "status": "pending", "note": "22 条调用涉及 12 个目标；原始分析未套开发版符号或配置。", "evidence": [{"base": "workspace", "path": "logs/retail-probe.log"}]},
-        {"id": "retail-build", "title": "独立零售配置、生成与编译", "status": "pending", "note": "地址和生成目录独立，不能直接复制开发版修复配置。", "evidence": []},
-        {"id": "function-map", "title": "建立关键功能跨版本对应记录", "status": "pending", "note": "记录两版镜像 hash、地址、名字线索、调用/数据证据和置信度。", "evidence": []},
-        {"id": "retail-runtime", "title": "零售资源与主要游戏流程验证", "status": "pending", "note": "以零售行为为最终目标，需实际加载和场景证据。", "evidence": []}
-      ]
-    },
-    {
       "id": "maintenance", "title": "调试能力与交付质量", "description": "保留可维护的代码层次和可复现验证。",
       "tasks": [
-        {"id": "debug-features", "title": "清点并验证开发版调试功能", "status": "pending", "note": "原开发镜像保留；有哪些调试模式、菜单或热键及是否可用仍待运行确认。", "evidence": []},
+        {"id": "debug-features", "title": "清点并验证开发版调试功能", "status": "in_progress", "note": "已确认 GP_TEST 调试菜单可见及列出的选项；各选项、快捷键和具体功能尚未测试。", "evidence": [{"base": "workspace", "path": "logs/game-client-20261002-004232.png"}]},
         {"id": "module-patches", "title": "实际补丁按职责和版本组织", "status": "pending", "note": "目录规则已写；有真实功能补丁后验证接入，避免手改或重排 generated。", "evidence": [{"base": "repo", "path": "docs/architecture.md"}]},
         {"id": "regressions", "title": "关键场景的可重现回归检查", "status": "pending", "note": "已通过场景在迁移/改功能后仍需复查。", "evidence": []},
         {"id": "delivery", "title": "稳定运行与启动说明验收", "status": "pending", "note": "验证干净环境启动、性能及稳定性；分发工程不包含游戏原件。", "evidence": []}

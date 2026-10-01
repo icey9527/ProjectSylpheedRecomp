@@ -1,0 +1,9 @@
+# Development image only: exact MAP/PDB public names and locations matched.
+# Replace the complete XAPI fiber lifecycle with SDK host-stack-aware hooks.
+# Raw PPC stack switching cannot suspend/resume the translated C++ call stack.
+[rexcrt]
+ConvertThreadToFiber = 0x82338788
+ConvertFiberToThread = 0x82338818
+CreateFiber = 0x82338868
+DeleteFiber = 0x82338948
+SwitchToFiber = 0x823389A8

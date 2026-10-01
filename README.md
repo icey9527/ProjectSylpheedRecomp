@@ -1,8 +1,9 @@
 # Project Sylpheed Recomp
 
 使用 ReXGlue v0.10.0 的 Project Sylpheed Xbox 360 静态重编译初始工程。
-Windows x64 Debug 宿主已编译，开发版镜像已实际加载并执行到声音初始化与 `GP_TEST` 启动。
-已修复首个运行时缺失函数入口；目前仍因访问 `0x0000000C` 异常退出，尚未验证菜单或可玩。
+Windows x64 Debug 宿主已编译，开发版已实际显示 `GP_TEST` 调试菜单。
+XAudio 缺失入口与 Fiber 访问异常已修复；三次 30 秒受控测试通过原崩溃点。
+当前仅推进开发版，零售无限期延后。菜单操作、实际声音播放、3D 任务和存档尚未验收。
 
 双击 `Start-Progress.bat` 打开本地实时进度面板（Python 3.11+，无需额外依赖）。
 显示实际 Git 提交、当前阶段、文件中的验收清单完成率、外层计划与 AI 交接，每 5 秒刷新。
@@ -75,6 +76,7 @@ cmake --build --preset win-amd64-debug
 
 - [Windows 安装与编译入门](docs/building-windows.md)
 - [开发版受控启动与首次运行修复](docs/running-development.md)
+- [Fiber 访问异常修复与首个菜单画面](docs/fiber-fix.md)
 - [符号对应、验证范围与查询方法](docs/symbols.md)
 - [代码结构与模块目录规则](docs/architecture.md)
 - [修改、返工、验证和 Git 提交规则](docs/contributing.md)
@@ -91,6 +93,8 @@ cmake --build --preset win-amd64-debug
 首次构建还修复了 17 个重新抛出异常的 catch funclet 边界，并检查函数内 goto 标签完整性。
 Windows x64 Debug 编译、链接已通过；输出为 `out/build/win-amd64-debug/project_sylpheed.exe`。
 实际启动后又发现 XAudio 共享入口 `0x82546298` 未注册，已通过 MAP/PDB 核实并在
-`config/runtime-functions.toml` 补充，重新生成/编译后越过该阻塞。生成函数索引现为 34,580 个。
+`config/runtime-functions.toml` 补充，重新生成/编译后越过该阻塞。
+随后在 `DeleteFiber` 捕获空指针访问，通过 `config/fiber-rexcrt.toml` 将完整五函数接入 SDK 原生 Fiber。
+生成函数索引现为 34,575 个；这五个改为原生接入而不再有独立生成定义，属于预期变化。
 仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 指令语义；
-下一步定位访问 `0x0000000C` 的崩溃线程与故障指令，不能仅根据附近资源错误猜测原因。
+下一步验证调试菜单输入、声音播放与场景。新增问题先捕获现场再定位，不按时间邻近的日志猜测原因。
