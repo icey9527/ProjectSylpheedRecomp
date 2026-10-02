@@ -6,6 +6,9 @@
 repo/
   src/app/                手写宿主入口及 ReXApp 配置
   src/input/              SDK 输入事件适配
+  src/features/performance/ 帧时间与进程指标、可选监测面板
+  src/platform/windows/   Windows 原生可勾选菜单
+  src/patches/graphics/development/ 开发镜像 Swap 测量接入
   config/                 函数发现等分析修复
   assets/                 匹配的完整开发镜像、MAP 和 PDB
   scripts/                生成、检查、符号查询工具
@@ -59,5 +62,7 @@ Windows 图形默认采用 SDK 的 D3D12 后端；输入、音频等依赖使用
 Fiber 生命周期通过配置接入 SDK 原生实现，见 fiber-fix.md；下一步按输入与场景的实际缺陷推进局部修复。
 
 `src/patches/input/development/vibration_trace.cpp` 是开发镜像的可选诊断接入：以强符号覆盖 `sub_82338D40` 的生成弱别名，调用 `__imp__sub_82338D40` 保留原实现。生成宏明确保留了这个原始入口，因此重新 codegen 不会覆盖手写接入。该文件只记录命令，不是震动行为修复；升级镜像须重新核对地址。
+
+`src/patches/graphics/development/frame_probe.cpp` 透传 `D3DDevice_Swap`（`0x8235CD78`），正常返回后记录时间戳。平台菜单与指标显示独立于游戏地址，见 [性能显示](performance-display.md)。
 
 `src/patches/movie/development/movie_fallback.cpp` 同样保留原入口，处理当前不可用电影的跳过和创建失败。它复用原游戏结束清理与场景通知，原播放器仍未完整支持；地址和开关见 [电影与标题](title-and-vibration.md)。

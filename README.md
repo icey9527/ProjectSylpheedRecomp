@@ -26,6 +26,8 @@ python scripts/verify_game_inputs.py --image-only
 
 配置模板在 `config/project_sylpheed.example.toml`。详细配置和诊断启动见 [运行说明](docs/running-development.md)。
 
+Windows 顶部“显示”菜单可分别勾选帧率、CPU 和内存监测，默认关闭；使用与指标含义见 [性能显示](docs/performance-display.md)。
+
 ## 开发
 
 - [代码结构](docs/architecture.md)：生成代码、宿主适配和补丁的边界。

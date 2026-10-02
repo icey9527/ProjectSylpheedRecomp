@@ -9,6 +9,8 @@
 #include "startup_config.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
+#include "features/performance/performance_display.h"
+#include "features/performance/frame_metrics.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -44,9 +46,19 @@ class ProjectSylpheedApp : public rex::ReXApp {
                 rex::cvar::GetFlagByName("mnk_mode"));
     input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>();
     window()->AddInputListener(input_diagnostics_.get(), 1);
+    if (performance_display_) performance_display_->AttachWindow(window());
+    SetGuestFrameStats([] {
+      const auto sample = sylpheed::performance::Frames().Snapshot();
+      return rex::ui::FrameStats{sample.frame_time_ms, sample.fps, sample.frame_count};
+    });
+  }
+
+  void OnCreateDialogs(rex::ui::ImGuiDrawer* drawer) override {
+    performance_display_ = std::make_unique<sylpheed::performance::PerformanceDisplay>(drawer);
   }
 
   void OnShutdown() override {
+    performance_display_.reset();
     if (input_diagnostics_) {
       window()->RemoveInputListener(input_diagnostics_.get());
       input_diagnostics_.reset();
@@ -70,5 +82,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
   // void OnShutdown() override {}
   // void OnConfigurePaths(rex::PathConfig& paths) override {}
  private:
+  std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
 };

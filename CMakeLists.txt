@@ -16,10 +16,15 @@ set(PROJECTSYLPHEED_SOURCES
     src/input/keyboard_keystroke_driver.cpp
     src/patches/input/development/vibration_trace.cpp
     src/patches/movie/development/movie_fallback.cpp
+    src/features/performance/frame_metrics.cpp
+    src/features/performance/performance_display.cpp
+    src/patches/graphics/development/frame_probe.cpp
 )
 
 if(WIN32)
     add_executable(project_sylpheed WIN32 ${PROJECTSYLPHEED_SOURCES})
+    target_sources(project_sylpheed PRIVATE src/platform/windows/performance_menu.cpp)
+    target_link_libraries(project_sylpheed PRIVATE comctl32 psapi)
 else()
     add_executable(project_sylpheed ${PROJECTSYLPHEED_SOURCES})
 endif()
