@@ -62,7 +62,7 @@ python scripts/run_development.py --game-data-root "D:/ProjectSylpheedDemoTest" 
 {"game_data_root": "<完整资源目录>"}
 ```
 
-诊断输出固定为仓库同级 `logs/run-development.log`，每次受控启动前清空；标准输出、错误输出和最近一次结果分别写入同级固定文件。用户数据位于 `logs/runtime-user-data/development/`，禁止游戏写入原资源映射。
+诊断日志固定在宿主 EXE 旁，文件名与主程序同名，例如 `project_sylpheed.log`；宿主每次启动前清空并重新写入。受控脚本只保留外层 `logs/development-last-run.json` 的结果摘要。用户数据位于 `logs/runtime-user-data/development/`，禁止游戏写入原资源映射。
 
 `image_loaded` 只说明镜像加载完成，`guest_thread_prepared` 发生于主线程恢复之前。进程退出 0、窗口存在或资源开始加载，均不能证明任务可玩。
 

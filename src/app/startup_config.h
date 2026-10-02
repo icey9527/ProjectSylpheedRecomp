@@ -4,6 +4,7 @@
 #include <rex/rex_app.h>
 
 #include <filesystem>
+#include <fstream>
 #include <string_view>
 #include "game_config.h"
 
@@ -29,6 +30,14 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   DefaultFlag("mnk_mode", "true");
   DefaultFlag("mnk_mouse", "false");
   DefaultFlag("gpu_plugin", "xenos");
+  const auto log_path = paths.config_path.parent_path() /
+                        (paths.config_path.stem().string() + ".log");
+  DefaultFlag("log_file", log_path.string());
+  // ReXGlue's rotating sink appends when given an explicit path. Truncate the
+  // single host log before logging initializes so every launch starts clean.
+  {
+    std::ofstream clear_log(log_path, std::ios::binary | std::ios::trunc);
+  }
   DefaultFlag("allow_game_relative_writes", "false");
   DefaultFlag("keybind_a", "Return,Space");
   DefaultFlag("keybind_b", "Backspace");

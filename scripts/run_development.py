@@ -50,17 +50,13 @@ def main():
 
     logs_root = REPO.parent / "logs"
     logs_root.mkdir(parents=True, exist_ok=True)
-    # Keep one reproducible diagnostic log. Each invocation starts clean;
-    # the last-run JSON is overwritten alongside it.
-    log_file = logs_root / "run-development.log"
-    stdout_file = logs_root / "run-development.stdout.txt"
-    stderr_file = logs_root / "run-development.stderr.txt"
-    for path in (log_file, stdout_file, stderr_file):
-        path.write_bytes(b"")
+    # The host owns one log beside the executable and truncates it during
+    # startup. Do not create per-run log directories or override that path.
+    log_file = binary.parent / f"{binary.stem}.log"
     user_dir = logs_root / "runtime-user-data/development"
     user_dir.mkdir(parents=True, exist_ok=True)
     command = [str(binary), f"--game_data_root={root}", f"--user_data_root={user_dir}",
-               "--gpu_plugin=xenos", f"--log_file={log_file}", "--log_level=debug",
+               "--gpu_plugin=xenos", "--log_level=debug",
                "--log_flush_interval=1", "--allow_game_relative_writes=false"]
     if args.initial_game_part:
         command.append(f"--initial_game_part={args.initial_game_part}")
@@ -70,8 +66,8 @@ def main():
     started = time.monotonic()
     process = None
     try:
-        with stdout_file.open("wb") as out, stderr_file.open("wb") as err:
-            process = subprocess.Popen(command, cwd=binary.parent, stdout=out, stderr=err)
+        with open("NUL", "wb") as sink:
+            process = subprocess.Popen(command, cwd=binary.parent, stdout=sink, stderr=sink)
             record["pid"] = process.pid
             while True:
                 remaining = args.seconds - (time.monotonic() - started)
@@ -109,12 +105,10 @@ def main():
         text = log_file.read_text(encoding="utf-8", errors="replace") if log_file.exists() else ""
         record["observed_stages"] = list(dict.fromkeys(re.findall(r"SYLPHEED_STAGE ([a-z_]+)", text)))
         record["log_file"] = str(log_file)
-        record["stdout_file"] = str(stdout_file)
-        record["stderr_file"] = str(stderr_file)
         (REPO.parent / "logs/development-last-run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Outcome: {record['outcome']}; process exit: {record['exit_code']}; "
           f"elapsed: {record['elapsed_seconds']}s", flush=True)
-    print("Read run-development.log for load/guest stages. A living process or exit 0 is not proof of gameplay.")
+    print(f"Read {log_file} for load/guest stages. A living process or exit 0 is not proof of gameplay.")
     return 0 if record["outcome"] == "exited" and record["exit_code"] == 0 else 1
 
 
