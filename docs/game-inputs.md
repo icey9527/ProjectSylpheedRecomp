@@ -1,6 +1,6 @@
 # 游戏输入
 
-当前代码与地址配置对应开发镜像 `Xacalite_ScriptTeam.exe`。仓库 `assets/` 保存完整镜像、MAP 和 PDB，`generated/` 保存由该镜像生成的 C++、头文件及 CMake 描述。文件虽以 `.exe` 命名，实际是 XEX2 封装；无需改名或重复存为 `.xex`。
+当前代码与地址配置对应开发镜像。仓库 `assets/` 保存完整镜像、MAP 和 PDB，`generated/` 保存由该镜像生成的 C++、头文件及 CMake 描述。运行时使用资源目录中的 `BaseLib.dll`；它仍是 XEX2，不是 Windows DLL。
 
 ## 文件与位置
 
@@ -13,9 +13,12 @@ repo/
   generated/
 ```
 
+运行资源目录另放同一镜像的副本 `BaseLib.dll`；仓库原件保留其原始文件名，供 codegen 和符号匹配使用。
+
 | 文件 | 用途 | 必需场景 |
 | --- | --- | --- |
-| `Xacalite_ScriptTeam.exe` | codegen 与运行时镜像数据 | 生成、运行 |
+| `BaseLib.dll` | 运行时开发镜像；内容必须与仓库输入一致 | 运行 |
+| `assets/Xacalite_ScriptTeam.exe` | codegen 输入原件 | 生成、符号匹配 |
 | `Xacalite_ScriptTeam.map` | 函数地址、名称、对象归属 | 重建符号索引、分析入口 |
 | `Xacalite_ScriptTeam.pdb` | 公共和模块函数/标签位置核对 | 重建符号索引、符号调查 |
 | 资源根 `config.ini` 和完整 `dat/` | 游戏配置与资源包 | 运行 |

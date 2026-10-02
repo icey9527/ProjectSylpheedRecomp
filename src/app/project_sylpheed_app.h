@@ -73,7 +73,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
 
   void OnLoadXexImage(std::string& xex_image) override {
     // This host was generated for the development image, not retail default.xex.
-    xex_image = "game:\\Xacalite_ScriptTeam.exe";
+    xex_image = "game:\\BaseLib.dll";
     REXLOG_INFO("SYLPHEED_STAGE image_selected: {}", xex_image);
   }
 

@@ -33,7 +33,7 @@ def main():
             local = json.loads(args.config.read_text(encoding="utf-8-sig"))
             root = Path(local["game_data_root"])
         root = root.resolve(strict=True)
-        image = root / "Xacalite_ScriptTeam.exe"
+        image = root / "BaseLib.dll"
         with image.open("rb") as stream:
             digest = hashlib.file_digest(stream, "sha256").hexdigest()
         if digest != DEVELOPMENT_SHA256:

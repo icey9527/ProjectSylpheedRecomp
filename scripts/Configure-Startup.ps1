@@ -19,8 +19,8 @@ if (!$GameDataRoot) {
 $content = [IO.File]::ReadAllText("$PSScriptRoot/../config/project_sylpheed.example.toml")
 if ($GameDataRoot) {
     $resolved = (Resolve-Path -LiteralPath $GameDataRoot).Path.Replace('\', '/')
-    if (!(Test-Path -LiteralPath "$resolved/Xacalite_ScriptTeam.exe")) {
-        throw 'Development image Xacalite_ScriptTeam.exe is missing.'
+    if (!(Test-Path -LiteralPath "$resolved/BaseLib.dll")) {
+        throw 'Development image BaseLib.dll is missing.'
     }
     # JSON string escaping is compatible with a TOML basic string here.
     $encodedPath = ConvertTo-Json -InputObject $resolved -Compress

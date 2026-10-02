@@ -1,6 +1,6 @@
 # 开发版运行
 
-当前宿主对应开发镜像 `Xacalite_ScriptTeam.exe`。不要将零售 `default.xex` 改名替代它。
+当前宿主对应开发镜像。运行时读取资源目录中的 `BaseLib.dll`，它是开发 XEX 的外置项目文件名，不是 Windows DLL。不要将零售 `default.xex` 改名替代它。
 
 ## 双击启动
 
@@ -10,7 +10,7 @@
 game_data_root = "<完整资源目录>"
 ```
 
-资源目录需包含匹配开发镜像、根 `config.ini` 和 `dat/`。相对路径基于宿主 EXE 目录；环境变量和命令行显式设置按 SDK 优先级覆盖配置。重编译宿主仍需要匹配镜像的初始数据和加载信息。
+资源目录需包含 `BaseLib.dll`、根 `config.ini` 和 `dat/`。相对路径基于宿主 EXE 目录；环境变量和命令行显式设置按 SDK 优先级覆盖配置。重编译宿主仍需要匹配镜像的初始数据和加载信息。
 
 默认 1280×720 窗口。语言默认读取资源根 INI 的 `[LANGUAGE]` 空键；显式 `user_language` 设置优先。配置模板见 `config/project_sylpheed.example.toml`，语言处理见 [language-and-input.md](language-and-input.md)。
 
