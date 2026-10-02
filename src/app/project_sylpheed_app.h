@@ -108,7 +108,8 @@ class ProjectSylpheedApp : public rex::ReXApp {
     window()->AddInputListener(input_diagnostics_.get(), 1);
     if (performance_display_) performance_display_->AttachWindow(window(), [this] {
 #ifdef _WIN32
-      sylpheed::BeginResourceDirectoryChange(startup_config_path_);
+      sylpheed::BeginResourceDirectoryChange(
+          static_cast<HWND>(window()->GetNativeWindowHandle()), startup_config_path_);
 #endif
     });
     SetGuestFrameStats([] {

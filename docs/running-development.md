@@ -14,7 +14,7 @@ game_data_root = "<完整资源目录>"
 
 默认 1280×720 窗口。语言默认读取资源根 INI 的 `[LANGUAGE]` 空键；显式 `user_language` 设置优先。配置模板见 `config/project_sylpheed.example.toml`，语言处理见 [language-and-input.md](language-and-input.md)。
 
-启动时资源目录无效，或缺少开发镜像、`config.ini`、`dat/`，会提示具体缺项并打开目录选择。散装 `dat/files.tbl` 不是宿主的必需项：打包资源由原游戏的 PAK 加载器查找、读取和解压，宿主不要求先解包。取消选择会退出本次启动。“工具 → 更改资源目录”也可选择目录；游戏继续使用当前资源，保存的新路径在重启后生效。选择器保存绝对路径；手写 TOML 也可使用相对路径，相对基准始终是 EXE 所在目录。
+启动时资源目录无效，或缺少开发镜像、`config.ini`、`dat/`，会提示具体缺项并打开目录选择。散装 `dat/files.tbl` 不是宿主的必需项：打包资源由原游戏的 PAK 加载器查找、读取和解压，宿主不要求先解包。取消选择会退出本次启动。“工具 → 更改资源目录”也可选择目录；保存成功后宿主会自动以新目录启动一份进程，再关闭旧窗口；若 Windows 拒绝启动，会保留当前进程并提示手动重启。选择器保存绝对路径；手写 TOML 也可使用相对路径，相对基准始终是 EXE 所在目录。
 
 保存只替换 `game_data_root` 的值，保留其他设置、注释与换行；先验证 TOML 再原子替换，文件无效或不可写时明确提示，原配置不覆盖。命令行、环境变量显式指定的路径仍优先，测试脚本也会显式指定资源。这里只检查启动必需结构，没有将可选宣传片或全部关卡资源缺失都当作启动失败；运行时具体资源仍由游戏加载器检查并记录日志。
 
@@ -43,6 +43,14 @@ python scripts/run_development.py --game-data-root "<完整资源目录>" --seco
 ```
 
 该脚本核对开发镜像 SHA-256、隔离用户数据、启用 GPU 插件，并保存日志。默认 45 秒，允许 1–600 秒；到时限、中断或致命日志时清理所启动的进程。直接双击宿主不执行该 Python 校验。
+
+试玩资源通常没有开发版 `GP_TEST` 调试表。复制到不含中文的路径后，可直接进入试玩教程，避免进入不存在的调试菜单：
+
+```powershell
+python scripts/run_development.py --game-data-root "D:/ProjectSylpheedDemoTest" --initial-game-part GP_TUTORIAL --seconds 45
+```
+
+`--initial-game-part GP_TITLE` 可用于只验证试玩标题/电影。试玩目录缺少的任务包不能通过宿主补写；遇到 `Disc Read Error` 时先检查场景所需的 `GP_*.pak/.p00`，不要把零售包无验证地覆盖进试玩目录。
 
 也可以将路径写入仓库同级 `assets/runtime.local.json`：
 

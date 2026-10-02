@@ -8,8 +8,10 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <atomic>
 #include <cfloat>
 #include <chrono>
+#include <cstdint>
 
 #ifdef _WIN32
 #include "platform/windows/tools_menu.h"
@@ -85,11 +87,19 @@ class ProcessSampler {
 class PerformancePanel final : public rex::ui::ImGuiDialog {
  public:
   PerformancePanel(rex::ui::ImGuiDrawer* drawer, std::array<bool, 3> flags)
-      : ImGuiDialog(drawer), flags_(flags) {}
-  void SetFlags(std::array<bool, 3> flags) { flags_ = flags; logged_sample_ = false; }
+      : ImGuiDialog(drawer) { SetFlags(flags); }
+  void SetFlags(std::array<bool, 3> flags) {
+    uint8_t mask = 0;
+    for (size_t i = 0; i < flags.size(); ++i) if (flags[i]) mask |= uint8_t(1u << i);
+    flags_mask_.store(mask, std::memory_order_release);
+    logged_sample_ = false;
+  }
 
  protected:
   void OnDraw(ImGuiIO&) override {
+    const uint8_t mask = flags_mask_.load(std::memory_order_acquire);
+    if (!mask) return;
+    const std::array<bool, 3> flags = {bool(mask & 1), bool(mask & 2), bool(mask & 4)};
     const auto* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(
         ImVec2(viewport->WorkPos.x + viewport->WorkSize.x - 12, viewport->WorkPos.y + 12),
@@ -99,11 +109,11 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
         ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings;
     FrameSnapshot frames;
     ProcessSample process;
-    if (flags_[0]) frames = Frames().Snapshot();
-    if (flags_[1] || flags_[2]) process = process_.Update();
+    if (flags[0]) frames = Frames().Snapshot();
+    if (flags[1] || flags[2]) process = process_.Update();
     if (ImGui::Begin("Performance", nullptr, window_flags)) {
-      if (flags_[0]) {
-        if (frames.recent) {
+      if (flags[0]) {
+        if (frames.recent && frames.history_count > 0) {
           ImGui::Text("Game: %.1f FPS  %.2f ms", frames.fps, frames.frame_time_ms);
           const auto peak = *std::max_element(frames.history_ms.begin(),
                                              frames.history_ms.begin() + frames.history_count);
@@ -115,11 +125,11 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
         }
         ImGui::Text("Completed swaps: %llu", static_cast<unsigned long long>(frames.frame_count));
       }
-      if (flags_[1]) {
+      if (flags[1]) {
         if (process.cpu_valid) ImGui::Text("Process CPU: %.1f%%", process.cpu);
         else ImGui::TextUnformatted("Process CPU: sampling / unavailable");
       }
-      if (flags_[2]) {
+      if (flags[2]) {
         if (process.memory_valid) {
           ImGui::Text("Working set: %.1f MiB", process.working_mib);
           ImGui::Text("Private memory: %.1f MiB", process.private_mib);
@@ -130,18 +140,18 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
     }
     ImGui::End();
     // One sample per selection, for acceptance evidence; no per-frame logs.
-    if (!logged_sample_ && (!flags_[0] || frames.recent) &&
-        (!flags_[1] || process.cpu_valid) && (!flags_[2] || process.memory_valid)) {
+    if (!logged_sample_ && (!flags[0] || frames.recent) &&
+        (!flags[1] || process.cpu_valid) && (!flags[2] || process.memory_valid)) {
       REXLOG_INFO("SYLPHEED_PERF sample fps={} ms={} swaps={} cpu={} working_mib={} private_mib={}",
-                  flags_[0] ? frames.fps : -1, flags_[0] ? frames.frame_time_ms : -1,
-                  frames.frame_count, flags_[1] ? process.cpu : -1,
-                  flags_[2] ? process.working_mib : -1, flags_[2] ? process.private_mib : -1);
+                  flags[0] ? frames.fps : -1, flags[0] ? frames.frame_time_ms : -1,
+                  frames.frame_count, flags[1] ? process.cpu : -1,
+                  flags[2] ? process.working_mib : -1, flags[2] ? process.private_mib : -1);
       logged_sample_ = true;
     }
   }
 
  private:
-  std::array<bool, 3> flags_;
+  std::atomic<uint8_t> flags_mask_{0};
   ProcessSampler process_;
   bool logged_sample_ = false;
 };
@@ -180,12 +190,11 @@ void PerformanceDisplay::Refresh() {
 #ifdef _WIN32
   if (menu_) menu_->Update(checked_[0]);
 #endif
-  if (std::any_of(checked_.begin(), checked_.end(), [](bool value) { return value; })) {
-    if (!panel_) panel_ = std::make_unique<PerformancePanel>(drawer_, checked_);
-    else static_cast<PerformancePanel*>(panel_.get())->SetFlags(checked_);
-  } else {
-    panel_.reset();
-  }
+  // Keep the drawer alive for the lifetime of the app. The native menu runs
+  // on the Win32/UI thread while ImGui drawers are painted by the renderer;
+  // destroying a drawer from the menu callback races with an in-flight draw.
+  if (!panel_) panel_ = std::make_unique<PerformancePanel>(drawer_, checked_);
+  else static_cast<PerformancePanel*>(panel_.get())->SetFlags(checked_);
 }
 
 }  // namespace sylpheed::performance

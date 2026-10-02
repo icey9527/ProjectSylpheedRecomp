@@ -23,6 +23,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game-data-root", type=Path)
     parser.add_argument("--seconds", type=int, default=45)
+    parser.add_argument("--initial-game-part", default=None,
+                        help="Override the guest startup part, e.g. GP_TITLE for packed/trial resources")
     parser.add_argument("--config", type=Path, default=REPO.parent / "assets/runtime.local.json")
     args = parser.parse_args()
     if not 1 <= args.seconds <= 600:
@@ -55,6 +57,8 @@ def main():
     command = [str(binary), f"--game_data_root={root}", f"--user_data_root={user_dir}",
                "--gpu_plugin=xenos", f"--log_file={log_file}", "--log_level=debug",
                "--log_flush_interval=1", "--allow_game_relative_writes=false"]
+    if args.initial_game_part:
+        command.append(f"--initial_game_part={args.initial_game_part}")
     record = {"started_at": datetime.now(timezone.utc).isoformat(), "image_sha256": digest,
               "game_data_root": str(root), "command": command, "time_limit_seconds": args.seconds}
     print(f"Run evidence: {run_dir}", flush=True)
