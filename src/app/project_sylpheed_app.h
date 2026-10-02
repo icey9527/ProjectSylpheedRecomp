@@ -9,7 +9,9 @@
 #include <rex/filesystem.h>
 #include <rex/filesystem/devices/host_path_device.h>
 #include <rex/ui/keybinds.h>
+#include <rex/system.h>
 #include "startup_config.h"
+#include "missing_resource_notifier.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
 #include "features/performance/performance_display.h"
@@ -107,6 +109,15 @@ class ProjectSylpheedApp : public rex::ReXApp {
                 rex::cvar::GetFlagByName("mnk_mode"));
     input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>();
     window()->AddInputListener(input_diagnostics_.get(), 1);
+    missing_resource_notifier_ = std::make_shared<sylpheed::MissingResourceNotifier>(
+        [this](std::string path) {
+          app_context().CallInUIThreadDeferred([path = std::move(path)] {
+            rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error,
+                "游戏资源缺失或无法读取：\n" + path +
+                "\n\n请确认资源包、files.tbl 和当前 XEX 属于同一版本。\n详细信息已写入程序同名 .log。");
+          });
+        });
+    rex::AddSink(missing_resource_notifier_);
     if (performance_display_) performance_display_->AttachWindow(window(), [this] {
 #ifdef _WIN32
       sylpheed::BeginResourceDirectoryChange(
@@ -140,6 +151,10 @@ class ProjectSylpheedApp : public rex::ReXApp {
   }
 
   void OnShutdown() override {
+    if (missing_resource_notifier_) {
+      rex::RemoveSink(missing_resource_notifier_);
+      missing_resource_notifier_.reset();
+    }
     performance_display_.reset();
     if (input_diagnostics_) {
       window()->RemoveInputListener(input_diagnostics_.get());
@@ -167,6 +182,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
   std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
   std::unique_ptr<rex::ui::ImGuiDialog> achievements_overlay_safe_;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
+  std::shared_ptr<sylpheed::MissingResourceNotifier> missing_resource_notifier_;
   std::filesystem::path startup_config_path_;
   bool auto_language_ = true;
 };

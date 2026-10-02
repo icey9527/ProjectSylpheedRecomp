@@ -14,6 +14,7 @@ include(generated/rexglue.cmake)
 set(PROJECTSYLPHEED_SOURCES
     src/app/main.cpp
     src/app/resource_paths.cpp
+    src/app/missing_resource_notifier.cpp
     src/audio/host_audio_system.cpp
     src/input/keyboard_keystroke_driver.cpp
     src/patches/input/development/vibration_trace.cpp
