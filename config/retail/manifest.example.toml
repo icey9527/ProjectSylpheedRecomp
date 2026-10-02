@@ -1,0 +1,12 @@
+# Independent retail analysis input. Supply the matching original default.xex.
+# SHA256: 8935855e0fbd2461c0aba73163dd023e110d099f01816d6286d3a52211bc4286
+# Analysis-only example. Use scripts/prepare_retail_probe.py for an isolated host.
+[project]
+name = "sylpheed_retail_probe"
+sdk_version = "0.10.0"
+game_root = "../../assets/retail"
+
+[entrypoint]
+file_path = "../../assets/retail/default.xex"
+out_directory_path = "../../out/analysis/retail/generated/default"
+includes = ["verified-entry-seeds.toml", "terminal-rethrow-boundaries.toml"]

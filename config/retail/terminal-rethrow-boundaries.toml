@@ -1,0 +1,18 @@
+# Retail-only terminal rethrow funclets. Ends are observed instructions after
+# bl 0x825F23D8 with r3=r4=0, not neighboring MAP addresses.
+# default.xex SHA256: 8935855e0fbd2461c0aba73163dd023e110d099f01816d6286d3a52211bc4286
+[functions]
+"0x821ba6e0" = { end = 0x821ba734 }
+"0x822156a0" = { end = 0x8221571c }
+"0x8224c020" = { end = 0x8224c074 }
+"0x8226fdf8" = { end = 0x8226fe3c }
+"0x822a8610" = { end = 0x822a8664 }
+"0x822bdf6c" = { end = 0x822bdfc0 }
+"0x822bf160" = { end = 0x822bf1b4 }
+"0x82311fac" = { end = 0x82312000 }
+"0x82312424" = { end = 0x82312478 }
+"0x8231292c" = { end = 0x82312980 }
+"0x82320308" = { end = 0x8232035c }
+"0x823334b0" = { end = 0x82333504 }
+"0x82349084" = { end = 0x823490d8 }
+"0x823e8e78" = { end = 0x823e8ecc }

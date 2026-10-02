@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(sylpheed_round_even_tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+add_executable(round_even_test round_even_test.cpp ../../src/platform/windows/round_even.cpp)
+enable_testing()
+add_test(NAME round_even COMMAND round_even_test)

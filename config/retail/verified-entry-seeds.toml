@@ -1,0 +1,20 @@
+# Retail-only branch targets from the baseline analyzer diagnostics.
+# Inspected in the SDK-loaded retail image, not copied from development MAP.
+# Lengths and readable semantic names are intentionally left to analysis.
+# default.xex SHA256: 8935855e0fbd2461c0aba73163dd023e110d099f01816d6286d3a52211bc4286
+[functions]
+"0x823D22A8" = {}
+"0x823D22D8" = {}
+"0x823D2308" = {}
+"0x823D2338" = {}
+"0x823D2368" = {}
+"0x823D23B8" = {}
+"0x823D23E8" = {}
+"0x823D2418" = {}
+"0x823D2448" = {}
+"0x823D2478" = {}
+"0x824DBEB8" = {}
+"0x827E7610" = {}
+# Emitter found a remaining direct branch at 0x824AA1D8. The target starts
+# 808D0100 80A40164 7CC00026 7CE802A6 in the independently loaded image.
+"0x824AC2D0" = {}
