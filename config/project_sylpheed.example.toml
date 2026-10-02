@@ -14,6 +14,8 @@ mnk_mouse = false
 # Failed player creation can still complete the movie without throwing.
 skip_movies = false
 skip_failed_movies = true
+# Optional movie-start subtitle gate / parsed-count diagnostics.
+trace_movie_subtitles = false
 # Windows Display menu checkboxes; all disabled by default.
 show_game_fps = false
 show_process_cpu = false

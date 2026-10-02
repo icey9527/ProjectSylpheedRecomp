@@ -170,6 +170,8 @@ def main():
                         help='Log guest motor command changes without changing vibration behavior.')
     parser.add_argument('--trace-audio',action='store_true',
                         help='Report host audio queue supply, silence and callback time once per second.')
+    parser.add_argument('--trace-subtitles',action='store_true',
+                        help='Log original subtitle enable/count/text-object state at movie startup.')
     parser.add_argument('--audio-starvation-break-ms',type=int,default=0,
                         help='Capture an empty audio queue after this supply gap (0 disables; 1..1000 ms).')
     args=parser.parse_args()
@@ -195,6 +197,7 @@ def main():
              '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log',f'--log_level={args.log_level}','--log_flush_interval=1','--allow_game_relative_writes=false']
     if args.trace_vibration: command.append('--trace_vibration=true')
     if args.trace_audio: command.append('--trace_audio_queue=true')
+    if args.trace_subtitles: command.append('--trace_movie_subtitles=true')
     if args.audio_starvation_break_ms:
         command.extend(['--trace_audio_queue=true',f'--audio_starvation_break_ms={args.audio_starvation_break_ms}'])
     (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,

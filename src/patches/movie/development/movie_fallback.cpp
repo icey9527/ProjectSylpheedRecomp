@@ -8,6 +8,8 @@
 REXCVAR_DEFINE_BOOL(skip_movies, false, "Game", "Skip movie playback");
 REXCVAR_DEFINE_BOOL(skip_failed_movies, true, "Game",
                    "Complete movies whose player creation returns a failure");
+REXCVAR_DEFINE_BOOL(trace_movie_subtitles, false, "Game",
+                   "Log the original movie subtitle gate, parsed count and text object at startup");
 
 REX_EXTERN(__imp__sub_821E9808);  // GamePart_Movie::Impl::OnStart
 REX_EXTERN(__imp__sub_821E9F50);  // GamePart_Movie::Impl::OnUpdateFrame
@@ -38,18 +40,30 @@ struct Scope {
 };
 std::mutex skipped_mutex;
 std::unordered_set<uint32_t> skipped_movies;
+
+void TraceSubtitles(uint32_t impl, uint8_t* base) {
+  if (!REXCVAR_GET(trace_movie_subtitles)) return;
+  // OnPrepare fills the map at +112 (size +120). OnStart copies
+  // SystemData +76 to the +108 gate and creates the +124 text object.
+  // Inspect completed startup on its own thread; do not force the gate or font.
+  REXLOG_INFO("SYLPHEED_SUBTITLE impl=0x{:08X} state={} enabled={} entries={} text_object=0x{:08X}",
+              impl, REX_LOAD_U32(impl + 24), REX_LOAD_U8(impl + 108) != 0,
+              REX_LOAD_U32(impl + 120), REX_LOAD_U32(impl + 124));
+}
 }  // namespace
 
 extern "C" REX_FUNC(sub_821E9808) {
+  const uint32_t impl = ctx.r3.u32;
   if (!REXCVAR_GET(skip_movies) && !REXCVAR_GET(skip_failed_movies)) {
     __imp__sub_821E9808(ctx, base);
+    TraceSubtitles(impl, base);
     return;
   }
   const auto entry = ctx;
-  const uint32_t impl = ctx.r3.u32;
   Scope startup(in_movie_startup);
   try {
     __imp__sub_821E9808(ctx, base);
+    TraceSubtitles(impl, base);
   } catch (const MovieSkipped& skipped) {
     // The interception is exactly at 0x821E9BC8. All startup guest string
     // temporaries have already been destroyed there. Preserve its completed

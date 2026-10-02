@@ -49,6 +49,14 @@ Debug 构建及 ABI 测试通过后，实际复测已记录跳过、完成状态
 
 第一关随后在 `OnPrepare` 触发 `XamShowDirtyDiscErrorUI`：请求 `dat/GP_MOVIE/jpn/pwterop_s01a.prt`、`HGRGE00.TTF` 和 `SUBTITLE_S01A.tbl` 失败。检查资源目录发现同名文件在 `dat/jpn/`，是路径布局不一致的线索，尚未验证文件内容兼容性。此准备阶段早于本补丁的播放器创建接入点，仍需处理。SDK 弹窗的“bad or unimplemented file IO”是固定提示文字，不是具体根因诊断；缓存写入也存在访问拒绝，不能仅凭时间相邻就认定它触发了弹窗。
 
+## 过场字幕诊断
+
+字幕由原游戏叠加：`OnPrepare`（`0x821EAD08`）读取电影表指定的字幕文件，`ParseSubtitle`（`0x821EA828`）建立时间区间；`OnStart`（`0x821E9808`）检查 `Session::GetSystemData`（`0x821A07C0`）返回数据的 `+76` 设置，非零才创建字幕文字对象。`SystemData::Setup`（`0x82336178`，`SystemData.obj`，公共原名/位置一致、模块位置一致）的默认初始化将其设为零，因此需先区分游戏设置关闭与字体/解析/绘制故障。
+
+TOML 中的 `trace_movie_subtitles=true` 或诊断脚本 `--trace-subtitles` 在原电影启动完成后记录 `SYLPHEED_SUBTITLE`：`enabled` 是字幕门控，`entries` 是解析后的时间条目数量，`text_object` 是文字对象地址。默认关闭，观测不改游戏设置或绘制。`enabled=false` 时先检查游戏 Config 的字幕设置；若开启且条目、对象均存在仍无字幕，再跟踪 `OnUpdateFrame`（`0x821E9F50`）时间轴和 `OnScene`（`0x821E8B38`）的 Lib2D 绘制。条目/对象存在本身不能证明屏幕显示正确。
+
+实际过场启动记录到 `enabled=false entries=16 text_object=0x00000000`：本片段已经解析字幕条目，但设置门控关闭，所以没有创建文字对象。开启游戏 Config 的字幕后仍需实际显示验收；不能据此称全部字幕或文字绘制已验证。标题宣传片无字幕也不能用于这项验收。
+
 ## 振动命令
 
 `XInputSetState` 位于 `0x82338D40`，对象 `xapilib:xinpapi.obj`，MAP/PDB 公共及模块原名、位置一致。
