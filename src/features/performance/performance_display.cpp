@@ -91,7 +91,10 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
 
  protected:
   void OnDraw(ImGuiIO&) override {
-    ImGui::SetNextWindowPos(ImVec2(12, 12), ImGuiCond_FirstUseEver);
+    const auto* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(
+        ImVec2(viewport->WorkPos.x + viewport->WorkSize.x - 12, viewport->WorkPos.y + 12),
+        ImGuiCond_Always, ImVec2(1, 0));
     ImGui::SetNextWindowBgAlpha(0.75f);
     constexpr auto window_flags = ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings |
