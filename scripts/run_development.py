@@ -1,7 +1,7 @@
 """Run the matching development image with isolated user data and a time limit.
 
 Python 3.11+, standard library only. Local paths are arguments or read from
-../assets/runtime.local.json; no paths or game files are added to Git.
+../assets/runtime.local.json; local configuration and run evidence stay outside Git.
 """
 
 import argparse

@@ -3,9 +3,9 @@
 [project]
 name = "project_sylpheed"
 sdk_version = "0.10.0"
-game_root = "../assets"
+game_root = "assets"
 
 [entrypoint]
-file_path = "../assets/Xacalite_ScriptTeam.exe"
+file_path = "assets/Xacalite_ScriptTeam.exe"
 out_directory_path = "generated/xacalite_scriptteam"
 includes = ["config/map-functions.toml", "config/catch-boundaries.toml", "config/runtime-functions.toml", "config/fiber-rexcrt.toml"]

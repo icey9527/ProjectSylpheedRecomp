@@ -7,16 +7,17 @@ repo/
   src/app/                手写宿主入口及 ReXApp 配置
   src/input/              SDK 输入事件适配
   config/                 函数发现等分析修复
+  assets/                 匹配的完整开发镜像、MAP 和 PDB
   scripts/                生成、检查、符号查询工具
   docs/                   结构、构建、维护及路线图
-  generated/              自动生成的 PPC 转译代码（忽略，不手改）
+  generated/              自动生成的 PPC 转译代码（跟踪，不手改）
   out/                    CMake 构建结果（忽略）
   CMakeLists.txt
   CMakePresets.json
   project_sylpheed_manifest.toml
 ```
 
-游戏输入与完整符号索引放在仓库外；生成代码和构建结果由工具重建。
+开发镜像和 MAP/PDB 在仓库 `assets/`，生成源码也跟踪。完整符号索引、codegen 缓存、完整资源包和构建结果不跟踪；生成文件通过工具重建，不手动修改。
 手写宿主入口已移到 `src/app/`，CMake 已同步源文件路径。
 
 ## 怎样按模块组织

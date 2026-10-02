@@ -1,3 +1,11 @@
+Game-derived input and generated code
+
+assets/Xacalite_ScriptTeam.exe, .map and .pdb retain their original contents.
+The translated game functions under generated/xacalite_scriptteam are
+derived from that development image. The project's BSD-3-Clause license
+for original host code does not grant a license to the original game or
+its derived game code. No complete game resource package is included.
+
 ReXGlue SDK and generated project scaffold
 https://github.com/rexglue/rexglue-sdk (v0.10.0)
 

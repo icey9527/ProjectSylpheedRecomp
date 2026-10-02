@@ -11,8 +11,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "ReXGlue codegen failed with exit code $LASTEXITCODE" }
     & "$PSScriptRoot/Check-GeneratedCode.ps1"
     $python = Get-Command python -ErrorAction SilentlyContinue
-    if ($python -and (Test-Path '../assets/Xacalite_ScriptTeam.map') -and
-        (Test-Path '../assets/Xacalite_ScriptTeam.pdb')) {
+    if ($python -and (Test-Path 'assets/Xacalite_ScriptTeam.map') -and
+        (Test-Path 'assets/Xacalite_ScriptTeam.pdb')) {
         & $python.Source "$PSScriptRoot/symbol_index.py" build
         if ($LASTEXITCODE -ne 0) { throw 'Symbol index refresh failed.' }
     } else { Write-Warning 'Symbol index not refreshed; see docs/symbols.md.' }

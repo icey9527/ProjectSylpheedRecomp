@@ -4,3 +4,8 @@
 *.cpp text eol=lf
 *.h text eol=lf
 *.ps1 text eol=crlf
+assets/Xacalite_ScriptTeam.exe -text -diff
+assets/Xacalite_ScriptTeam.map -text -diff
+assets/Xacalite_ScriptTeam.pdb -text -diff
+# Keep codegen formatting intact; GitHub collapses these files by default.
+generated/** linguist-generated=true whitespace=-blank-at-eol,-blank-at-eof

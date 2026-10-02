@@ -12,7 +12,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input-dir", type=Path, default=REPO.parent / "assets")
+    parser.add_argument("--input-dir", type=Path, default=REPO / "assets")
     parser.add_argument("--image-only", action="store_true", help="Do not require MAP/PDB")
     args = parser.parse_args()
     try:

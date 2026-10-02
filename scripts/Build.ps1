@@ -38,8 +38,8 @@ try {
     & "$PSScriptRoot/Check-GeneratedCode.ps1"
     & "$PSScriptRoot/Configure-Startup.ps1" -Configuration $Configuration
     $python = Get-Command python -ErrorAction SilentlyContinue
-    if ($python -and (Test-Path '../assets/Xacalite_ScriptTeam.map') -and
-        (Test-Path '../assets/Xacalite_ScriptTeam.pdb')) {
+    if ($python -and (Test-Path 'assets/Xacalite_ScriptTeam.map') -and
+        (Test-Path 'assets/Xacalite_ScriptTeam.pdb')) {
         & $python.Source "$PSScriptRoot/symbol_index.py" build | Out-File -Encoding utf8 "$logDirectory/symbols-$preset.json"
         if ($LASTEXITCODE -ne 0) { throw 'Host built, but symbol index refresh failed.' }
     } else { Write-Warning 'Symbol index not refreshed; see docs/symbols.md.' }

@@ -15,7 +15,7 @@
 
 ## 生成与构建
 
-先准备 [匹配的开发版输入](game-inputs.md)。从仓库目录执行：
+仓库已跟踪 [匹配的开发版输入与生成源码](game-inputs.md)。从仓库目录执行；修改生成配置时需要 codegen，初次构建也可直接执行 `Build.ps1`：
 
 ```powershell
 python scripts/verify_game_inputs.py --image-only

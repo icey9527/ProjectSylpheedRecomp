@@ -1,10 +1,16 @@
-/generated/
+/generated/*
+!/generated/rexglue.cmake
+!/generated/xacalite_scriptteam/
+/generated/xacalite_scriptteam/*
+!/generated/xacalite_scriptteam/*.cpp
+!/generated/xacalite_scriptteam/*.h
+!/generated/xacalite_scriptteam/*.cmake
 /out/
 /build/
 /.vs/
 /.vscode/
 /CMakeUserPresets.json
-/assets/
+/assets/*
 /logs/
 *.exe
 *.xex
@@ -47,3 +53,6 @@ __pycache__/
 *.zip
 *.7z
 *.rar
+!/assets/Xacalite_ScriptTeam.exe
+!/assets/Xacalite_ScriptTeam.map
+!/assets/Xacalite_ScriptTeam.pdb

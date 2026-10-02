@@ -14,6 +14,35 @@ ReXGlue v0.10.0 的 `MnkInputDriver` 已实现键盘到手柄状态的映射，�
 
 此适配针对 v0.10.0。升级 SDK 时先检查官方 MnK 事件实现；如果已经提供同一事件流，应撤下补充驱动，避免重复输入。
 
+## 玩家自定义按键
+
+编辑宿主 EXE 同目录的 `project_sylpheed.toml`，保存后重启游戏。`config/project_sylpheed.example.toml` 列出全部常用手柄映射；现有配置不会被构建脚本覆盖。省略的项继续使用 SDK 默认值，空字符串可取消该项的键盘映射。
+
+| 手柄功能 | TOML 配置项 | 项目默认键 |
+| --- | --- | --- |
+| A / B | `keybind_a` / `keybind_b` | Enter 或空格 / Backspace |
+| X / Y | `keybind_x` / `keybind_y` | L / P |
+| Start / Back | `keybind_start` / `keybind_back` | X / Z 或 Tab |
+| 左 / 右肩键 | `keybind_left_shoulder` / `keybind_right_shoulder` | 1 / 3 |
+| 左 / 右扳机 | `keybind_left_trigger` / `keybind_right_trigger` | Q 或 I / E 或 O |
+| 左摇杆方向 | `keybind_lstick_up/down/left/right` | W / S / A / D |
+| 右摇杆方向 | `keybind_rstick_up/down/left/right` | 小键盘 8 / 2 / 4 / 6 |
+| 左 / 右摇杆按下 | `keybind_lstick_press` / `keybind_rstick_press` | F / K |
+| 十字键方向 | `keybind_dpad_up/down/left/right` | 方向键 |
+
+例如把确认改为 J 或空格，把 Start 改为 Enter：
+
+```toml
+keybind_a = "J,Space"
+keybind_start = "Return"
+```
+
+键名区分大小写：Enter 使用 `Return`，方向键使用 `Up` / `Down` / `Left` / `Right`，小键盘使用 `Numpad8` 等 SDK 名称。逗号表示任选一个键，也支持 `Shift+Up`、`Ctrl+J` 等组合；修饰键须精确匹配，绑定 `J` 时按住 Shift 的 `J` 不等同于它。避免把同一键分配给多个动作，否则它们会同时触发。
+
+`mnk_mode = true` 开启键盘转手柄；`mnk_mouse = false` 使用按键控制右摇杆。鼠标菜单点击不是这套映射的功能，开启鼠标摇杆也不等于添加了菜单点击。
+
+官方 SDK 负责物理输入、按键配置和手柄状态，我们补充缺失的事件流。不能据此推断所有其他重编译游戏都要自己写键盘驱动：只查询状态的游戏可能直接使用 SDK 已有支持。
+
 ## 独立验证
 
 测试不需要游戏或符号原件，使用真实 SDK MnK 驱动与可控物理手柄替身，验证事件、状态合并、能力、振动和玩家分配。从配置好 Clang/MSVC 的终端执行：

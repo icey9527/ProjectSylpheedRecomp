@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$LogPath,
-    [string]$MapPath = "$PSScriptRoot/../../assets/Xacalite_ScriptTeam.map",
+    [string]$MapPath = "$PSScriptRoot/../assets/Xacalite_ScriptTeam.map",
     [string]$OutputPath = "$PSScriptRoot/../config/map-functions.toml"
 )
 $ErrorActionPreference = 'Stop'

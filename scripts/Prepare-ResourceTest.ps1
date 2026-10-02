@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)][string]$GameDataRoot,
-    [string]$DevelopmentImage = "$PSScriptRoot/../../assets/Xacalite_ScriptTeam.exe"
+    [string]$DevelopmentImage = "$PSScriptRoot/../assets/Xacalite_ScriptTeam.exe"
 )
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path -LiteralPath $GameDataRoot).Path
