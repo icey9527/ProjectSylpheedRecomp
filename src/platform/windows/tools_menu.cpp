@@ -9,8 +9,14 @@ constexpr UINT_PTR subclass_id = 0x53595050;
 }
 
 ToolsMenu::ToolsMenu(HWND window, std::function<void()> toggle,
-                                 std::function<void()> change_resources)
-    : window_(window), toggle_(std::move(toggle)), change_resources_(std::move(change_resources)) {
+                                 std::function<void()> change_resources,
+                                 std::function<void()> toggle_missing_resources,
+                                 std::function<bool()> missing_resources_checked)
+    : window_(window),
+      toggle_(std::move(toggle)),
+      change_resources_(std::move(change_resources)),
+      toggle_missing_resources_(std::move(toggle_missing_resources)),
+      missing_resources_checked_(std::move(missing_resources_checked)) {
   // Preserve any future SDK-owned menu instead of silently replacing it.
   if (!window_ || GetMenu(window_)) return;
   RECT client{};
@@ -21,6 +27,7 @@ ToolsMenu::ToolsMenu(HWND window, std::function<void()> toggle,
   if (!AppendMenuW(popup_, MF_STRING, first_id, L"运行信息")) return;
   if (!AppendMenuW(popup_, MF_SEPARATOR, 0, nullptr)) return;
   if (!AppendMenuW(popup_, MF_STRING, first_id + 1, L"更改资源目录…")) return;
+  if (!AppendMenuW(popup_, MF_STRING, first_id + 2, L"缺失资源调试提示")) return;
   if (!AppendMenuW(menu_, MF_POPUP, reinterpret_cast<UINT_PTR>(popup_), L"工具")) return;
   // Keep SDL's event / presentation loop running while the menu is open.
   // A modal Win32 menu otherwise blocks that loop while audio keeps running.
@@ -62,18 +69,29 @@ ToolsMenu::~ToolsMenu() {
   }
 }
 
-void ToolsMenu::Update(bool checked) {
+void ToolsMenu::Update(bool checked, bool missing_resources_checked) {
   if (!attached_) return;
   CheckMenuItem(popup_, first_id, MF_BYCOMMAND | (checked ? MF_CHECKED : MF_UNCHECKED));
+  CheckMenuItem(popup_, first_id + 2, MF_BYCOMMAND |
+      (missing_resources_checked ? MF_CHECKED : MF_UNCHECKED));
 }
 
 LRESULT CALLBACK ToolsMenu::WindowProc(HWND window, UINT message, WPARAM wp, LPARAM lp,
                                             UINT_PTR, DWORD_PTR data) {
   auto* self = reinterpret_cast<ToolsMenu*>(data);
   if (message == WM_COMMAND && lp == 0 && HIWORD(wp) == 0 &&
-      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 2) {
-    if (LOWORD(wp) == first_id) self->toggle_();
-    else if (self->change_resources_) self->change_resources_();
+      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 3) {
+    if (LOWORD(wp) == first_id) {
+      self->toggle_();
+    } else if (LOWORD(wp) == first_id + 1) {
+      if (self->change_resources_) self->change_resources_();
+    } else if (self->toggle_missing_resources_) {
+      self->toggle_missing_resources_();
+    }
+    if (self->missing_resources_checked_) {
+      CheckMenuItem(self->popup_, first_id + 2, MF_BYCOMMAND |
+          (self->missing_resources_checked_() ? MF_CHECKED : MF_UNCHECKED));
+    }
     return 0;
   }
   if (message == WM_NCDESTROY) {

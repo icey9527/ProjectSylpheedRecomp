@@ -10,6 +10,8 @@
 #include <rex/filesystem/devices/host_path_device.h>
 #include <rex/ui/keybinds.h>
 #include <rex/system.h>
+#include <fstream>
+#include <vector>
 #include "startup_config.h"
 #include "missing_resource_notifier.h"
 #include "input_diagnostics.h"
@@ -22,6 +24,9 @@
 #ifdef _WIN32
 #include "platform/windows/resource_picker.h"
 #endif
+
+REXCVAR_DEFINE_BOOL(show_missing_resource_errors, false, "Diagnostics",
+                    "Show a debug popup for missing game files");
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -104,6 +109,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
   }
 
   void OnPostSetup() override {
+    ApplyProjectIcon();
     REXLOG_INFO("SYLPHEED_CONFIG user_language={} mnk_mode={}",
                 rex::cvar::GetFlagByName("user_language"),
                 rex::cvar::GetFlagByName("mnk_mode"));
@@ -111,6 +117,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
     window()->AddInputListener(input_diagnostics_.get(), 1);
     missing_resource_notifier_ = std::make_shared<sylpheed::MissingResourceNotifier>(
         [this](std::string path) {
+          if (!REXCVAR_GET(show_missing_resource_errors)) return;
           app_context().CallInUIThreadDeferred([path = std::move(path)] {
             rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error,
                 "游戏资源缺失或无法读取：\n" + path +
@@ -123,7 +130,12 @@ class ProjectSylpheedApp : public rex::ReXApp {
       sylpheed::BeginResourceDirectoryChange(
           static_cast<HWND>(window()->GetNativeWindowHandle()), startup_config_path_);
 #endif
-    });
+    }, [this] {
+      const bool enabled = REXCVAR_GET(show_missing_resource_errors);
+      rex::cvar::SetFlagByName("show_missing_resource_errors", enabled ? "false" : "true");
+      REXLOG_INFO("SYLPHEED_DIAGNOSTICS missing_resource_errors={}",
+                  !enabled);
+    }, [] { return REXCVAR_GET(show_missing_resource_errors); });
     SetGuestFrameStats([] {
       const auto sample = sylpheed::performance::Frames().Snapshot();
       return rex::ui::FrameStats{sample.frame_time_ms, sample.fps, sample.frame_count};
@@ -160,6 +172,22 @@ class ProjectSylpheedApp : public rex::ReXApp {
       window()->RemoveInputListener(input_diagnostics_.get());
       input_diagnostics_.reset();
     }
+  }
+
+  void ApplyProjectIcon() {
+    const auto icon_path = rex::filesystem::GetExecutableFolder() / "project_sylpheed.ico";
+    std::ifstream file(icon_path, std::ios::binary | std::ios::ate);
+    if (!file) {
+      REXLOG_WARN("SYLPHEED_UI project icon not found: {}", icon_path.string());
+      return;
+    }
+    const auto length = file.tellg();
+    if (length <= 0) return;
+    file.seekg(0);
+    std::vector<uint8_t> bytes(static_cast<size_t>(length));
+    if (!file.read(reinterpret_cast<char*>(bytes.data()), length)) return;
+    window()->SetIcon(bytes.data(), bytes.size());
+    REXLOG_INFO("SYLPHEED_UI project icon applied");
   }
 
   void OnPostLaunchModule(rex::system::XThread* thread) override {

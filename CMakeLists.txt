@@ -46,4 +46,7 @@ add_custom_command(TARGET project_sylpheed POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/assets/Xacalite_ScriptTeam.exe"
         "$<TARGET_FILE_DIR:project_sylpheed>/BaseLib.dll"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/src/app/project_sylpheed.ico"
+        "$<TARGET_FILE_DIR:project_sylpheed>/project_sylpheed.ico"
     VERBATIM)

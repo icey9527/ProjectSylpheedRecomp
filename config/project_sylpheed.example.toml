@@ -24,6 +24,8 @@ trace_movie_subtitles = false
 movie_subtitles = "on"
 # Tools -> Runtime information; disabled by default.
 show_runtime_info = false
+# Debug only: show a popup for guest game-file ENOENT reports. Logs remain enabled.
+show_missing_resource_errors = false
 # Keep the first small-CPU warning and periodic summaries; restart after editing.
 throttle_affinity_warning = true
 # Short-lock host audio queue. Set false and restart to use the SDK queue.

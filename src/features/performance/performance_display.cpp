@@ -167,13 +167,19 @@ PerformanceDisplay::PerformanceDisplay(rex::ui::ImGuiDrawer* drawer) : drawer_(d
 }
 PerformanceDisplay::~PerformanceDisplay() = default;
 
-void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<void()> change_resources) {
+void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<void()> change_resources,
+                                      std::function<void()> toggle_missing_resources,
+                                      std::function<bool()> missing_resources_checked) {
 #ifdef _WIN32
+  missing_resources_checked_ = missing_resources_checked;
+  const bool missing_checked = missing_resources_checked_ ? missing_resources_checked_() : false;
   menu_ = std::make_unique<ToolsMenu>(static_cast<HWND>(window->GetNativeWindowHandle()),
-                                          [this] { Toggle(); }, std::move(change_resources));
+                                          [this] { Toggle(); }, std::move(change_resources),
+                                          std::move(toggle_missing_resources),
+                                          missing_resources_checked_);
   if (!menu_->attached()) REXLOG_ERROR("SYLPHEED_PERF native menu could not be attached");
   else REXLOG_INFO("SYLPHEED_PERF native tools menu attached");
-  menu_->Update(checked_[0]);
+  menu_->Update(checked_[0], missing_checked);
 #else
   (void)window;
 #endif
@@ -188,7 +194,10 @@ void PerformanceDisplay::Toggle() {
 void PerformanceDisplay::Refresh() {
   checked_.fill(REXCVAR_GET(show_runtime_info));
 #ifdef _WIN32
-  if (menu_) menu_->Update(checked_[0]);
+  if (menu_) {
+    const bool missing_checked = missing_resources_checked_ ? missing_resources_checked_() : false;
+    menu_->Update(checked_[0], missing_checked);
+  }
 #endif
   // Keep the drawer alive for the lifetime of the app. The native menu runs
   // on the Win32/UI thread while ImGui drawers are painted by the renderer;
