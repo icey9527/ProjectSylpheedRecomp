@@ -1,4 +1,5 @@
 #include "generated/xacalite_scriptteam/project_sylpheed_pch.h"
+#include "subtitle_settings.h"
 
 #include <rex/cvar.h>
 
@@ -54,6 +55,7 @@ void TraceSubtitles(uint32_t impl, uint8_t* base) {
 
 extern "C" REX_FUNC(sub_821E9808) {
   const uint32_t impl = ctx.r3.u32;
+  sylpheed::movie::SubtitleStartupScope subtitles(impl);
   if (!REXCVAR_GET(skip_movies) && !REXCVAR_GET(skip_failed_movies)) {
     __imp__sub_821E9808(ctx, base);
     TraceSubtitles(impl, base);

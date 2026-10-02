@@ -57,6 +57,8 @@ TOML 中的 `trace_movie_subtitles=true` 或诊断脚本 `--trace-subtitles` 在
 
 实际过场启动记录到 `enabled=false entries=16 text_object=0x00000000`：本片段已经解析字幕条目，但设置门控关闭，所以没有创建文字对象。开启游戏 Config 的字幕后仍需实际显示验收；不能据此称全部字幕或文字绘制已验证。标题宣传片无字幕也不能用于这项验收。
 
+宿主现在提供 `movie_subtitles = "on"`（默认）、`"off"`、`"game"`。`subtitle_settings.cpp` 在原 `OnStart` 的 `GetDevice` 调用点（返回 `0x821E9874`，目标 `0x826A1760`，`AppFrame:XenonApp.obj`，公共原名及位置一致、模块位置一致）调整当前电影的门控字节，随后调用原 getter；原游戏继续创建字体、更新与绘制文字。作用域限于本线程的电影启动，其他 getter 调用原样透传，不修改 SystemData 或档案文件。新版实际记录到 `enabled=true entries=16` 和有效文字对象，玩家答复有效；全部过场、语言和长期稳定性尚未逐一验证。配置来源、档案和验证见 [设置与存档](settings-and-saves.md)。
+
 ## 振动命令
 
 `XInputSetState` 位于 `0x82338D40`，对象 `xapilib:xinpapi.obj`，MAP/PDB 公共及模块原名、位置一致。

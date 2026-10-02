@@ -50,6 +50,7 @@ REX_EXTERN(__imp__sub_8256A518) {
   ctx.r3.u32 = fail_creation ? 0x80070002 : 0;
 }
 REX_EXTERN(__imp__sub_821E9F50) { ++updated; }
+REX_EXTERN(__imp__sub_826A1760) {}
 REX_EXTERN(__imp__sub_821EB8D0) { ++destroyed; }
 REX_EXTERN(__imp__sub_82569918) {
   ++status_calls;

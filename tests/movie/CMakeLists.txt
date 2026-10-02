@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(rexglue 0.10.0 EXACT REQUIRED CONFIG)
 add_executable(movie_fallback_test
     movie_fallback_test.cpp
-    ../../src/patches/movie/development/movie_fallback.cpp)
+    ../../src/patches/movie/development/movie_fallback.cpp
+    ../../src/patches/movie/development/subtitle_settings.cpp)
 target_include_directories(movie_fallback_test PRIVATE ../..)
 target_link_libraries(movie_fallback_test PRIVATE rex::runtime)
 rexglue_apply_target_settings(movie_fallback_test)

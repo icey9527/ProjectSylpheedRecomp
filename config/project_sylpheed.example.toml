@@ -16,6 +16,8 @@ skip_movies = false
 skip_failed_movies = true
 # Optional movie-start subtitle gate / parsed-count diagnostics.
 trace_movie_subtitles = false
+# on/off overrides the movie instance; game follows the original user profile.
+movie_subtitles = "on"
 # Windows Display menu checkboxes; all disabled by default.
 show_game_fps = false
 show_process_cpu = false
