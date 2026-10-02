@@ -22,6 +22,13 @@ PerformanceMenu::PerformanceMenu(HWND window, std::function<void(unsigned)> togg
     if (!AppendMenuW(popup_, MF_STRING, first_id + i, labels[i])) return;
   }
   if (!AppendMenuW(menu_, MF_POPUP, reinterpret_cast<UINT_PTR>(popup_), L"显示")) return;
+  // Keep SDL's event / presentation loop running while the menu is open.
+  // A modal Win32 menu otherwise blocks that loop while audio keeps running.
+  MENUINFO info{};
+  info.cbSize = sizeof(info);
+  info.fMask = MIM_STYLE | MIM_APPLYTOSUBMENUS;
+  info.dwStyle = MNS_MODELESS;
+  if (!SetMenuInfo(menu_, &info)) return;
   if (!SetWindowSubclass(window_, WindowProc, subclass_id, reinterpret_cast<DWORD_PTR>(this))) return;
   if (!SetMenu(window_, menu_)) {
     RemoveWindowSubclass(window_, WindowProc, subclass_id);
