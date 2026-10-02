@@ -22,3 +22,18 @@ Windows x64 首次编译在 `sub_826C4788` 和 `sub_826D8614` 报缺少 `loc_826
 
 原始发现记录留在外层 `logs/missing-generated-labels.json`，修复日志和完整构建日志也留在外层。
 30 条 float16_4 指令警告另行跟踪，本项修复没有解决那些警告。
+
+## 教程图片加载遗漏 JPEG 回调
+
+进入教程时，CRT `abort()` 的宿主栈经过 `ResolveIndirectFunction`、
+`D3DX::reset_input_controller`（`0x82425818`）、`jpeg_consume_input` 和
+`jpeg_read_header`。运行日志确认未注册的调用目标为 `0x8241C748`。
+
+MAP 将该入口标为 `D3DX::reset_error_mgr`，对象为 `d3dx9:jerror.obj`；
+PDB 模块 procedure 在相同 `0003:002AC748` 位置有可读名字，公共符号中没有同位置记录。
+`jpeg_std_error`（`0x8241C760`）把该地址写入错误管理器的 `+16` 回调字段，
+`reset_input_controller` 从该字段取出并调用。它是原版的真实回调，原生成结果缺少其入口。
+
+`config/runtime-functions.toml` 补充该入口，交给官方分析器生成和注册，不指定猜测长度，
+也不替换为空函数。生成的原函数包含六条 PPC 指令：将错误管理器的 `+108` 和 `+20`
+字段清零后返回。修复通过配置保留，重新 codegen 会重建对应函数与注册。

@@ -4,3 +4,7 @@
 # ?QueryInterface@CEffectManager@XAUDIO@@UAAXPAPAUIXAudioEffectManager@@@Z
 # ?QueryInterface@CFrameBuffer@XAUDIO@@UAAXPAPAUIXAudioFrameBuffer@@@Z
 "0x82546298" = { name = "XAUDIO_CEffectManager_QueryInterface_82546298" }
+# ?reset_error_mgr@D3DX@@YAXPAUjpeg_common_struct@1@@Z (d3dx9:jerror.obj)
+# jpeg_std_error stores this callback at +16; tutorial JPEG loading calls it
+# from reset_input_controller. The original entry was not discovered.
+"0x8241C748" = {}
