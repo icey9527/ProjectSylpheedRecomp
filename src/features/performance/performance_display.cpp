@@ -12,18 +12,17 @@
 #include <chrono>
 
 #ifdef _WIN32
-#include "platform/windows/performance_menu.h"
+#include "platform/windows/tools_menu.h"
 #include <psapi.h>
 #endif
 
 REXCVAR_DEFINE_BOOL(show_game_fps, false, "Performance", "Show game Swap rate and frame times");
 REXCVAR_DEFINE_BOOL(show_process_cpu, false, "Performance", "Show process CPU usage");
 REXCVAR_DEFINE_BOOL(show_process_memory, false, "Performance", "Show working set and private memory");
+REXCVAR_DEFINE_BOOL(show_runtime_info, false, "Performance", "Show the collapsible runtime information panel");
 
 namespace sylpheed::performance {
 namespace {
-constexpr const char* options[] = {"show_game_fps", "show_process_cpu", "show_process_memory"};
-
 struct ProcessSample {
   bool cpu_valid = false;
   bool memory_valid = false;
@@ -97,8 +96,7 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
         ImGuiCond_Always, ImVec2(1, 0));
     ImGui::SetNextWindowBgAlpha(0.75f);
     constexpr auto window_flags = ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings |
-        ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings;
     FrameSnapshot frames;
     ProcessSample process;
     if (flags_[0]) frames = Frames().Snapshot();
@@ -149,32 +147,38 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
 };
 }
 
-PerformanceDisplay::PerformanceDisplay(rex::ui::ImGuiDrawer* drawer) : drawer_(drawer) { Refresh(); }
+PerformanceDisplay::PerformanceDisplay(rex::ui::ImGuiDrawer* drawer) : drawer_(drawer) {
+  // Migrate the previous independent switches only if the new option was not
+  // explicitly configured. Keep the old cvars registered for existing TOMLs.
+  if (rex::cvar::GetFlagSource("show_runtime_info") == rex::cvar::Source::kDefault &&
+      (REXCVAR_GET(show_game_fps) || REXCVAR_GET(show_process_cpu) || REXCVAR_GET(show_process_memory)))
+    rex::cvar::SetFlagByName("show_runtime_info", "true");
+  Refresh();
+}
 PerformanceDisplay::~PerformanceDisplay() = default;
 
-void PerformanceDisplay::AttachWindow(rex::ui::Window* window) {
+void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<void()> change_resources) {
 #ifdef _WIN32
-  menu_ = std::make_unique<PerformanceMenu>(static_cast<HWND>(window->GetNativeWindowHandle()),
-                                          [this](unsigned item) { Toggle(item); });
+  menu_ = std::make_unique<ToolsMenu>(static_cast<HWND>(window->GetNativeWindowHandle()),
+                                          [this] { Toggle(); }, std::move(change_resources));
   if (!menu_->attached()) REXLOG_ERROR("SYLPHEED_PERF native menu could not be attached");
-  else REXLOG_INFO("SYLPHEED_PERF native display menu attached");
-  menu_->Update(checked_);
+  else REXLOG_INFO("SYLPHEED_PERF native tools menu attached");
+  menu_->Update(checked_[0]);
 #else
   (void)window;
 #endif
 }
 
-void PerformanceDisplay::Toggle(unsigned item) {
-  if (item >= checked_.size()) return;
-  if (!rex::cvar::SetFlagByName(options[item], checked_[item] ? "false" : "true")) return;
+void PerformanceDisplay::Toggle() {
+  if (!rex::cvar::SetFlagByName("show_runtime_info", checked_[0] ? "false" : "true")) return;
   Refresh();
   REXLOG_INFO("SYLPHEED_PERF options fps={} cpu={} memory={}", checked_[0], checked_[1], checked_[2]);
 }
 
 void PerformanceDisplay::Refresh() {
-  checked_ = {REXCVAR_GET(show_game_fps), REXCVAR_GET(show_process_cpu), REXCVAR_GET(show_process_memory)};
+  checked_.fill(REXCVAR_GET(show_runtime_info));
 #ifdef _WIN32
-  if (menu_) menu_->Update(checked_);
+  if (menu_) menu_->Update(checked_[0]);
 #endif
   if (std::any_of(checked_.begin(), checked_.end(), [](bool value) { return value; })) {
     if (!panel_) panel_ = std::make_unique<PerformancePanel>(drawer_, checked_);

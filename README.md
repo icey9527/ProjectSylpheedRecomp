@@ -26,7 +26,7 @@ python scripts/verify_game_inputs.py --image-only
 
 配置模板在 `config/project_sylpheed.example.toml`。详细配置和诊断启动见 [运行说明](docs/running-development.md)。
 
-Windows 顶部“显示”菜单可分别勾选帧率、CPU 和内存监测，默认关闭；使用与指标含义见 [性能显示](docs/performance-display.md)。
+Windows 顶部“工具”菜单提供统一的可折叠运行信息面板和资源目录选择；目录更改重启生效。使用与指标含义见 [性能显示](docs/performance-display.md)。
 
 宿主音频队列保留 SDK 的解码与混音，可在 TOML 切回原后端；诊断开关和验证见 [音频输出](docs/audio-output.md)。
 

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <functional>
 
 namespace rex::ui {
 class ImGuiDrawer;
@@ -10,22 +11,22 @@ class Window;
 }
 
 namespace sylpheed::performance {
-class PerformanceMenu;
+class ToolsMenu;
 
 class PerformanceDisplay {
  public:
   explicit PerformanceDisplay(rex::ui::ImGuiDrawer* drawer);
   ~PerformanceDisplay();
-  void AttachWindow(rex::ui::Window* window);
+  void AttachWindow(rex::ui::Window* window, std::function<void()> change_resources = {});
 
  private:
-  void Toggle(unsigned item);
+  void Toggle();
   void Refresh();
   rex::ui::ImGuiDrawer* drawer_;
   std::array<bool, 3> checked_{};
   std::unique_ptr<rex::ui::ImGuiDialog> panel_;
 #ifdef _WIN32
-  std::unique_ptr<PerformanceMenu> menu_;
+  std::unique_ptr<ToolsMenu> menu_;
 #endif
 };
 

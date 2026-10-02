@@ -13,6 +13,7 @@ include(generated/rexglue.cmake)
 # Sources
 set(PROJECTSYLPHEED_SOURCES
     src/app/main.cpp
+    src/app/resource_paths.cpp
     src/audio/host_audio_system.cpp
     src/input/keyboard_keystroke_driver.cpp
     src/patches/input/development/vibration_trace.cpp
@@ -26,8 +27,9 @@ set(PROJECTSYLPHEED_SOURCES
 
 if(WIN32)
     add_executable(project_sylpheed WIN32 ${PROJECTSYLPHEED_SOURCES})
-    target_sources(project_sylpheed PRIVATE src/platform/windows/performance_menu.cpp)
-    target_link_libraries(project_sylpheed PRIVATE comctl32 psapi)
+    target_sources(project_sylpheed PRIVATE src/platform/windows/tools_menu.cpp
+        src/platform/windows/resource_picker.cpp)
+    target_link_libraries(project_sylpheed PRIVATE comctl32 psapi ole32 shell32 uuid)
 else()
     add_executable(project_sylpheed ${PROJECTSYLPHEED_SOURCES})
 endif()

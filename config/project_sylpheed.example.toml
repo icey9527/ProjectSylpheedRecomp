@@ -18,10 +18,8 @@ skip_failed_movies = true
 trace_movie_subtitles = false
 # on/off overrides the movie instance; game follows the original user profile.
 movie_subtitles = "on"
-# Windows Display menu checkboxes; all disabled by default.
-show_game_fps = false
-show_process_cpu = false
-show_process_memory = false
+# Tools -> Runtime information; disabled by default.
+show_runtime_info = false
 # Keep the first small-CPU warning and periodic summaries; restart after editing.
 throttle_affinity_warning = true
 # Short-lock host audio queue. Set false and restart to use the SDK queue.

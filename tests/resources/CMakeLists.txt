@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.25)
+project(sylpheed_resource_tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+find_package(rexglue 0.10.0 EXACT REQUIRED CONFIG)
+add_executable(resource_paths_test resource_paths_test.cpp ../../src/app/resource_paths.cpp)
+target_include_directories(resource_paths_test PRIVATE ../../src)
+target_link_libraries(resource_paths_test PRIVATE rex::runtime)
+rexglue_apply_target_settings(resource_paths_test)
+if(WIN32)
+    add_custom_command(TARGET resource_paths_test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:resource_paths_test>
+            $<TARGET_FILE_DIR:resource_paths_test> COMMAND_EXPAND_LISTS VERBATIM)
+endif()
+enable_testing()
+add_test(NAME resource_paths COMMAND resource_paths_test)

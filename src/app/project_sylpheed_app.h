@@ -13,6 +13,10 @@
 #include "features/performance/frame_metrics.h"
 #include "features/performance/affinity_warning_filter.h"
 #include "audio/host_audio_system.h"
+#include "resource_paths.h"
+#ifdef _WIN32
+#include "platform/windows/resource_picker.h"
+#endif
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -28,7 +32,37 @@ class ProjectSylpheedApp : public rex::ReXApp {
   }
 
   void OnConfigurePaths(rex::PathConfig& paths) override {
+    auto_language_ = rex::cvar::GetFlagSource("user_language") == rex::cvar::Source::kDefault;
     sylpheed::ConfigureStartup(paths);
+    startup_config_path_ = paths.config_path;
+  }
+
+  std::optional<rex::PathConfig> OnFinalizePaths(const rex::PathConfig& defaults,
+      std::function<void(rex::PathConfig)>) override {
+    auto paths = defaults;
+#ifdef _WIN32
+    const auto owner = static_cast<HWND>(window()->GetNativeWindowHandle());
+    for (;;) {
+      const auto problem = sylpheed::ResourceDirectoryError(paths.game_data_root);
+      if (problem.empty()) break;
+      const auto utf8 = paths.game_data_root.generic_u8string();
+      sylpheed::ResourceMessage(owner, problem + "\n当前目录：" +
+          std::string(utf8.begin(), utf8.end()), true);
+      const auto root = sylpheed::PickResourceDirectory(owner);
+      if (!root) { app_context().RequestDeferredQuit(); return std::nullopt; }
+      paths.game_data_root = *root;
+      if (sylpheed::ResourceDirectoryError(*root).empty()) {
+        std::string error;
+        if (!sylpheed::SaveResourceDirectory(paths.config_path, *root, error))
+          sylpheed::ResourceMessage(owner, "本次使用所选目录，但未能保存配置：" + error, true);
+        if (auto_language_) {
+          if (const auto language = sylpheed::ReadDefaultLanguage(*root))
+            rex::cvar::SetFlagByName("user_language", std::to_string(*language));
+        }
+      }
+    }
+#endif
+    return paths;
   }
 
   static std::unique_ptr<rex::ui::WindowedApp> Create(
@@ -53,7 +87,11 @@ class ProjectSylpheedApp : public rex::ReXApp {
                 rex::cvar::GetFlagByName("mnk_mode"));
     input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>();
     window()->AddInputListener(input_diagnostics_.get(), 1);
-    if (performance_display_) performance_display_->AttachWindow(window());
+    if (performance_display_) performance_display_->AttachWindow(window(), [this] {
+#ifdef _WIN32
+      sylpheed::BeginResourceDirectoryChange(startup_config_path_);
+#endif
+    });
     SetGuestFrameStats([] {
       const auto sample = sylpheed::performance::Frames().Snapshot();
       return rex::ui::FrameStats{sample.frame_time_ms, sample.fps, sample.frame_count};
@@ -91,4 +129,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
  private:
   std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
+  std::filesystem::path startup_config_path_;
+  bool auto_language_ = true;
 };

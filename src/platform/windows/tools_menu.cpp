@@ -1,4 +1,4 @@
-#include "performance_menu.h"
+#include "tools_menu.h"
 
 #include <commctrl.h>
 
@@ -8,8 +8,9 @@ constexpr UINT first_id = 0x7300;
 constexpr UINT_PTR subclass_id = 0x53595050;
 }
 
-PerformanceMenu::PerformanceMenu(HWND window, std::function<void(unsigned)> toggle)
-    : window_(window), toggle_(std::move(toggle)) {
+ToolsMenu::ToolsMenu(HWND window, std::function<void()> toggle,
+                                 std::function<void()> change_resources)
+    : window_(window), toggle_(std::move(toggle)), change_resources_(std::move(change_resources)) {
   // Preserve any future SDK-owned menu instead of silently replacing it.
   if (!window_ || GetMenu(window_)) return;
   RECT client{};
@@ -17,11 +18,10 @@ PerformanceMenu::PerformanceMenu(HWND window, std::function<void(unsigned)> togg
   menu_ = CreateMenu();
   popup_ = CreatePopupMenu();
   if (!menu_ || !popup_) return;
-  const wchar_t* labels[] = {L"帧率与帧时间", L"进程 CPU 占用", L"内存占用"};
-  for (unsigned i = 0; i < 3; ++i) {
-    if (!AppendMenuW(popup_, MF_STRING, first_id + i, labels[i])) return;
-  }
-  if (!AppendMenuW(menu_, MF_POPUP, reinterpret_cast<UINT_PTR>(popup_), L"显示")) return;
+  if (!AppendMenuW(popup_, MF_STRING, first_id, L"运行信息")) return;
+  if (!AppendMenuW(popup_, MF_SEPARATOR, 0, nullptr)) return;
+  if (!AppendMenuW(popup_, MF_STRING, first_id + 1, L"更改资源目录…")) return;
+  if (!AppendMenuW(menu_, MF_POPUP, reinterpret_cast<UINT_PTR>(popup_), L"工具")) return;
   // Keep SDL's event / presentation loop running while the menu is open.
   // A modal Win32 menu otherwise blocks that loop while audio keeps running.
   MENUINFO info{};
@@ -46,7 +46,7 @@ PerformanceMenu::PerformanceMenu(HWND window, std::function<void(unsigned)> togg
   DrawMenuBar(window_);
 }
 
-PerformanceMenu::~PerformanceMenu() {
+ToolsMenu::~ToolsMenu() {
   if (window_ && IsWindow(window_) && attached_) {
     RemoveWindowSubclass(window_, WindowProc, subclass_id);
     SetMenu(window_, nullptr);
@@ -62,19 +62,18 @@ PerformanceMenu::~PerformanceMenu() {
   }
 }
 
-void PerformanceMenu::Update(const std::array<bool, 3>& checked) {
+void ToolsMenu::Update(bool checked) {
   if (!attached_) return;
-  for (unsigned i = 0; i < 3; ++i) {
-    CheckMenuItem(popup_, first_id + i, MF_BYCOMMAND | (checked[i] ? MF_CHECKED : MF_UNCHECKED));
-  }
+  CheckMenuItem(popup_, first_id, MF_BYCOMMAND | (checked ? MF_CHECKED : MF_UNCHECKED));
 }
 
-LRESULT CALLBACK PerformanceMenu::WindowProc(HWND window, UINT message, WPARAM wp, LPARAM lp,
+LRESULT CALLBACK ToolsMenu::WindowProc(HWND window, UINT message, WPARAM wp, LPARAM lp,
                                             UINT_PTR, DWORD_PTR data) {
-  auto* self = reinterpret_cast<PerformanceMenu*>(data);
+  auto* self = reinterpret_cast<ToolsMenu*>(data);
   if (message == WM_COMMAND && lp == 0 && HIWORD(wp) == 0 &&
-      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 3) {
-    self->toggle_(LOWORD(wp) - first_id);
+      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 2) {
+    if (LOWORD(wp) == first_id) self->toggle_();
+    else if (self->change_resources_) self->change_resources_();
     return 0;
   }
   if (message == WM_NCDESTROY) {
