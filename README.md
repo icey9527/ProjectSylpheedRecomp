@@ -28,6 +28,8 @@ python scripts/verify_game_inputs.py --image-only
 
 Windows 顶部“显示”菜单可分别勾选帧率、CPU 和内存监测，默认关闭；使用与指标含义见 [性能显示](docs/performance-display.md)。
 
+宿主音频队列保留 SDK 的解码与混音，可在 TOML 切回原后端；诊断开关和验证见 [音频输出](docs/audio-output.md)。
+
 ## 开发
 
 - [代码结构](docs/architecture.md)：生成代码、宿主适配和补丁的边界。

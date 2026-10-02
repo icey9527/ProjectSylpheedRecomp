@@ -12,6 +12,7 @@
 #include "features/performance/performance_display.h"
 #include "features/performance/frame_metrics.h"
 #include "features/performance/affinity_warning_filter.h"
+#include "audio/host_audio_system.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -23,6 +24,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
 
   void OnPreSetup(rex::RuntimeConfig& config) override {
     config.input_factory = REX_INPUT_BACKEND(sylpheed::input::CreateInputSystem);
+    config.audio_factory = REX_AUDIO_BACKEND(sylpheed::audio::HostAudioSystem);
   }
 
   void OnConfigurePaths(rex::PathConfig& paths) override {

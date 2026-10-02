@@ -168,8 +168,15 @@ def main():
                         help='Capture breakpoints after the initial loader stop. For a CRT abort dialog, select Retry.')
     parser.add_argument('--trace-vibration',action='store_true',
                         help='Log guest motor command changes without changing vibration behavior.')
+    parser.add_argument('--trace-audio',action='store_true',
+                        help='Report host audio queue supply, silence and callback time once per second.')
+    parser.add_argument('--audio-starvation-break-ms',type=int,default=0,
+                        help='Capture an empty audio queue after this supply gap (0 disables; 1..1000 ms).')
     args=parser.parse_args()
     if not 1 <= args.seconds <= 600: parser.error('Time limit must be 1..600 seconds.')
+    if not 0 <= args.audio_starvation_break_ms <= 1000: parser.error('Audio gap threshold must be 0..1000 ms.')
+    if args.audio_starvation_break_ms and not args.capture_breakpoints:
+        parser.error('--audio-starvation-break-ms requires --capture-breakpoints.')
     if not 0 <= args.fault_address < 2**64: parser.error('Fault address must fit uint64.')
     root=args.game_data_root
     if root is None:
@@ -187,6 +194,9 @@ def main():
     command=[str(binary),f'--game_data_root={root}',f'--user_data_root={ROOT}/logs/runtime-user-data/development',
              '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log',f'--log_level={args.log_level}','--log_flush_interval=1','--allow_game_relative_writes=false']
     if args.trace_vibration: command.append('--trace_vibration=true')
+    if args.trace_audio: command.append('--trace_audio_queue=true')
+    if args.audio_starvation_break_ms:
+        command.extend(['--trace_audio_queue=true',f'--audio_starvation_break_ms={args.audio_starvation_break_ms}'])
     (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,
         'seconds':args.seconds,'configuration':args.configuration,'log_level':args.log_level,'fault_address':hex(args.fault_address),
         'capture_breakpoints':args.capture_breakpoints},indent=2),encoding='utf-8')

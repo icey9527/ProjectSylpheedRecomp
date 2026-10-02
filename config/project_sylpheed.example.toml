@@ -20,6 +20,10 @@ show_process_cpu = false
 show_process_memory = false
 # Keep the first small-CPU warning and periodic summaries; restart after editing.
 throttle_affinity_warning = true
+# Short-lock host audio queue. Set false and restart to use the SDK queue.
+host_audio_queue = true
+# Optional 1 Hz diagnostics, not realtime callback logging.
+trace_audio_queue = false
 # Controller mappings; comma separates alternatives. Restart after editing.
 keybind_a = "Return,Space"
 keybind_b = "Backspace"

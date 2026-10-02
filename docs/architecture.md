@@ -6,6 +6,7 @@
 repo/
   src/app/                手写宿主入口及 ReXApp 配置
   src/input/              SDK 输入事件适配
+  src/audio/              SDK 音频供给与 SDL 宿主输出队列适配
   src/features/performance/ 帧时间与进程指标、可选监测面板
   src/platform/windows/   Windows 原生可勾选菜单
   src/patches/graphics/development/ 开发镜像 Swap 测量接入
@@ -54,6 +55,7 @@ MAP 的 `2DGrpLib` 可作为 UI 调查线索，`xaudio/xact` 可作为音频线�
 
 生成代码仍表达 Xbox 的寄存器、内存及调用语义，ReXGlue 运行时负责提供相应的内核/API 与设备支持。
 Windows 图形默认采用 SDK 的 D3D12 后端；输入、音频等依赖使用 SDK 选定的实现。
+宿主音频输出队列通过官方 `audio_factory` 局部接入，SDK 解码/混音与游戏回调保留，见 [音频输出](audio-output.md)。
 所以首先是“生成代码 + ReXGlue 运行时 + 完整开发 SDK”构建和运行，而不是逐个把 Xbox 库替换成 Windows 库。
 
 只有基线运行暴露具体缺口、性能或功能需求时，才做局部宿主适配。
