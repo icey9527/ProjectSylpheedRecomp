@@ -28964,7 +28964,7 @@ DEFINE_REX_FUNC(sub_827A9960) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827A9990) {
+DEFINE_REX_FUNC(Lib2D_LetterObj_GetScale_827A9990) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-20
 	ctx.r3.s64 = ctx.r3.s64 + -20;

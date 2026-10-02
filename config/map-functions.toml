@@ -2,92 +2,92 @@
 # No guessed lengths; analyzer discovers the function bodies.
 [functions]
 # XapiFiberSwapContext
-"0x8233AB90" = {}
+"0x8233AB90" = { name = "XapiFiberSwapContext_8233AB90" }
 # ??_ECRouterEffect@XAUDIO@@UAAPAXI@Z
 # ??_GCRouterEffect@XAUDIO@@UAAPAXI@Z
-"0x8254F0F0" = {}
+"0x8254F0F0" = { name = "XAUDIO_CRouterEffect_vector_deleting_destructor_8254F0F0" }
 # ?SetParam@CPCMSourceEffect@XAUDIO@@UAAJEEPBTXAUDIOFXPARAM@@@Z
 # ?SetParam@CXMASourceEffect@XAUDIO@@UAAJEEPBTXAUDIOFXPARAM@@@Z
-"0x82553608" = {}
+"0x82553608" = { name = "XAUDIO_CPCMSourceEffect_SetParam_82553608" }
 # ?IsShow@TextObj@Lib2D@@UBAHXZ
-"0x82786D68" = {}
+"0x82786D68" = { name = "Lib2D_TextObj_IsShow_82786D68" }
 # ?GetInitialPos@TextObj@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x82786D70" = {}
+"0x82786D70" = { name = "Lib2D_TextObj_GetInitialPos_82786D70" }
 # ?GetRect@TextObj@Lib2D@@UBAXAAURect@2@@Z
-"0x82786D78" = {}
+"0x82786D78" = { name = "Lib2D_TextObj_GetRect_82786D78" }
 # ?GetQuad@TextObj@Lib2D@@UBAXAAUQuad@2@@Z
-"0x82786D80" = {}
+"0x82786D80" = { name = "Lib2D_TextObj_GetQuad_82786D80" }
 # ?GetClickMode@TextObj@Lib2D@@UBAKXZ
-"0x82786DB8" = {}
+"0x82786DB8" = { name = "Lib2D_TextObj_GetClickMode_82786DB8" }
 # ?SetClickMode@TextObj@Lib2D@@UAAXK@Z
-"0x82786DC0" = {}
+"0x82786DC0" = { name = "Lib2D_TextObj_SetClickMode_82786DC0" }
 # ?GetInitialPos@PushButton@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x8278BCF0" = {}
+"0x8278BCF0" = { name = "Lib2D_PushButton_GetInitialPos_8278BCF0" }
 # ?GetRect@PushButton@Lib2D@@UBAXAAURect@2@@Z
-"0x8278BD20" = {}
+"0x8278BD20" = { name = "Lib2D_PushButton_GetRect_8278BD20" }
 # ?GetQuad@PushButton@Lib2D@@UBAXAAUQuad@2@@Z
-"0x8278BD50" = {}
+"0x8278BD50" = { name = "Lib2D_PushButton_GetQuad_8278BD50" }
 # ?GetScale@PushButton@Lib2D@@UBAXAAM0PAU__vector4@@1@Z
-"0x8278BD80" = {}
+"0x8278BD80" = { name = "Lib2D_PushButton_GetScale_8278BD80" }
 # ?GetRotate@PushButton@Lib2D@@UBAXAAU__vector4@@PAU3@@Z
-"0x8278BDB0" = {}
+"0x8278BDB0" = { name = "Lib2D_PushButton_GetRotate_8278BDB0" }
 # ?GetZ@PushButton@Lib2D@@UBAMXZ
-"0x8278BE00" = {}
+"0x8278BE00" = { name = "Lib2D_PushButton_GetZ_8278BE00" }
 # ?GetDiffuseColor@PushButton@Lib2D@@UBAKXZ
-"0x8278BE30" = {}
+"0x8278BE30" = { name = "Lib2D_PushButton_GetDiffuseColor_8278BE30" }
 # ?IsSaturation@PushButton@Lib2D@@UBAHXZ
-"0x8278BE60" = {}
+"0x8278BE60" = { name = "Lib2D_PushButton_IsSaturation_8278BE60" }
 # ?GetClickMode@PushButton@Lib2D@@UBAKXZ
-"0x8278BE90" = {}
+"0x8278BE90" = { name = "Lib2D_PushButton_GetClickMode_8278BE90" }
 # ?SetClickMode@PushButton@Lib2D@@UAAXK@Z
-"0x8278BEC0" = {}
+"0x8278BEC0" = { name = "Lib2D_PushButton_SetClickMode_8278BEC0" }
 # ?GetType@ScrollbarSpin@Lib2D@@UBAKXZ
-"0x8278BEF0" = {}
+"0x8278BEF0" = { name = "Lib2D_ScrollbarSpin_GetType_8278BEF0" }
 # ?IsShow@ScrollbarObj@Lib2D@@UBAHXZ
-"0x8278EB00" = {}
+"0x8278EB00" = { name = "Lib2D_ScrollbarObj_IsShow_8278EB00" }
 # ?GetInitialPos@ScrollbarObj@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x8278EB08" = {}
+"0x8278EB08" = { name = "Lib2D_ScrollbarObj_GetInitialPos_8278EB08" }
 # ?GetRect@ScrollbarObj@Lib2D@@UBAXAAURect@2@@Z
-"0x8278EB10" = {}
+"0x8278EB10" = { name = "Lib2D_ScrollbarObj_GetRect_8278EB10" }
 # ?GetQuad@ScrollbarObj@Lib2D@@UBAXAAUQuad@2@@Z
-"0x8278EB18" = {}
+"0x8278EB18" = { name = "Lib2D_ScrollbarObj_GetQuad_8278EB18" }
 # ?GetClickMode@ScrollbarObj@Lib2D@@UBAKXZ
-"0x8278EB48" = {}
+"0x8278EB48" = { name = "Lib2D_ScrollbarObj_GetClickMode_8278EB48" }
 # ?SetClickMode@ScrollbarObj@Lib2D@@UAAXK@Z
-"0x8278EB50" = {}
+"0x8278EB50" = { name = "Lib2D_ScrollbarObj_SetClickMode_8278EB50" }
 # ?SetPlacement@RatObj@Lib2D@@UAAXK@Z
-"0x827939C0" = {}
+"0x827939C0" = { name = "Lib2D_RatObj_SetPlacement_827939C0" }
 # ?GetInitialPos@RatObj@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x827939D0" = {}
+"0x827939D0" = { name = "Lib2D_RatObj_GetInitialPos_827939D0" }
 # ?GetScale@RatObj@Lib2D@@UBAXAAM0PAU__vector4@@1@Z
-"0x827939D8" = {}
+"0x827939D8" = { name = "Lib2D_RatObj_GetScale_827939D8" }
 # ?GetClickMode@RatObj@Lib2D@@UBAKXZ
-"0x82793A18" = {}
+"0x82793A18" = { name = "Lib2D_RatObj_GetClickMode_82793A18" }
 # ?SetClickMode@RatObj@Lib2D@@UAAXK@Z
-"0x82793A20" = {}
+"0x82793A20" = { name = "Lib2D_RatObj_SetClickMode_82793A20" }
 # ?SetPlacement@PrimitiveObj@Lib2D@@UAAXK@Z
-"0x82797740" = {}
+"0x82797740" = { name = "Lib2D_PrimitiveObj_SetPlacement_82797740" }
 # ?GetInitialPos@PrimitiveObj@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x82797758" = {}
+"0x82797758" = { name = "Lib2D_PrimitiveObj_GetInitialPos_82797758" }
 # ?GetRect@PrimitiveObj@Lib2D@@UBAXAAURect@2@@Z
-"0x82797760" = {}
+"0x82797760" = { name = "Lib2D_PrimitiveObj_GetRect_82797760" }
 # ?GetQuad@PrimitiveObj@Lib2D@@UBAXAAUQuad@2@@Z
-"0x82797768" = {}
+"0x82797768" = { name = "Lib2D_PrimitiveObj_GetQuad_82797768" }
 # ?GetClickMode@PrimitiveObj@Lib2D@@UBAKXZ
-"0x827977B0" = {}
+"0x827977B0" = { name = "Lib2D_PrimitiveObj_GetClickMode_827977B0" }
 # ?SetClickMode@PrimitiveObj@Lib2D@@UAAXK@Z
-"0x827977B8" = {}
+"0x827977B8" = { name = "Lib2D_PrimitiveObj_SetClickMode_827977B8" }
 # ?SetPlacement@LetterObj@Lib2D@@UAAXK@Z
-"0x827A9968" = {}
+"0x827A9968" = { name = "Lib2D_LetterObj_SetPlacement_827A9968" }
 # ?GetInitialPos@LetterObj@Lib2D@@UBAXAAUtagPOINT@@@Z
-"0x827A9980" = {}
+"0x827A9980" = { name = "Lib2D_LetterObj_GetInitialPos_827A9980" }
 # ?GetRect@LetterObj@Lib2D@@UBAXAAURect@2@@Z
-"0x827A9988" = {}
+"0x827A9988" = { name = "Lib2D_LetterObj_GetRect_827A9988" }
 # ?GetScale@LetterObj@Lib2D@@UBAXAAM0PAU__vector4@@1@Z
-"0x827A9990" = {}
+"0x827A9990" = { name = "Lib2D_LetterObj_GetScale_827A9990" }
 # ?GetClickMode@LetterObj@Lib2D@@UBAKXZ
-"0x827A99D8" = {}
+"0x827A99D8" = { name = "Lib2D_LetterObj_GetClickMode_827A99D8" }
 # ?SetClickMode@LetterObj@Lib2D@@UAAXK@Z
-"0x827A99E0" = {}
+"0x827A99E0" = { name = "Lib2D_LetterObj_SetClickMode_827A99E0" }
 # XACTSetVolume
-"0x82858198" = {}
+"0x82858198" = { name = "XACTSetVolume_82858198" }

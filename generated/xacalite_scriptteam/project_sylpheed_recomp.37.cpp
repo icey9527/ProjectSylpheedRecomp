@@ -28412,7 +28412,7 @@ DEFINE_REX_FUNC(sub_82793A38) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827939c0
-	sub_827939C0(ctx, base);
+	Lib2D_RatObj_SetPlacement_827939C0(ctx, base);
 	return;
 }
 
@@ -28423,7 +28423,7 @@ DEFINE_REX_FUNC(sub_82793B18) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827939d0
-	sub_827939D0(ctx, base);
+	Lib2D_RatObj_GetInitialPos_827939D0(ctx, base);
 	return;
 }
 

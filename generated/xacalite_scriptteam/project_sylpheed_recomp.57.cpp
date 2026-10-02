@@ -16759,7 +16759,7 @@ DEFINE_REX_FUNC(sub_82553F38) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x82553608
-	sub_82553608(ctx, base);
+	XAUDIO_CPCMSourceEffect_SetParam_82553608(ctx, base);
 	return;
 }
 

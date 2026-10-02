@@ -23086,7 +23086,7 @@ loc_826C2060:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_826C4788) {
+DEFINE_REX_FUNC(CStageSpecification_Catch_229987_826C4788) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-288
@@ -23527,7 +23527,7 @@ DEFINE_REX_FUNC(sub_826D57E8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_826D8614) {
+DEFINE_REX_FUNC(C2DResourceManager_Catch_188284_826D8614) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-192

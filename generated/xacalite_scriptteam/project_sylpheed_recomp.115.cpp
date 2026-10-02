@@ -7816,7 +7816,7 @@ loc_82310488:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8231468C) {
+DEFINE_REX_FUNC(HangarUI_Catch_187326_8231468C) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-192
@@ -28238,7 +28238,7 @@ DEFINE_REX_FUNC(sub_827939B0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827939D8) {
+DEFINE_REX_FUNC(Lib2D_RatObj_GetScale_827939D8) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-112
 	ctx.r3.s64 = ctx.r3.s64 + -112;
@@ -28247,7 +28247,7 @@ DEFINE_REX_FUNC(sub_827939D8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82793A18) {
+DEFINE_REX_FUNC(Lib2D_RatObj_GetClickMode_82793A18) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-112
 	ctx.r3.s64 = ctx.r3.s64 + -112;
@@ -28263,7 +28263,7 @@ DEFINE_REX_FUNC(sub_82793AC8) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82793a18
-	sub_82793A18(ctx, base);
+	Lib2D_RatObj_GetClickMode_82793A18(ctx, base);
 	return;
 }
 

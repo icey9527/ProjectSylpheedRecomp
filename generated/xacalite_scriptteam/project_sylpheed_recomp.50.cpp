@@ -17131,7 +17131,7 @@ loc_8249C374:
 	sub_82450290(ctx, base);
 }
 
-DEFINE_REX_FUNC(sub_82546298) {
+DEFINE_REX_FUNC(XAUDIO_CEffectManager_QueryInterface_82546298) {
 	REX_FUNC_PROLOGUE();
 	// cmplwi cr6,r3,0
 	ctx.cr6.compare<uint32_t>(ctx.r3.u32, 0, ctx.xer);

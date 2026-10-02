@@ -30380,7 +30380,7 @@ DEFINE_REX_FUNC(sub_82804910) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82807148) {
+DEFINE_REX_FUNC(ISL_Engine_Catch_135468_82807148) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-224

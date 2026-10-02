@@ -28584,7 +28584,7 @@ DEFINE_REX_FUNC(sub_8278BF40) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278be90
-	sub_8278BE90(ctx, base);
+	Lib2D_PushButton_GetClickMode_8278BE90(ctx, base);
 	return;
 }
 
@@ -28595,7 +28595,7 @@ DEFINE_REX_FUNC(sub_8278C000) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278be30
-	sub_8278BE30(ctx, base);
+	Lib2D_PushButton_GetDiffuseColor_8278BE30(ctx, base);
 	return;
 }
 

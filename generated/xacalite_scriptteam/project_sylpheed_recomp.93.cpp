@@ -27563,7 +27563,7 @@ DEFINE_REX_FUNC(sub_8278C5B8) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278be60
-	sub_8278BE60(ctx, base);
+	Lib2D_PushButton_IsSaturation_8278BE60(ctx, base);
 	return;
 }
 

@@ -27912,7 +27912,7 @@ loc_8277C614:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BD50) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetQuad_8278BD50) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);

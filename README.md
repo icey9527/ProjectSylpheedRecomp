@@ -29,7 +29,7 @@ python scripts/verify_game_inputs.py --image-only
 ## 开发
 
 - [代码结构](docs/architecture.md)：生成代码、宿主适配和补丁的边界。
-- [符号索引](docs/symbols.md)：按地址或名字定位函数。
+- [函数命名与符号索引](docs/symbols.md)：已有 62 个入口恢复可读名字，按地址或名字定位函数。
 - [贡献说明](docs/contributing.md)：验证和提交要求。
 - [语言与输入](docs/language-and-input.md)、[Fiber 修复](docs/fiber-fix.md)、[生成边界修复](docs/build-fixes.md)：现有适配依据与限制。
 

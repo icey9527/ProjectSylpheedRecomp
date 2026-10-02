@@ -28983,7 +28983,7 @@ DEFINE_REX_FUNC(sub_827A9B48) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a9990
-	sub_827A9990(ctx, base);
+	Lib2D_LetterObj_GetScale_827A9990(ctx, base);
 	return;
 }
 

@@ -22173,7 +22173,7 @@ loc_826660D0:
 	// lhz r3,160(r3)
 	ctx.r3.u64 = REX_LOAD_U16(ctx.r3.u32 + 160);
 	// b 0x82858198
-	sub_82858198(ctx, base);
+	XACTSetVolume_82858198(ctx, base);
 	return;
 }
 
@@ -27046,7 +27046,7 @@ DEFINE_REX_FUNC(sub_8278B3E4) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BDB0) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetRotate_8278BDB0) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);

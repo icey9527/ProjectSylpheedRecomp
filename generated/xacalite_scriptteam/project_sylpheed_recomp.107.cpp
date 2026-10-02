@@ -26861,7 +26861,7 @@ DEFINE_REX_FUNC(sub_8278BFD0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bd20
-	sub_8278BD20(ctx, base);
+	Lib2D_PushButton_GetRect_8278BD20(ctx, base);
 	return;
 }
 

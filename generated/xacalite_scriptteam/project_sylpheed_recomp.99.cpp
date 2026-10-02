@@ -8644,7 +8644,7 @@ loc_82326E7C:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8233AB90) {
+DEFINE_REX_FUNC(XapiFiberSwapContext_8233AB90) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// lwz r4,256(r13)

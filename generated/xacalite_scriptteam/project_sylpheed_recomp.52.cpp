@@ -28424,7 +28424,7 @@ DEFINE_REX_FUNC(sub_82786E88) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82786dc0
-	sub_82786DC0(ctx, base);
+	Lib2D_TextObj_SetClickMode_82786DC0(ctx, base);
 	return;
 }
 
@@ -28622,7 +28622,7 @@ DEFINE_REX_FUNC(sub_8278BFE0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278be60
-	sub_8278BE60(ctx, base);
+	Lib2D_PushButton_IsSaturation_8278BE60(ctx, base);
 	return;
 }
 
@@ -28642,7 +28642,7 @@ DEFINE_REX_FUNC(sub_8278C4E8) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278bdb0
-	sub_8278BDB0(ctx, base);
+	Lib2D_PushButton_GetRotate_8278BDB0(ctx, base);
 	return;
 }
 

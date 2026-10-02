@@ -7611,7 +7611,7 @@ DEFINE_REX_FUNC(sub_822FAC30) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_822FB1D4) {
+DEFINE_REX_FUNC(SaveLoad_Catch_183734_822FB1D4) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-640
@@ -17810,7 +17810,7 @@ DEFINE_REX_FUNC(sub_8254E8D8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8254F0F0) {
+DEFINE_REX_FUNC(XAUDIO_CRouterEffect_vector_deleting_destructor_8254F0F0) {
 	REX_FUNC_PROLOGUE();
 	// lis r11,-32247
 	ctx.r11.s64 = -2113339392;
@@ -29138,7 +29138,7 @@ DEFINE_REX_FUNC(sub_8278B7B4) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BE90) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetClickMode_8278BE90) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);

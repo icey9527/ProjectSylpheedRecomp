@@ -28717,7 +28717,7 @@ DEFINE_REX_FUNC(sub_827A9978) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827A99E0) {
+DEFINE_REX_FUNC(Lib2D_LetterObj_SetClickMode_827A99E0) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-20
 	ctx.r3.s64 = ctx.r3.s64 + -20;

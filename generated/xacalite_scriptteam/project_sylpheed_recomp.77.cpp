@@ -27531,7 +27531,7 @@ DEFINE_REX_FUNC(sub_827972C0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82797740) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_SetPlacement_82797740) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;
@@ -27547,7 +27547,7 @@ DEFINE_REX_FUNC(sub_82797800) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827977b8
-	sub_827977B8(ctx, base);
+	Lib2D_PrimitiveObj_SetClickMode_827977B8(ctx, base);
 	return;
 }
 

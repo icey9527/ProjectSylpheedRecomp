@@ -16917,7 +16917,7 @@ DEFINE_REX_FUNC(sub_82553590) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82553608) {
+DEFINE_REX_FUNC(XAUDIO_CPCMSourceEffect_SetParam_82553608) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,4
 	ctx.r3.s64 = ctx.r3.s64 + 4;

@@ -26939,7 +26939,7 @@ DEFINE_REX_FUNC(sub_82786D60) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82786D78) {
+DEFINE_REX_FUNC(Lib2D_TextObj_GetRect_82786D78) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-128
 	ctx.r3.s64 = ctx.r3.s64 + -128;

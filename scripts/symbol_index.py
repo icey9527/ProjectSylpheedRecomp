@@ -133,7 +133,7 @@ def read_pdb(path):
     return metadata, symbols, private
 
 
-def demangle(name):
+def demangle(name, flags=0):
     if not name.startswith("?"):
         return name
     try:
@@ -141,7 +141,7 @@ def demangle(name):
         function.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint, ctypes.c_uint]
         function.restype = ctypes.c_uint
         buffer = ctypes.create_unicode_buffer(4096)
-        if function(name, buffer, len(buffer), 0):
+        if function(name, buffer, len(buffer), flags):
             return buffer.value
     except (AttributeError, OSError):
         pass
@@ -169,14 +169,41 @@ def read_map(path):
     return (f"0x{int(stamp[1], 16):08X}" if stamp else None), rows
 
 
+def generated_registrations(directory):
+    """The generated registrar is the address authority, including renamed functions."""
+    registrations = {}
+    pattern = re.compile(r"registrar->SetFunction\(\s*(0x[0-9A-Fa-f]+)\s*,\s*(\w+)\s*\)")
+    for file in sorted(Path(directory).glob("*_register.cpp")):
+        for address, name in pattern.findall(file.read_text(encoding="utf-8")):
+            key = f"0x{int(address, 16):08X}"
+            if key in registrations and registrations[key] != name:
+                raise ValueError(f"Conflicting generated registration for {key}")
+            registrations[key] = name
+    return registrations
+
+
 def generated_functions(directory):
-    functions = {}
+    registrations = generated_registrations(directory)
+    definitions = {}
     pattern = re.compile(r"DEFINE_REX_FUNC\((\w+)\)")
     for file in sorted(Path(directory).glob("*_recomp*.cpp")):
         for line_number, line in enumerate(file.read_text(encoding="utf-8").splitlines(), 1):
             match = pattern.search(line)
-            if match and re.fullmatch(r"sub_[0-9A-Fa-f]{8}", match[1]):
-                functions[f"0x{int(match[1][4:], 16):08X}"] = (match[1], file.name, line_number)
+            if match:
+                name = match[1]
+                if name in definitions:
+                    raise ValueError(f"Duplicate generated definition: {name}")
+                definitions[name] = (name, file.name, line_number)
+    functions = {address: definitions[name] for address, name in registrations.items()
+                 if name in definitions}
+    # Legacy generated fixtures may omit the registrar. Do not infer addresses
+    # from suffixes of readable names: only the old sub_ADDRESS form is explicit.
+    for name, location in definitions.items():
+        if re.fullmatch(r"sub_[0-9A-Fa-f]{8}", name):
+            address = f"0x{int(name[4:], 16):08X}"
+            if registrations and registrations.get(address) != name:
+                raise ValueError(f"Generated definition/registration mismatch for {address}")
+            functions.setdefault(address, location)
     return functions
 
 
@@ -225,7 +252,9 @@ def build(args):
         map_rows_without_public_or_module_location=sum(
             row["pdb_status"] == "absent_public_location" and
             row["pdb_module_status"] == "absent_module_location" for row in rows),
-        generated_sub_function_count=len(generated),
+        generated_sub_function_count=sum(bool(re.fullmatch(r"sub_[0-9A-Fa-f]{8}", value[0]))
+                                         for value in generated.values()),
+        generated_function_count=len(generated),
         map_unique_addresses_with_generated_entry=len(set(counts) & set(generated)),
         map_unique_addresses_without_generated_entry=len(set(counts) - set(generated)),
         generated_entries_without_map_function=len(set(generated) - set(counts)),
@@ -241,7 +270,8 @@ def build(args):
                 "Segment:offset equality is checked; no PDB section remapping applied.",
                 "XEX CodeView GUID/age has not been verified.",
                 "MAP function names are not reliable function lengths or subsystem boundaries.",
-                "Generated entry comparison recognizes sub_ADDRESS definitions only."])
+                "Generated addresses use registrar SetFunction entries and emitted definitions; "
+                "legacy sub_ADDRESS definitions can be read without a registrar."])
     output.with_suffix(".summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 

@@ -28450,7 +28450,7 @@ DEFINE_REX_FUNC(sub_8278BF60) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bcf0
-	sub_8278BCF0(ctx, base);
+	Lib2D_PushButton_GetInitialPos_8278BCF0(ctx, base);
 	return;
 }
 
@@ -28461,7 +28461,7 @@ DEFINE_REX_FUNC(sub_8278C030) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bec0
-	sub_8278BEC0(ctx, base);
+	Lib2D_PushButton_SetClickMode_8278BEC0(ctx, base);
 	return;
 }
 
@@ -28485,7 +28485,7 @@ DEFINE_REX_FUNC(sub_8278C608) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278bec0
-	sub_8278BEC0(ctx, base);
+	Lib2D_PushButton_SetClickMode_8278BEC0(ctx, base);
 	return;
 }
 
@@ -29421,7 +29421,7 @@ DEFINE_REX_FUNC(sub_827A9B18) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a9968
-	sub_827A9968(ctx, base);
+	Lib2D_LetterObj_SetPlacement_827A9968(ctx, base);
 	return;
 }
 

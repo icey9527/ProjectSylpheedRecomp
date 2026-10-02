@@ -27474,7 +27474,7 @@ DEFINE_REX_FUNC(sub_8278E8F0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278EB18) {
+DEFINE_REX_FUNC(Lib2D_ScrollbarObj_GetQuad_8278EB18) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-84
 	ctx.r3.s64 = ctx.r3.s64 + -84;
@@ -27490,7 +27490,7 @@ DEFINE_REX_FUNC(sub_8278EB88) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278eb00
-	sub_8278EB00(ctx, base);
+	Lib2D_ScrollbarObj_IsShow_8278EB00(ctx, base);
 	return;
 }
 

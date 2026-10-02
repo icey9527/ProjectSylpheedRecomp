@@ -4591,7 +4591,7 @@ DEFINE_REX_FUNC(sub_82279BE8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8227A2F4) {
+DEFINE_REX_FUNC(commu_tbl_text_Catch_166190_8227A2F4) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-176
@@ -28003,7 +28003,7 @@ loc_827887D0:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BD80) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetScale_8278BD80) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);
@@ -28041,7 +28041,7 @@ DEFINE_REX_FUNC(sub_8278C598) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278be00
-	sub_8278BE00(ctx, base);
+	Lib2D_PushButton_GetZ_8278BE00(ctx, base);
 	return;
 }
 
@@ -28382,7 +28382,7 @@ DEFINE_REX_FUNC(sub_827977F0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82797740
-	sub_82797740(ctx, base);
+	Lib2D_PrimitiveObj_SetPlacement_82797740(ctx, base);
 	return;
 }
 

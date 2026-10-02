@@ -3,36 +3,36 @@
 # MAP catch names and PDB module labels agree at every start. See docs/build-fixes.md.
 [functions]
 # __catch$156217 / GamePart_MovieTheater.obj
-"0x821EE4B8" = { end = 0x821EE504 }
+"0x821EE4B8" = { name = "GamePart_MovieTheater_Catch_156217_821EE4B8", end = 0x821EE504 }
 # __catch$158121 / GamePart_Selector.obj
-"0x821F5AB4" = { end = 0x821F5B00 }
+"0x821F5AB4" = { name = "GamePart_Selector_Catch_158121_821F5AB4", end = 0x821F5B00 }
 # __catch$166190 / commu_tbl_text.obj
-"0x8227A2F4" = { end = 0x8227A340 }
+"0x8227A2F4" = { name = "commu_tbl_text_Catch_166190_8227A2F4", end = 0x8227A340 }
 # __catch$266772 / StageScriptPhase.obj
-"0x822DE56C" = { end = 0x822DE5B0 }
+"0x822DE56C" = { name = "StageScriptPhase_Catch_266772_822DE56C", end = 0x822DE5B0 }
 # __catch$183734 / SaveLoad.obj
-"0x822FB1D4" = { end = 0x822FB220 }
+"0x822FB1D4" = { name = "SaveLoad_Catch_183734_822FB1D4", end = 0x822FB220 }
 # __catch$186614 / SaveLoad.obj
-"0x822FB680" = { end = 0x822FB6CC }
+"0x822FB680" = { name = "SaveLoad_Catch_186614_822FB680", end = 0x822FB6CC }
 # __catch$187326 / HangarUI.obj
-"0x8231468C" = { end = 0x823146D8 }
+"0x8231468C" = { name = "HangarUI_Catch_187326_8231468C", end = 0x823146D8 }
 # __catch$188509 / HangarUI.obj
-"0x82314A84" = { end = 0x82314AD0 }
+"0x82314A84" = { name = "HangarUI_Catch_188509_82314A84", end = 0x82314AD0 }
 # __catch$172671 / Leaderboard.obj
-"0x8232DAB0" = { end = 0x8232DAFC }
+"0x8232DAB0" = { name = "Leaderboard_Catch_172671_8232DAB0", end = 0x8232DAFC }
 # __catch$175035 / Leaderboard.obj
-"0x8232E2C8" = { end = 0x8232E314 }
+"0x8232E2C8" = { name = "Leaderboard_Catch_175035_8232E2C8", end = 0x8232E314 }
 # __catch$229987 / SilpheedXenon:CStageSpecification.obj
-"0x826C4788" = { end = 0x826C47D4 }
+"0x826C4788" = { name = "CStageSpecification_Catch_229987_826C4788", end = 0x826C47D4 }
 # __catch$231280 / SilpheedXenon:CStageSpecification.obj
-"0x826C4B80" = { end = 0x826C4BCC }
+"0x826C4B80" = { name = "CStageSpecification_Catch_231280_826C4B80", end = 0x826C4BCC }
 # __catch$237344 / SilpheedXenon:CStageSpecification.obj
-"0x826C62A8" = { end = 0x826C62F4 }
+"0x826C62A8" = { name = "CStageSpecification_Catch_237344_826C62A8", end = 0x826C62F4 }
 # __catch$188284 / SilpheedXenon:C2DResourceManager.obj
-"0x826D8614" = { end = 0x826D8660 }
+"0x826D8614" = { name = "C2DResourceManager_Catch_188284_826D8614", end = 0x826D8660 }
 # __catch$210988 / SilpheedXenon:CUnitManager.obj
-"0x826F8F40" = { end = 0x826F8F8C }
+"0x826F8F40" = { name = "CUnitManager_Catch_210988_826F8F40", end = 0x826F8F8C }
 # __catch$114279 / 2DGrpLib:BitmapReader.obj
-"0x827B3F20" = { end = 0x827B3F6C }
+"0x827B3F20" = { name = "BitmapReader_Catch_114279_827B3F20", end = 0x827B3F6C }
 # __catch$135468 / ISL_Release:ISL_Engine.obj
-"0x82807148" = { end = 0x82807194 }
+"0x82807148" = { name = "ISL_Engine_Catch_135468_82807148", end = 0x82807194 }

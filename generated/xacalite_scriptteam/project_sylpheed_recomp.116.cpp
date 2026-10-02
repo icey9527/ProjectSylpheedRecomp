@@ -27354,7 +27354,7 @@ DEFINE_REX_FUNC(sub_82786E68) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82786d70
-	sub_82786D70(ctx, base);
+	Lib2D_TextObj_GetInitialPos_82786D70(ctx, base);
 	return;
 }
 
@@ -27519,7 +27519,7 @@ loc_82787C88:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BCF0) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetInitialPos_8278BCF0) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);
@@ -28483,7 +28483,7 @@ loc_827A6348:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827A99D8) {
+DEFINE_REX_FUNC(Lib2D_LetterObj_GetClickMode_827A99D8) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-20
 	ctx.r3.s64 = ctx.r3.s64 + -20;
@@ -28499,7 +28499,7 @@ DEFINE_REX_FUNC(sub_827A9AE8) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a9980
-	sub_827A9980(ctx, base);
+	Lib2D_LetterObj_GetInitialPos_827A9980(ctx, base);
 	return;
 }
 

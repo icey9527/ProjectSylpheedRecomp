@@ -2,6 +2,7 @@
 
 #include "project_sylpheed_pch.h"
 
+DECLARE_REX_FUNC(Lib2D_PushButton_GetDiffuseColor_8278BE30);
 DECLARE_REX_FUNC(__imp__NtAllocateVirtualMemory);
 DECLARE_REX_FUNC(__imp__NtFreeVirtualMemory);
 DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
@@ -363,7 +364,6 @@ DECLARE_REX_FUNC(sub_827086E0);
 DECLARE_REX_FUNC(sub_82709408);
 DECLARE_REX_FUNC(sub_827202B8);
 DECLARE_REX_FUNC(sub_82785160);
-DECLARE_REX_FUNC(sub_8278BE30);
 DECLARE_REX_FUNC(sub_8278C228);
 DECLARE_REX_FUNC(sub_8278F608);
 DECLARE_REX_FUNC(sub_82798F08);

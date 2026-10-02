@@ -25380,7 +25380,7 @@ loc_826C2170:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_826C4B80) {
+DEFINE_REX_FUNC(CStageSpecification_Catch_231280_826C4B80) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-208

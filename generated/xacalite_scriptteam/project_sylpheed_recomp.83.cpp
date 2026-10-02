@@ -2141,7 +2141,7 @@ loc_821E8588:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_821EE4B8) {
+DEFINE_REX_FUNC(GamePart_MovieTheater_Catch_156217_821EE4B8) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-208
@@ -26987,7 +26987,7 @@ DEFINE_REX_FUNC(sub_82786DE8) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82786d78
-	sub_82786D78(ctx, base);
+	Lib2D_TextObj_GetRect_82786D78(ctx, base);
 	return;
 }
 

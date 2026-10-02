@@ -3,4 +3,4 @@
 [functions]
 # ?QueryInterface@CEffectManager@XAUDIO@@UAAXPAPAUIXAudioEffectManager@@@Z
 # ?QueryInterface@CFrameBuffer@XAUDIO@@UAAXPAPAUIXAudioFrameBuffer@@@Z
-"0x82546298" = {}
+"0x82546298" = { name = "XAUDIO_CEffectManager_QueryInterface_82546298" }

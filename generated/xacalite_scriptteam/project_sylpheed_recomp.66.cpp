@@ -29476,7 +29476,7 @@ DEFINE_REX_FUNC(sub_8278BA28) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BE00) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetZ_8278BE00) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);
@@ -29514,7 +29514,7 @@ DEFINE_REX_FUNC(sub_8278C5D8) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278be30
-	sub_8278BE30(ctx, base);
+	Lib2D_PushButton_GetDiffuseColor_8278BE30(ctx, base);
 	return;
 }
 

@@ -7301,7 +7301,7 @@ loc_822F9494:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_822FB680) {
+DEFINE_REX_FUNC(SaveLoad_Catch_186614_822FB680) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-192

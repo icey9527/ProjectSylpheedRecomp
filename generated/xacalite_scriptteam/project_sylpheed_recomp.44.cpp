@@ -28715,7 +28715,7 @@ DEFINE_REX_FUNC(sub_82797718) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82797758) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_GetInitialPos_82797758) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;

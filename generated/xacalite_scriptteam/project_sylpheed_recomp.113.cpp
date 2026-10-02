@@ -7701,7 +7701,7 @@ DEFINE_REX_FUNC(sub_8232CBD8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8232E2C8) {
+DEFINE_REX_FUNC(Leaderboard_Catch_175035_8232E2C8) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-240

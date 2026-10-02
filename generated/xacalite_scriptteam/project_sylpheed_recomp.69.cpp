@@ -28660,7 +28660,7 @@ DEFINE_REX_FUNC(sub_827978D0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827977b0
-	sub_827977B0(ctx, base);
+	Lib2D_PrimitiveObj_GetClickMode_827977B0(ctx, base);
 	return;
 }
 

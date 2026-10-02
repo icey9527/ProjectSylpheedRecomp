@@ -27525,7 +27525,7 @@ DEFINE_REX_FUNC(sub_827939E0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82793A20) {
+DEFINE_REX_FUNC(Lib2D_RatObj_SetClickMode_82793A20) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-112
 	ctx.r3.s64 = ctx.r3.s64 + -112;

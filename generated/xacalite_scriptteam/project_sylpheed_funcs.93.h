@@ -2,6 +2,7 @@
 
 #include "project_sylpheed_pch.h"
 
+DECLARE_REX_FUNC(Lib2D_PushButton_IsSaturation_8278BE60);
 DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
 DECLARE_REX_FUNC(__imp__RtlInitializeCriticalSection);
 DECLARE_REX_FUNC(__imp__RtlInitializeCriticalSectionAndSpinCount);
@@ -285,7 +286,6 @@ DECLARE_REX_FUNC(sub_82785160);
 DECLARE_REX_FUNC(sub_82785708);
 DECLARE_REX_FUNC(sub_82785B90);
 DECLARE_REX_FUNC(sub_82786ED8);
-DECLARE_REX_FUNC(sub_8278BE60);
 DECLARE_REX_FUNC(sub_8278F608);
 DECLARE_REX_FUNC(sub_8279CE20);
 DECLARE_REX_FUNC(sub_8279F5D8);

@@ -26960,7 +26960,7 @@ loc_82785D54:
 	sub_82832618(ctx, base);
 }
 
-DEFINE_REX_FUNC(sub_82786D80) {
+DEFINE_REX_FUNC(Lib2D_TextObj_GetQuad_82786D80) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-128
 	ctx.r3.s64 = ctx.r3.s64 + -128;
@@ -26985,7 +26985,7 @@ DEFINE_REX_FUNC(sub_82786E18) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82786db8
-	sub_82786DB8(ctx, base);
+	Lib2D_TextObj_GetClickMode_82786DB8(ctx, base);
 	return;
 }
 
@@ -27170,7 +27170,7 @@ DEFINE_REX_FUNC(sub_8278C020) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bd50
-	sub_8278BD50(ctx, base);
+	Lib2D_PushButton_GetQuad_8278BD50(ctx, base);
 	return;
 }
 
@@ -27523,7 +27523,7 @@ loc_82795B70:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82797760) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_GetRect_82797760) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;
@@ -27539,7 +27539,7 @@ DEFINE_REX_FUNC(sub_82797860) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82797760
-	sub_82797760(ctx, base);
+	Lib2D_PrimitiveObj_GetRect_82797760(ctx, base);
 	return;
 }
 
@@ -28319,7 +28319,7 @@ loc_827A8000:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827B3F20) {
+DEFINE_REX_FUNC(BitmapReader_Catch_114279_827B3F20) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-1280

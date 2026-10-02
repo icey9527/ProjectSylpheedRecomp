@@ -6284,7 +6284,7 @@ DEFINE_REX_FUNC(sub_822DCC1C) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_822DE56C) {
+DEFINE_REX_FUNC(StageScriptPhase_Catch_266772_822DE56C) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-256

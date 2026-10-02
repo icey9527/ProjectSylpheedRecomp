@@ -27453,7 +27453,7 @@ loc_827417C8:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82786D68) {
+DEFINE_REX_FUNC(Lib2D_TextObj_IsShow_82786D68) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-128
 	ctx.r3.s64 = ctx.r3.s64 + -128;
@@ -27478,7 +27478,7 @@ DEFINE_REX_FUNC(sub_82786DF8) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82786d68
-	sub_82786D68(ctx, base);
+	Lib2D_TextObj_IsShow_82786D68(ctx, base);
 	return;
 }
 
@@ -27780,7 +27780,7 @@ DEFINE_REX_FUNC(sub_8278E910) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278EB10) {
+DEFINE_REX_FUNC(Lib2D_ScrollbarObj_GetRect_8278EB10) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-84
 	ctx.r3.s64 = ctx.r3.s64 + -84;

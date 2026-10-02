@@ -26155,7 +26155,7 @@ DEFINE_REX_FUNC(sub_82786D58) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82786D70) {
+DEFINE_REX_FUNC(Lib2D_TextObj_GetInitialPos_82786D70) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-128
 	ctx.r3.s64 = ctx.r3.s64 + -128;
@@ -26371,7 +26371,7 @@ DEFINE_REX_FUNC(sub_8278B434) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BE30) {
+DEFINE_REX_FUNC(Lib2D_PushButton_GetDiffuseColor_8278BE30) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);
@@ -26409,7 +26409,7 @@ DEFINE_REX_FUNC(sub_8278C5F8) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278bd50
-	sub_8278BD50(ctx, base);
+	Lib2D_PushButton_GetQuad_8278BD50(ctx, base);
 	return;
 }
 
@@ -26770,7 +26770,7 @@ DEFINE_REX_FUNC(sub_827978E0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82797768
-	sub_82797768(ctx, base);
+	Lib2D_PrimitiveObj_GetQuad_82797768(ctx, base);
 	return;
 }
 

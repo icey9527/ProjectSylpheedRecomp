@@ -7679,7 +7679,7 @@ loc_82310ECC:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82314A84) {
+DEFINE_REX_FUNC(HangarUI_Catch_188509_82314A84) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-192
@@ -25117,7 +25117,7 @@ DEFINE_REX_FUNC(sub_82797720) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827977B0) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_GetClickMode_827977B0) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;

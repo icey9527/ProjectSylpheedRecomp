@@ -2,6 +2,7 @@
 
 #include "project_sylpheed_pch.h"
 
+DECLARE_REX_FUNC(Lib2D_PrimitiveObj_GetClickMode_827977B0);
 DECLARE_REX_FUNC(__imp__KeAcquireSpinLockAtRaisedIrql);
 DECLARE_REX_FUNC(__imp__KeRaiseIrqlToDpcLevel);
 DECLARE_REX_FUNC(__imp__KeReleaseSpinLockFromRaisedIrql);
@@ -400,7 +401,6 @@ DECLARE_REX_FUNC(sub_82785C70);
 DECLARE_REX_FUNC(sub_82786F00);
 DECLARE_REX_FUNC(sub_8278F608);
 DECLARE_REX_FUNC(sub_827939A8);
-DECLARE_REX_FUNC(sub_827977B0);
 DECLARE_REX_FUNC(sub_82799370);
 DECLARE_REX_FUNC(sub_8279C258);
 DECLARE_REX_FUNC(sub_8279EDA8);

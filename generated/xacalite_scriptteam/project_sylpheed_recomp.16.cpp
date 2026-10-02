@@ -26496,7 +26496,7 @@ DEFINE_REX_FUNC(sub_82786CC0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82786DC0) {
+DEFINE_REX_FUNC(Lib2D_TextObj_SetClickMode_82786DC0) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-128
 	ctx.r3.s64 = ctx.r3.s64 + -128;
@@ -26712,7 +26712,7 @@ loc_8278B12C:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BEC0) {
+DEFINE_REX_FUNC(Lib2D_PushButton_SetClickMode_8278BEC0) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);

@@ -26991,7 +26991,7 @@ DEFINE_REX_FUNC(sub_8278E658) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278EB50) {
+DEFINE_REX_FUNC(Lib2D_ScrollbarObj_SetClickMode_8278EB50) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-84
 	ctx.r3.s64 = ctx.r3.s64 + -84;
@@ -27135,7 +27135,7 @@ DEFINE_REX_FUNC(sub_827939A0) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827939C0) {
+DEFINE_REX_FUNC(Lib2D_RatObj_SetPlacement_827939C0) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-112
 	ctx.r3.s64 = ctx.r3.s64 + -112;

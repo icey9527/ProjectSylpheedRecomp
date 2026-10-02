@@ -24936,7 +24936,7 @@ DEFINE_REX_FUNC(sub_826C2640) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_826C62A8) {
+DEFINE_REX_FUNC(CStageSpecification_Catch_237344_826C62A8) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-528
@@ -29382,7 +29382,7 @@ DEFINE_REX_FUNC(sub_827A9950) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827A9988) {
+DEFINE_REX_FUNC(Lib2D_LetterObj_GetRect_827A9988) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-20
 	ctx.r3.s64 = ctx.r3.s64 + -20;

@@ -2,6 +2,7 @@
 
 #include "project_sylpheed_pch.h"
 
+DECLARE_REX_FUNC(Lib2D_ScrollbarObj_GetQuad_8278EB18);
 DECLARE_REX_FUNC(__imp__NtAllocateVirtualMemory);
 DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
 DECLARE_REX_FUNC(__imp__RtlLeaveCriticalSection);
@@ -333,7 +334,6 @@ DECLARE_REX_FUNC(sub_82762E90);
 DECLARE_REX_FUNC(sub_8276BB68);
 DECLARE_REX_FUNC(sub_8276C438);
 DECLARE_REX_FUNC(sub_82785110);
-DECLARE_REX_FUNC(sub_8278EB18);
 DECLARE_REX_FUNC(sub_8278EC70);
 DECLARE_REX_FUNC(sub_8278F608);
 DECLARE_REX_FUNC(sub_82799370);

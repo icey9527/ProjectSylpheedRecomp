@@ -24831,7 +24831,7 @@ DEFINE_REX_FUNC(sub_826F7038) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_826F8F40) {
+DEFINE_REX_FUNC(CUnitManager_Catch_210988_826F8F40) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-224
@@ -27556,7 +27556,7 @@ DEFINE_REX_FUNC(sub_8278EBE8) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278eb18
-	sub_8278EB18(ctx, base);
+	Lib2D_ScrollbarObj_GetQuad_8278EB18(ctx, base);
 	return;
 }
 

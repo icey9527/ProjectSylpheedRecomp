@@ -2221,7 +2221,7 @@ DEFINE_REX_FUNC(sub_821F4C20) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_821F5AB4) {
+DEFINE_REX_FUNC(GamePart_Selector_Catch_158121_821F5AB4) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-176

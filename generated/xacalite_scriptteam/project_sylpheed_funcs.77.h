@@ -2,6 +2,7 @@
 
 #include "project_sylpheed_pch.h"
 
+DECLARE_REX_FUNC(Lib2D_PrimitiveObj_SetClickMode_827977B8);
 DECLARE_REX_FUNC(__imp__RtlEnterCriticalSection);
 DECLARE_REX_FUNC(__imp__RtlInitializeCriticalSection);
 DECLARE_REX_FUNC(__imp__RtlInitializeCriticalSectionAndSpinCount);
@@ -378,7 +379,6 @@ DECLARE_REX_FUNC(sub_82785198);
 DECLARE_REX_FUNC(sub_82785660);
 DECLARE_REX_FUNC(sub_8278CC20);
 DECLARE_REX_FUNC(sub_8278F608);
-DECLARE_REX_FUNC(sub_827977B8);
 DECLARE_REX_FUNC(sub_82797960);
 DECLARE_REX_FUNC(sub_82799370);
 DECLARE_REX_FUNC(sub_8279B6C0);

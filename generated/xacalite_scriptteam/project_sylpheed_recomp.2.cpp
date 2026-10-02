@@ -28948,7 +28948,7 @@ DEFINE_REX_FUNC(sub_8278BF30) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bd80
-	sub_8278BD80(ctx, base);
+	Lib2D_PushButton_GetScale_8278BD80(ctx, base);
 	return;
 }
 
@@ -29071,7 +29071,7 @@ DEFINE_REX_FUNC(sub_8278EC28) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278eb48
-	sub_8278EB48(ctx, base);
+	Lib2D_ScrollbarObj_GetClickMode_8278EB48(ctx, base);
 	return;
 }
 

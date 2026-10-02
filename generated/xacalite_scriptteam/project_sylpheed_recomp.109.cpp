@@ -16499,7 +16499,7 @@ DEFINE_REX_FUNC(sub_8254E898) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8254f0f0
-	sub_8254F0F0(ctx, base);
+	XAUDIO_CRouterEffect_vector_deleting_destructor_8254F0F0(ctx, base);
 	return;
 }
 
@@ -26485,7 +26485,7 @@ DEFINE_REX_FUNC(sub_8278BF00) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278bdb0
-	sub_8278BDB0(ctx, base);
+	Lib2D_PushButton_GetRotate_8278BDB0(ctx, base);
 	return;
 }
 
@@ -26496,7 +26496,7 @@ DEFINE_REX_FUNC(sub_8278BFC0) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278be00
-	sub_8278BE00(ctx, base);
+	Lib2D_PushButton_GetZ_8278BE00(ctx, base);
 	return;
 }
 
@@ -26951,7 +26951,7 @@ DEFINE_REX_FUNC(sub_827A9B28) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a9988
-	sub_827A9988(ctx, base);
+	Lib2D_LetterObj_GetRect_827A9988(ctx, base);
 	return;
 }
 

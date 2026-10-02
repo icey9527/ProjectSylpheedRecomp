@@ -27570,7 +27570,7 @@ DEFINE_REX_FUNC(sub_8278BC90) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BEF0) {
+DEFINE_REX_FUNC(Lib2D_ScrollbarSpin_GetType_8278BEF0) {
 	REX_FUNC_PROLOGUE();
 	// lis r3,21328
 	ctx.r3.s64 = 1397751808;
@@ -27611,7 +27611,7 @@ DEFINE_REX_FUNC(sub_8278C528) {
 	// addi r3,r3,-4
 	ctx.r3.s64 = ctx.r3.s64 + -4;
 	// b 0x8278be90
-	sub_8278BE90(ctx, base);
+	Lib2D_PushButton_GetClickMode_8278BE90(ctx, base);
 	return;
 }
 
@@ -27687,7 +27687,7 @@ DEFINE_REX_FUNC(sub_8278E5B4) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278EB08) {
+DEFINE_REX_FUNC(Lib2D_ScrollbarObj_GetInitialPos_8278EB08) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-84
 	ctx.r3.s64 = ctx.r3.s64 + -84;
@@ -27703,7 +27703,7 @@ DEFINE_REX_FUNC(sub_8278EB68) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x8278eb10
-	sub_8278EB10(ctx, base);
+	Lib2D_ScrollbarObj_GetRect_8278EB10(ctx, base);
 	return;
 }
 

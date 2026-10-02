@@ -27476,7 +27476,7 @@ DEFINE_REX_FUNC(sub_82797700) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_82797768) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_GetQuad_82797768) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;

@@ -27985,7 +27985,7 @@ loc_82788E0C:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8278BE60) {
+DEFINE_REX_FUNC(Lib2D_PushButton_IsSaturation_8278BE60) {
 	REX_FUNC_PROLOGUE();
 	// lwz r11,-24(r3)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r3.u32 + -24);
@@ -28362,7 +28362,7 @@ DEFINE_REX_FUNC(sub_82797360) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827977B8) {
+DEFINE_REX_FUNC(Lib2D_PrimitiveObj_SetClickMode_827977B8) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-24
 	ctx.r3.s64 = ctx.r3.s64 + -24;

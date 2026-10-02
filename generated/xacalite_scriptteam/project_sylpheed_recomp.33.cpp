@@ -28658,7 +28658,7 @@ DEFINE_REX_FUNC(sub_827939A8) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827939D0) {
+DEFINE_REX_FUNC(Lib2D_RatObj_GetInitialPos_827939D0) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-112
 	ctx.r3.s64 = ctx.r3.s64 + -112;
@@ -28683,7 +28683,7 @@ DEFINE_REX_FUNC(sub_82793A68) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827939d8
-	sub_827939D8(ctx, base);
+	Lib2D_RatObj_GetScale_827939D8(ctx, base);
 	return;
 }
 
@@ -29368,7 +29368,7 @@ DEFINE_REX_FUNC(sub_827A8838) {
 	return;
 }
 
-DEFINE_REX_FUNC(sub_827A9968) {
+DEFINE_REX_FUNC(Lib2D_LetterObj_SetPlacement_827A9968) {
 	REX_FUNC_PROLOGUE();
 	// addi r3,r3,-20
 	ctx.r3.s64 = ctx.r3.s64 + -20;
@@ -29393,7 +29393,7 @@ DEFINE_REX_FUNC(sub_827A9A58) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a99d8
-	sub_827A99D8(ctx, base);
+	Lib2D_LetterObj_GetClickMode_827A99D8(ctx, base);
 	return;
 }
 

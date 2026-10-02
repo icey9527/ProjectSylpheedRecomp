@@ -27242,7 +27242,7 @@ DEFINE_REX_FUNC(sub_827A9B38) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x827a99e0
-	sub_827A99E0(ctx, base);
+	Lib2D_LetterObj_SetClickMode_827A99E0(ctx, base);
 	return;
 }
 

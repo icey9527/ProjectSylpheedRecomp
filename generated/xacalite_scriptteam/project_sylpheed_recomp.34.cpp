@@ -8081,7 +8081,7 @@ loc_8231ACEC:
 	return;
 }
 
-DEFINE_REX_FUNC(sub_8232DAB0) {
+DEFINE_REX_FUNC(Leaderboard_Catch_172671_8232DAB0) {
 	REX_FUNC_PROLOGUE();
 	uint32_t ea{};
 	// addi r31,r12,-192

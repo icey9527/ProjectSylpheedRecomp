@@ -29223,7 +29223,7 @@ DEFINE_REX_FUNC(sub_82793A58) {
 	// subf r3,r11,r3
 	ctx.r3.u64 = ctx.r3.u64 - ctx.r11.u64;
 	// b 0x82793a20
-	sub_82793A20(ctx, base);
+	Lib2D_RatObj_SetClickMode_82793A20(ctx, base);
 	return;
 }
 
