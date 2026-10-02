@@ -22,6 +22,8 @@ workspace/
 
 已有提交的入口/边界配置可用于代码生成；不做符号分析时 MAP/PDB 可缺省。只有三份分析输入仍不足以运行游戏，运行资源可以放在独立目录，并由宿主 TOML 指向。
 
+从干净源码树仅提供匹配镜像，可以完成代码生成与 CMake 配置；`generated/rexglue.cmake` 也由官方 codegen 重建。MAP/PDB 用于进一步调查，并非使用已提交修复配置的构建前提。编译还需要完整 SDK 和工具链，运行还需要完整资源。
+
 ## 匹配检查
 
 `config/game-inputs.json` 记录已使用三份文件的大小、SHA-256，以及 PDB GUID/age。执行：
