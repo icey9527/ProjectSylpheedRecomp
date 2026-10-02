@@ -42,6 +42,16 @@ python scripts/run_development.py --game-data-root "<完整资源目录>" --seco
 
 捕获 Windows 异常可使用 `scripts/debug_development.py`，先运行 `--help` 查看目标异常和时间限制；宿主本身没有 codegen 工具的 `--help` 退出行为。
 
+定位 CRT `abort()` 弹窗时：
+
+```powershell
+python scripts/debug_development.py --game-data-root "<完整资源目录>" --capture-breakpoints --seconds 300
+```
+
+在该脚本启动的窗口中手动复现；如果出现 CRT 弹窗，选择“重试（Retry）”让调试器取得断点现场。脚本跳过初始加载器断点，捕获后续断点、目标地址的首次访问违规或任意未处理异常，并结束本次启动的进程。它不会跳过错误继续游戏。
+
+证据保存在仓库同级 `logs/crash-probe-<时间>/`：`launch.json`、`runtime.log`、`capture.json`（异常与各线程的宿主栈）、`host.dmp` 和 `result.json`。转储包含线程栈及部分关联内存，不是完整 Xbox 内存快照。宿主寄存器不能直接当作 PPC 寄存器；SDK DLL 缺少匹配 PDB 时，部分栈帧只能显示地址或导出名。
+
 ## 其他版本资源实验
 
 开发代码配合零售资源仅验证过镜像加载，完整兼容性未知。需要尝试时可使用 `scripts/Prepare-ResourceTest.ps1 -GameDataRoot "<资源目录>"`，仅补入缺少的开发镜像，保留已有文件。它不会把宿主转换为零售版；故障诊断优先使用配套开发版资源。

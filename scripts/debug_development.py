@@ -1,7 +1,8 @@
 """Capture a Windows x64 development-host exception with DbgHelp stack symbols.
 
 Standard library only. Evidence stays outside Git. Stops the debuggee after a
-matching first-chance AV or any second-chance AV; this is a diagnostic run.
+matching first-chance AV or any unhandled exception. Optionally captures
+breakpoints after the initial loader breakpoint (for example CRT abort Retry).
 """
 import ctypes as C
 from ctypes import wintypes as W
@@ -13,6 +14,7 @@ ROOT = REPO.parent
 OUT = None
 if sys.platform != 'win32' or C.sizeof(C.c_void_p) != 8:
     raise SystemExit('This diagnostic requires Windows and 64-bit Python.')
+import msvcrt
 KERNEL32 = C.WinDLL('kernel32', use_last_error=True)
 DBGHELP = C.WinDLL('dbghelp', use_last_error=True)
 VOID_P = C.c_void_p
@@ -65,6 +67,8 @@ symopts = proto(DBGHELP, 'SymSetOptions', W.DWORD, [W.DWORD])
 symfrom = proto(DBGHELP, 'SymFromAddr', W.BOOL, [W.HANDLE,ULONG64,C.POINTER(ULONG64),VOID_P])
 symline = proto(DBGHELP, 'SymGetLineFromAddr64', W.BOOL, [W.HANDLE,ULONG64,C.POINTER(W.DWORD),C.POINTER(IMAGEHLP_LINE64)])
 walk = proto(DBGHELP, 'StackWalk64', W.BOOL, [W.DWORD,W.HANDLE,W.HANDLE,C.POINTER(STACKFRAME64),VOID_P,VOID_P,VOID_P,VOID_P,VOID_P])
+dump = proto(DBGHELP, 'MiniDumpWriteDump', W.BOOL,
+             [W.HANDLE,W.DWORD,W.HANDLE,W.DWORD,VOID_P,VOID_P,VOID_P])
 
 def memory(proc, address, size):
     buf=C.create_string_buffer(size); n=C.c_size_t()
@@ -82,7 +86,7 @@ def symbol(proc, address):
     if symline(proc,address,C.byref(off),C.byref(line)):
         result.update(file=line.file.decode('utf-8','replace'),line=line.number)
     return result
-def capture(proc, thread, event, data):
+def thread_context(thread):
     raw=C.create_string_buffer(1232+16)
     ctx=(C.addressof(raw)+15)&~15
     C.c_uint32.from_address(ctx+48).value=0x10000B
@@ -90,31 +94,63 @@ def capture(proc, thread, event, data):
     context=C.string_at(ctx,1232)
     regs={name:hex(struct.unpack_from('<Q',context,off)[0]) for name,off in
           [('rax',120),('rcx',128),('rdx',136),('rbx',144),('rsp',152),('rbp',160),('rsi',168),('rdi',176),('r8',184),('r9',192),('r10',200),('r11',208),('r12',216),('r13',224),('r14',232),('r15',240),('rip',248)]}
-    symopts(0x2|0x10|0x200|0x80000) # undecorate, source lines, no critical dialogs
-    initialized=syminit(proc,str(REPO/'out/build/win-amd64-debug'),True)
+    return raw, ctx, context, regs
+
+def stack_frames(proc, thread, ctx, regs, initialized):
     frame=STACKFRAME64()
     frame.pc.offset=int(regs['rip'],16); frame.frame.offset=int(regs['rbp'],16); frame.stack.offset=int(regs['rsp'],16)
     frame.pc.mode=frame.frame.mode=frame.stack.mode=3
     frames=[symbol(proc,frame.pc.offset)]
     if initialized:
-        for _ in range(32):
+        for _ in range(64):
             if not walk(0x8664,proc,thread,C.byref(frame),VOID_P(ctx),None,C.cast(DBGHELP.SymFunctionTableAccess64,VOID_P),C.cast(DBGHELP.SymGetModuleBase64,VOID_P),None): break
             if not frame.pc.offset: break
             if frame.pc.offset != int(frames[-1]['pc'],16):
                 frames.append(symbol(proc,frame.pc.offset))
-    result={'captured_at': datetime.now().isoformat(), 'process_id': event.pid, 'exception_code':hex(struct.unpack_from('<I',data)[0]),'exception_address':hex(struct.unpack_from('<Q',data,16)[0]),
-            'first_chance':struct.unpack_from('<I',data,152)[0], 'fault_address':hex(struct.unpack_from('<Q',data,40)[0]),
-            'thread_id':event.tid,'registers':regs,'frames':frames,'symbol_init':bool(initialized)}
-    for name in ['rcx','rdx','rbp','rsp']:
-        value=int(regs[name],16)
-        blob=memory(proc,value,1024)
-        (OUT/(name+'.bin')).write_bytes(blob)
-    (OUT/'host-context.bin').write_bytes(context)
-    (OUT/'stack.bin').write_bytes(memory(proc,int(regs['rsp'],16),65536))
-    (OUT/'fault-code.bin').write_bytes(memory(proc,int(regs['rip'],16)-32,128))
-    (OUT/'capture.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
-    print(json.dumps(result,indent=2),flush=True)
-    if initialized:symclean(proc)
+    return frames
+
+def capture(proc, thread, event, data, threads):
+    symopts(0x2|0x10|0x200|0x80000) # undecorate, source lines, no critical dialogs
+    initialized=syminit(proc,str(REPO/'out/build/win-amd64-debug'),True)
+    try:
+        raw, ctx, context, regs=thread_context(thread)
+        code=struct.unpack_from('<I',data)[0]
+        parameter_count=min(struct.unpack_from('<I',data,24)[0],15)
+        result={'captured_at': datetime.now().isoformat(), 'process_id': event.pid,
+                'exception_code':hex(code),'exception_address':hex(struct.unpack_from('<Q',data,16)[0]),
+                'first_chance':struct.unpack_from('<I',data,152)[0],
+                'exception_parameters':[hex(struct.unpack_from('<Q',data,32+i*8)[0]) for i in range(parameter_count)],
+                'thread_id':event.tid,'registers':regs,
+                'frames':stack_frames(proc,thread,ctx,regs,initialized),'symbol_init':bool(initialized)}
+        if code==0xC0000005 and parameter_count>=2:
+            result['fault_address']=hex(struct.unpack_from('<Q',data,40)[0])
+        # All threads are suspended by the Windows debug event. These stacks
+        # also show a worker's failure when a CRT dialog runs on another thread.
+        result['other_threads']=[]
+        for tid, handle in threads.items():
+            if tid==event.tid:continue
+            try:
+                other_raw, other_ctx, _, other_regs=thread_context(handle)
+                result['other_threads'].append({'thread_id':tid,'registers':other_regs,
+                    'frames':stack_frames(proc,handle,other_ctx,other_regs,initialized)})
+            except OSError as error:
+                result['other_threads'].append({'thread_id':tid,'error':str(error)})
+        for name in ['rcx','rdx','rbp','rsp']:
+            (OUT/(name+'.bin')).write_bytes(memory(proc,int(regs[name],16),1024))
+        (OUT/'host-context.bin').write_bytes(context)
+        (OUT/'stack.bin').write_bytes(memory(proc,int(regs['rsp'],16),65536))
+        (OUT/'fault-code.bin').write_bytes(memory(proc,int(regs['rip'],16)-32,128))
+        with (OUT/'host.dmp').open('wb') as stream:
+            # Thread info, unloaded modules, and stack-referenced memory; avoid
+            # a full dump of the multi-gigabyte guest address space.
+            succeeded=dump(proc,event.pid,W.HANDLE(msvcrt.get_osfhandle(stream.fileno())),
+                           0x1000|0x20|0x40,None,None,None)
+            result['minidump_written']=bool(succeeded)
+            if not succeeded:result['minidump_error']=C.get_last_error()
+        (OUT/'capture.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        print(json.dumps({key:value for key,value in result.items() if key!='other_threads'},indent=2),flush=True)
+    finally:
+        if initialized:symclean(proc)
 
 def main():
     global OUT
@@ -124,6 +160,8 @@ def main():
                         help='First-chance host fault address to capture (default: guest 0xC at base 0x100000000).')
     parser.add_argument('--config',type=pathlib.Path,default=ROOT/'assets/runtime.local.json')
     parser.add_argument('--game-data-root',type=pathlib.Path)
+    parser.add_argument('--capture-breakpoints',action='store_true',
+                        help='Capture breakpoints after the initial loader stop. For a CRT abort dialog, select Retry.')
     args=parser.parse_args()
     if not 1 <= args.seconds <= 600: parser.error('Time limit must be 1..600 seconds.')
     if not 0 <= args.fault_address < 2**64: parser.error('Fault address must fit uint64.')
@@ -142,14 +180,17 @@ def main():
     (ROOT/'logs/runtime-user-data/development').mkdir(parents=True,exist_ok=True)
     command=[str(binary),f'--game_data_root={root}',f'--user_data_root={ROOT}/logs/runtime-user-data/development',
              '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log','--log_level=debug','--log_flush_interval=1','--allow_game_relative_writes=false']
-    (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,'seconds':args.seconds,'fault_address':hex(args.fault_address)},indent=2),encoding='utf-8')
+    (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,
+        'seconds':args.seconds,'fault_address':hex(args.fault_address),
+        'capture_breakpoints':args.capture_breakpoints},indent=2),encoding='utf-8')
     si=STARTUPINFO();si.cb=C.sizeof(si);pi=PROCESS_INFORMATION()
     assert C.sizeof(DEBUG_EVENT)==176 and C.sizeof(STACKFRAME64)==264 and C.sizeof(SYMBOL_INFO)==88
     if not create(str(binary),C.create_unicode_buffer(subprocess.list2cmdline(command)),None,None,False,0x08000002,None,str(binary.parent),C.byref(si),C.byref(pi)):
         raise C.WinError(C.get_last_error())
     print('Evidence:',OUT,flush=True)
     threads={pi.tid:pi.thread}; handles={pi.process,pi.thread}
-    end=time.monotonic()+args.seconds; captured=False
+    end=time.monotonic()+args.seconds; captured=False; loader_breakpoint_seen=False
+    started=time.monotonic(); result={'pid':pi.pid,'outcome':'time_limit'}
     try:
         while time.monotonic()<end:
             event=DEBUG_EVENT()
@@ -161,6 +202,10 @@ def main():
                 if file:close(file)
             elif event.code==2:
                 thread=struct.unpack_from('<Q',data)[0];threads[event.tid]=thread;handles.add(thread)
+            elif event.code==4:
+                thread=threads.pop(event.tid,None)
+                if thread:
+                    handles.discard(thread);close(thread)
             elif event.code==6:
                 file=struct.unpack_from('<Q',data)[0]
                 if file:close(file)
@@ -169,16 +214,30 @@ def main():
                 first=struct.unpack_from('<I',data,152)[0]
                 fault=struct.unpack_from('<Q',data,40)[0]
                 status=0x80010001
-                if code==0x80000003:status=0x10002
-                if code==0xC0000005 and (fault==args.fault_address or not first):
-                    capture(pi.process,threads[event.tid],event,data)
+                target=not first or (code==0xC0000005 and fault==args.fault_address)
+                if code==0x80000003 and first:
+                    status=0x10002
+                    if not loader_breakpoint_seen:
+                        loader_breakpoint_seen=True
+                    elif args.capture_breakpoints:
+                        target=True
+                if target:
+                    capture(pi.process,threads[event.tid],event,data,threads)
                     captured=True
+                    result.update(outcome='captured',exception_code=hex(code),first_chance=first)
                     terminate(pi.process,0xDEAD)
             elif event.code==5:
-                print('Host exited:',hex(struct.unpack_from('<I',data)[0]),flush=True)
+                exit_code=struct.unpack_from('<I',data)[0]
+                result.update(outcome='exited',exit_code=hex(exit_code))
+                print('Host exited:',hex(exit_code),flush=True)
                 cont(event.pid,event.tid,status);break
             cont(event.pid,event.tid,status)
             if captured:break
+    except KeyboardInterrupt:
+        result['outcome']='interrupted'
+    except Exception as error:
+        result.update(outcome='debugger_error',error=str(error))
+        raise
     finally:
         terminate(pi.process,0xDEAD)
         # Drain process exit to avoid leaving a stopped debuggee.
@@ -189,6 +248,8 @@ def main():
             if event.code==5:break
         for handle in handles:
             if handle:close(handle)
+        result['elapsed_seconds']=round(time.monotonic()-started,2)
+        (OUT/'result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     if not captured:raise RuntimeError('No target exception captured before exit/time limit')
 
 if __name__=='__main__':main()
