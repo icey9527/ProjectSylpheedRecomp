@@ -19,10 +19,14 @@ std::string ResourceDirectoryError(const std::filesystem::path& root) {
   std::error_code ec;
   if (root.empty() || !std::filesystem::is_directory(root, ec))
     return "请选择完整游戏资源目录。";
-  for (const auto* file : {"Xacalite_ScriptTeam.exe", "config.ini", "dat/files.tbl"}) {
+  for (const auto* file : {"Xacalite_ScriptTeam.exe", "config.ini"}) {
     if (!std::filesystem::is_regular_file(root / file, ec))
       return std::string("所选目录缺少必需文件：") + file;
   }
+  // Loose tables are optional: the guest owns PAK lookup and decompression.
+  // A host filesystem existence check cannot see entries inside tables.pak.
+  if (!std::filesystem::is_directory(root / "dat", ec))
+    return "所选目录缺少资源目录：dat";
   return {};
 }
 

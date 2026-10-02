@@ -40,8 +40,16 @@ int main() {
     const auto root_utf8 = root.generic_u8string();
     Require(sylpheed::ResolveResourcePath(std::string(root_utf8.begin(), root_utf8.end()), dir) == root, "absolute path retained");
     Require(!sylpheed::ResourceDirectoryError(dir).empty(), "missing essential resources reported");
-    for (const auto* path : {"Xacalite_ScriptTeam.exe", "config.ini", "dat/files.tbl"}) { std::ofstream file(dir / path); file << "fixture"; }
-    Require(sylpheed::ResourceDirectoryError(dir).empty(), "valid startup essentials accepted");
+    for (const auto* path : {"Xacalite_ScriptTeam.exe", "config.ini", "dat/tables.pak", "dat/tables.p00"}) { std::ofstream file(dir / path); file << "fixture"; }
+    Require(!std::filesystem::exists(dir / "dat/files.tbl"), "packed-only fixture has no loose table");
+    Require(sylpheed::ResourceDirectoryError(dir).empty(), "packed resource layout must reach the original guest loader");
+    std::filesystem::remove(dir / "dat/tables.pak");
+    std::filesystem::remove(dir / "dat/tables.p00");
+    { std::ofstream file(dir / "dat/files.tbl"); file << "fixture"; }
+    Require(sylpheed::ResourceDirectoryError(dir).empty(), "loose resource layout accepted");
+    std::filesystem::remove(dir / "dat/files.tbl");
+    std::filesystem::remove(dir / "dat");
+    Require(!sylpheed::ResourceDirectoryError(dir).empty(), "missing resource directory rejected");
     Require(std::filesystem::canonical(dir).parent_path() == temp_root &&
             std::filesystem::canonical(dir).filename() == dir.filename(), "cleanup stays in the exact test directory");
     std::filesystem::remove_all(dir);
