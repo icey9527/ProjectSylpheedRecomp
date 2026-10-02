@@ -27881,6 +27881,8 @@ loc_827CBA88:
 
 DEFINE_REX_FUNC(sub_827D0FC0) {
 	REX_FUNC_PROLOGUE();
+	PPCContext env{};
+	PPCRegister temp{};
 	uint32_t ea{};
 	// mflr r12
 	ctx.r12.u64 = ctx.lr;
@@ -27902,7 +27904,10 @@ DEFINE_REX_FUNC(sub_827D0FC0) {
 	REX_STORE_U32(ctx.r1.u32 + 80, ctx.r11.u32);
 	// bl 0x82839520
 	ctx.lr = 0x827D0FE4;
-	sub_82839520(ctx, base);
+	env = ctx;
+	temp.s64 = ppc_setjmp(ctx.r3.u32);
+	if (temp.s64 != 0) ctx = env;
+	ctx.r3 = temp;
 	// cmpwi cr6,r3,0
 	ctx.cr6.compare<int32_t>(ctx.r3.s32, 0, ctx.xer);
 	// bne cr6,0x827d1018

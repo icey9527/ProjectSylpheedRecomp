@@ -16715,7 +16715,7 @@ loc_8251E340:
 	REX_STORE_U32(ctx.r11.u32 + 340, ctx.r10.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x8251E360;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 }
 
 DEFINE_REX_FUNC(sub_82527F10) {

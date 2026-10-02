@@ -1,0 +1,6 @@
+# Development LIBCMT entries: MAP and PDB raw names/locations match exactly.
+# Preserve host-stack control flow as well as PPCContext during nonlocal returns.
+# LIBCMT:setjmp.obj
+setjmp_address = 0x82839520
+# LIBCMT:longjmp.obj
+longjmp_address = 0x828392D0

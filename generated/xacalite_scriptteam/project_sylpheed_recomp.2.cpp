@@ -9872,7 +9872,7 @@ DEFINE_REX_FUNC(sub_8238C540) {
 	// li r4,1
 	ctx.r4.s64 = 1;
 	// b 0x828392d0
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 	return;
 }
 
@@ -16673,7 +16673,7 @@ loc_82510FB4:
 	REX_STORE_U32(ctx.r6.u32 + 340, ctx.r11.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x82510FF4;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 loc_82510FF4:
 	// add r4,r28,r30
 	ctx.r4.u64 = ctx.r28.u64 + ctx.r30.u64;

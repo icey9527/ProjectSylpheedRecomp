@@ -16250,7 +16250,7 @@ loc_825114C4:
 	// stw r11,340(r10)
 	REX_STORE_U32(ctx.r10.u32 + 340, ctx.r11.u32);
 	// b 0x828392d0
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 	return;
 }
 
@@ -29532,6 +29532,8 @@ loc_827D1B18:
 
 DEFINE_REX_FUNC(sub_827D52E8) {
 	REX_FUNC_PROLOGUE();
+	PPCContext env{};
+	PPCRegister temp{};
 	uint32_t ea{};
 	// mflr r12
 	ctx.r12.u64 = ctx.lr;
@@ -29818,7 +29820,10 @@ loc_827D54E8:
 	REX_STORE_U32(ctx.r1.u32 + 480, ctx.r11.u32);
 	// bl 0x82839520
 	ctx.lr = 0x827D550C;
-	sub_82839520(ctx, base);
+	env = ctx;
+	temp.s64 = ppc_setjmp(ctx.r3.u32);
+	if (temp.s64 != 0) ctx = env;
+	ctx.r3 = temp;
 	// lwz r30,96(r1)
 	ctx.r30.u64 = REX_LOAD_U32(ctx.r1.u32 + 96);
 	// cmpwi cr6,r3,0

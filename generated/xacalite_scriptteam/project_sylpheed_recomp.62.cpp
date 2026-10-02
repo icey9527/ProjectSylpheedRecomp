@@ -17601,7 +17601,7 @@ DEFINE_REX_FUNC(sub_8252DF68) {
 	REX_STORE_U32(ctx.r31.u32 + 340, ctx.r11.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x8252DFE0;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 loc_8252DFE0:
 	// lwz r11,336(r31)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r31.u32 + 336);
@@ -17621,7 +17621,7 @@ loc_8252DFE0:
 	REX_STORE_U32(ctx.r31.u32 + 340, ctx.r11.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x8252E004;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 loc_8252E004:
 	// lwz r11,336(r31)
 	ctx.r11.u64 = REX_LOAD_U32(ctx.r31.u32 + 336);
@@ -17641,7 +17641,7 @@ loc_8252E004:
 	REX_STORE_U32(ctx.r31.u32 + 340, ctx.r11.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x8252E028;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 loc_8252E028:
 	// lwz r29,428(r31)
 	ctx.r29.u64 = REX_LOAD_U32(ctx.r31.u32 + 428);

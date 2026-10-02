@@ -9395,6 +9395,8 @@ loc_82377AD4:
 
 DEFINE_REX_FUNC(sub_8238F2B0) {
 	REX_FUNC_PROLOGUE();
+	PPCContext env{};
+	PPCRegister temp{};
 	uint32_t ea{};
 	// mflr r12
 	ctx.r12.u64 = ctx.lr;
@@ -9478,7 +9480,10 @@ DEFINE_REX_FUNC(sub_8238F2B0) {
 	REX_STORE_U32(ctx.r1.u32 + 536, ctx.r11.u32);
 	// bl 0x82839520
 	ctx.lr = 0x8238F348;
-	sub_82839520(ctx, base);
+	env = ctx;
+	temp.s64 = ppc_setjmp(ctx.r3.u32);
+	if (temp.s64 != 0) ctx = env;
+	ctx.r3 = temp;
 	// lis r27,9345
 	ctx.r27.s64 = 612433920;
 	// cmpwi r3,0

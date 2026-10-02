@@ -29975,7 +29975,7 @@ DEFINE_REX_FUNC(sub_827C27B8) {
 	// stw r10,12(r11)
 	REX_STORE_U32(ctx.r11.u32 + 12, ctx.r10.u32);
 	// b 0x828392d0
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 	return;
 }
 

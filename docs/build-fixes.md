@@ -37,3 +37,19 @@ PDB 模块 procedure 在相同 `0003:002AC748` 位置有可读名字，公共符
 `config/runtime-functions.toml` 补充该入口，交给官方分析器生成和注册，不指定猜测长度，
 也不替换为空函数。生成的原函数包含六条 PPC 指令：将错误管理器的 `+108` 和 `+20`
 字段清零后返回。修复通过配置保留，重新 codegen 会重建对应函数与注册。
+
+## JPEG 错误路径的非局部返回
+
+补齐回调后，教程继续加载但在 `read_markers` 的 `0x8241BBBC` 读取空指针。
+故障现场的 PPCContext 已有 `setjmp` 返回位置 `0x8238EFD4`，但宿主栈仍在
+JPEG 读头调用链中。`D3DXTex::d3dx_jpeg_error_exit`（`0x8238C3D8`）调用
+原 `longjmp` 后，原生成函数只恢复 Xbox 栈和寄存器，再通过普通 C++ 返回；
+它没有返回宿主对应的 `setjmp` 调用点，后续函数因此使用了错误的栈。
+
+`config/nonlocal-jumps.toml` 配置官方支持的 `setjmp_address = 0x82839520` 和
+`longjmp_address = 0x828392D0`。两者来自 `LIBCMT:setjmp.obj`、`LIBCMT:longjmp.obj`，
+MAP/PDB 的原名及位置精确匹配。生成器将直接调用接入宿主 `ppc_setjmp/ppc_longjmp`，
+并在非局部返回时恢复保存的 PPCContext，让原游戏按既有错误路径继续处理。
+Debug 构建后使用同版资源复测，用户确认可以继续进入，未再触发原回调 abort 或
+随后的 JPEG 空指针异常。JPEG 解码为何返回错误、是否选择了其他图片格式尚未单独
+验证；此次修复恢复原有错误返回流程，完整任务与存档仍须另行验收。

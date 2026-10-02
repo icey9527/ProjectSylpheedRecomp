@@ -27318,7 +27318,7 @@ DEFINE_REX_FUNC(sub_827CF978) {
 	// addi r3,r3,1264
 	ctx.r3.s64 = ctx.r3.s64 + 1264;
 	// b 0x828392d0
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 	return;
 loc_827CF9B4:
 	// lwz r9,0(r3)

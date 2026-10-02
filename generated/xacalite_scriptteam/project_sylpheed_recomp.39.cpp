@@ -16662,7 +16662,7 @@ loc_8251EA70:
 	REX_STORE_U32(ctx.r11.u32 + 340, ctx.r10.u32);
 	// bl 0x828392d0
 	ctx.lr = 0x8251EA88;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 loc_8251EA88:
 	// cmpwi cr6,r9,4
 	ctx.cr6.compare<int32_t>(ctx.r9.s32, 4, ctx.xer);

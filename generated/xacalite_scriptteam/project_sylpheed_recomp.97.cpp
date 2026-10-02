@@ -13068,7 +13068,7 @@ loc_82450264:
 	ctx.r3.s64 = ctx.r29.s64 + 1040;
 	// bl 0x828392d0
 	ctx.lr = 0x82450270;
-	sub_828392D0(ctx, base);
+	ppc_longjmp(ctx.r3.u32, ctx.r4.s32);
 }
 
 DEFINE_REX_FUNC(sub_82455BC8) {
