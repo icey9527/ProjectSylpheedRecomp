@@ -9,8 +9,6 @@
 #include <rex/filesystem.h>
 #include <rex/filesystem/devices/host_path_device.h>
 #include <rex/ui/keybinds.h>
-#include <rex/system/achievement_manager.h>
-#include <imgui.h>
 #include "startup_config.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
@@ -22,44 +20,6 @@
 #ifdef _WIN32
 #include "platform/windows/resource_picker.h"
 #endif
-
-class SafeAchievementsDialog final : public rex::ui::ImGuiDialog {
- public:
-  SafeAchievementsDialog(rex::ui::ImGuiDrawer* drawer,
-                         rex::system::AchievementManager* achievements)
-      : ImGuiDialog(drawer), achievements_(achievements) {}
-
- protected:
-  void OnDraw(ImGuiIO&) override {
-    if (!achievements_) {
-      Close();
-      return;
-    }
-    if (ImGui::Begin("Achievements##overlay", nullptr, ImGuiWindowFlags_NoCollapse)) {
-      const auto list = achievements_->ListAchievements();
-      int unlocked = 0;
-      for (const auto& achievement : list) {
-        if (achievements_->IsUnlocked(achievement.id)) ++unlocked;
-      }
-      ImGui::Text("%d / %d unlocked", unlocked, static_cast<int>(list.size()));
-      ImGui::Separator();
-      for (const auto& achievement : list) {
-        const bool is_unlocked = achievements_->IsUnlocked(achievement.id);
-        ImGui::TextColored(is_unlocked ? ImVec4(0.35f, 1.0f, 0.45f, 1.0f)
-                                       : ImVec4(0.65f, 0.65f, 0.65f, 1.0f),
-                           "%s %s (%dG)", is_unlocked ? "[+]" : "[ ]",
-                           achievement.label.c_str(), static_cast<int>(achievement.gamerscore));
-        ImGui::TextWrapped("%s", (is_unlocked ? achievement.description
-                                               : achievement.unachieved_description).c_str());
-        ImGui::Separator();
-      }
-    }
-    ImGui::End();
-  }
-
- private:
-  rex::system::AchievementManager* achievements_ = nullptr;
-};
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -161,7 +121,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
 
   void OnCreateDialogs(rex::ui::ImGuiDrawer* drawer) override {
     performance_display_ = std::make_unique<sylpheed::performance::PerformanceDisplay>(drawer);
-    achievement_drawer_ = drawer;
     // The SDK's default F7 callback destroys the dialog immediately from the
     // key event. ImGui may still be iterating the dialog vector in that frame,
     // so defer both creation and destruction to the next UI turn.
@@ -172,10 +131,8 @@ class ProjectSylpheedApp : public rex::ReXApp {
                               if (achievements_overlay_safe_) {
                                 achievements_overlay_safe_.reset();
                               } else {
-                                if (achievement_drawer_ && runtime()) {
-                                  achievements_overlay_safe_ =
-                                      std::make_unique<SafeAchievementsDialog>(
-                                          achievement_drawer_, &achievements());
+                                if (runtime()) {
+                                  achievements_overlay_safe_ = CreateAchievementsOverlay();
                                 }
                               }
                             });
@@ -209,7 +166,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
  private:
   std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
   std::unique_ptr<rex::ui::ImGuiDialog> achievements_overlay_safe_;
-  rex::ui::ImGuiDrawer* achievement_drawer_ = nullptr;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
   std::filesystem::path startup_config_path_;
   bool auto_language_ = true;
