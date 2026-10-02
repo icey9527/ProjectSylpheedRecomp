@@ -1,9 +1,14 @@
 #include "src/features/performance/frame_metrics.h"
+#include "src/features/performance/affinity_warning_filter.h"
 #include "generated/xacalite_scriptteam/project_sylpheed_pch.h"
 
 #include <cmath>
 #include <cstring>
 #include <stdexcept>
+#include <sstream>
+#include <thread>
+#include <spdlog/sinks/ostream_sink.h>
+#include <rex/logging.h>
 
 using namespace sylpheed::performance;
 REX_EXTERN(sub_8235CD78);
@@ -63,5 +68,53 @@ int main() {
   catch (const std::runtime_error&) { propagated = true; }
   Require(propagated && Frames().Snapshot().frame_count == before + 1,
           "failed original calls propagate without a fake completed frame");
+
+  std::ostringstream output, second_output;
+  AffinityWarningFilter filter;
+  filter.add_sink(std::make_shared<spdlog::sinks::ostream_sink_mt>(output));
+  filter.add_sink(std::make_shared<spdlog::sinks::ostream_sink_mt>(second_output));
+  const char* warning = "Too few processor cores - scheduling will be wonky";
+  spdlog::details::log_msg message("sys", spdlog::level::warn, warning);
+  const auto first_time = message.time;
+  filter.log(message);
+  const auto first_output = output.str();
+  std::thread a([&] { for (int i = 0; i < 100; ++i) filter.log(message); });
+  std::thread b([&] { for (int i = 0; i < 100; ++i) filter.log(message); });
+  a.join(); b.join();
+  Require(output.str() == first_output, "repeat warnings do not reach output sinks");
+  spdlog::details::log_msg other("sys", spdlog::level::warn, "A different warning");
+  filter.log(other);
+  other.level = spdlog::level::err;
+  other.payload = warning;
+  filter.log(other);
+  Require(output.str().find("A different warning") != std::string::npos &&
+          output.str().find("[error]") != std::string::npos,
+          "unrelated warnings and errors must be retained");
+  message.time = first_time + seconds(10);
+  filter.log(message);
+  Require(output.str().find("200 repeated messages suppressed") != std::string::npos &&
+          output.str() == second_output.str(),
+          "periodic summaries and all original sinks are preserved");
+  message.time = first_time - seconds(1);
+  const auto before_clock_reset = output.str().size();
+  filter.log(message);
+  Require(output.str().size() > before_clock_reset, "clock rollback must not silence warnings");
+  // Exercise actual SDK category creation / sink installation, not only the
+  // filter class. The sys category may not exist at the app startup hook.
+  std::ostringstream installed_output;
+  rex::LogConfig config;
+  config.category_sinks["sys"] = {
+      std::make_shared<spdlog::sinks::ostream_sink_mt>(installed_output)};
+  rex::InitLogging(config);
+  InstallAffinityWarningFilter();
+  const auto sys = rex::GetLogger(rex::log::sys());
+  Require(sys && sys->sinks().size() == 1 &&
+          dynamic_cast<AffinityWarningFilter*>(sys->sinks().front().get()),
+          "startup must install the filter on the actual lazy SDK sys category");
+  sys->warn(warning);
+  const auto installed_first = installed_output.str();
+  sys->warn(warning);
+  Require(!installed_first.empty() && installed_output.str() == installed_first,
+          "installed SDK logger retains the first warning and filters repeats");
   return 0;
 }

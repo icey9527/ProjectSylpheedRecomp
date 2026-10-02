@@ -5,6 +5,7 @@ find_package(rexglue 0.10.0 EXACT REQUIRED CONFIG)
 add_executable(performance_metrics_test
     performance_metrics_test.cpp
     ../../src/features/performance/frame_metrics.cpp
+    ../../src/features/performance/affinity_warning_filter.cpp
     ../../src/patches/graphics/development/frame_probe.cpp)
 target_include_directories(performance_metrics_test PRIVATE ../.. ../../src)
 target_link_libraries(performance_metrics_test PRIVATE rex::runtime)

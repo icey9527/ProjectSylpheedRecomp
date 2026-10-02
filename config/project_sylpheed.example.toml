@@ -18,6 +18,8 @@ skip_failed_movies = true
 show_game_fps = false
 show_process_cpu = false
 show_process_memory = false
+# Keep the first small-CPU warning and periodic summaries; restart after editing.
+throttle_affinity_warning = true
 # Controller mappings; comma separates alternatives. Restart after editing.
 keybind_a = "Return,Space"
 keybind_b = "Backspace"

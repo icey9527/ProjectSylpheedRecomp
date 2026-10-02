@@ -17,6 +17,7 @@ set(PROJECTSYLPHEED_SOURCES
     src/patches/input/development/vibration_trace.cpp
     src/patches/movie/development/movie_fallback.cpp
     src/features/performance/frame_metrics.cpp
+    src/features/performance/affinity_warning_filter.cpp
     src/features/performance/performance_display.cpp
     src/patches/graphics/development/frame_probe.cpp
 )

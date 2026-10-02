@@ -11,10 +11,15 @@
 #include "input/keyboard_keystroke_driver.h"
 #include "features/performance/performance_display.h"
 #include "features/performance/frame_metrics.h"
+#include "features/performance/affinity_warning_filter.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
   using rex::ReXApp::ReXApp;
+
+  void OnPostInitLogging() override {
+    sylpheed::performance::InstallAffinityWarningFilter();
+  }
 
   void OnPreSetup(rex::RuntimeConfig& config) override {
     config.input_factory = REX_INPUT_BACKEND(sylpheed::input::CreateInputSystem);
