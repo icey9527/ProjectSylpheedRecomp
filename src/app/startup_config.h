@@ -55,17 +55,20 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   paths.update_data_root = resolve("update_data_root", paths.update_data_root);
   paths.cache_root = resolve("cache_root", paths.user_data_root / "cache");
   paths.metadata_root = resolve("metadata_root", paths.metadata_root);
-  // Retail/trial packed resources commonly keep the files.tbl entry as
-  // GP_TEST even though the matching debug table was removed. If the user
-  // did not explicitly choose an entry and no loose GP_TEST table exists,
-  // start at the title instead of opening a missing debug part and showing a
-  // misleading disc-read failure. Explicit initial_game_part remains the
-  // authority, and development resources with dat/GP_TEST are unchanged.
+  // Keep the original resource priority: a loose GP_TEST directory wins;
+  // otherwise a packaged GP_TEST.pak/.p00 pair is still a valid entry. Only
+  // fall back to the title when neither representation exists. Explicit
+  // initial_game_part remains the authority.
+  const auto dat = paths.game_data_root / "dat";
+  const bool has_loose_gp_test = std::filesystem::is_directory(dat / "GP_TEST");
+  const bool has_packed_gp_test =
+      std::filesystem::is_regular_file(dat / "GP_TEST.pak") &&
+      std::filesystem::is_regular_file(dat / "GP_TEST.p00");
   if (rex::cvar::GetFlagSource("initial_game_part") == rex::cvar::Source::kDefault &&
       rex::cvar::GetFlagByName("initial_game_part") == "game" &&
-      !std::filesystem::is_directory(paths.game_data_root / "dat" / "GP_TEST")) {
+      !has_loose_gp_test && !has_packed_gp_test) {
     rex::cvar::SetFlagByName("initial_game_part", "GP_TITLE");
-    REXLOG_INFO("SYLPHEED_BOOTSTRAP no loose dat/GP_TEST table; defaulting initial_game_part=GP_TITLE");
+    REXLOG_INFO("SYLPHEED_BOOTSTRAP no loose or packed GP_TEST table; defaulting initial_game_part=GP_TITLE");
   }
   // XTLGetLanguage reads this SDK flag via ExGetXConfigSetting. Keep explicit
   // TOML/environment/CLI overrides, otherwise use the game's own default.

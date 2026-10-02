@@ -48,12 +48,17 @@ def main():
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.exit(1, f"Preflight failed: {error}\n")
 
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    run_dir = REPO.parent / "logs" / f"run-development-{stamp}"
-    run_dir.mkdir(parents=True)
-    user_dir = REPO.parent / "logs/runtime-user-data/development"
+    logs_root = REPO.parent / "logs"
+    logs_root.mkdir(parents=True, exist_ok=True)
+    # Keep one reproducible diagnostic log. Each invocation starts clean;
+    # the last-run JSON is overwritten alongside it.
+    log_file = logs_root / "run-development.log"
+    stdout_file = logs_root / "run-development.stdout.txt"
+    stderr_file = logs_root / "run-development.stderr.txt"
+    for path in (log_file, stdout_file, stderr_file):
+        path.write_bytes(b"")
+    user_dir = logs_root / "runtime-user-data/development"
     user_dir.mkdir(parents=True, exist_ok=True)
-    log_file = run_dir / "runtime.log"
     command = [str(binary), f"--game_data_root={root}", f"--user_data_root={user_dir}",
                "--gpu_plugin=xenos", f"--log_file={log_file}", "--log_level=debug",
                "--log_flush_interval=1", "--allow_game_relative_writes=false"]
@@ -61,11 +66,11 @@ def main():
         command.append(f"--initial_game_part={args.initial_game_part}")
     record = {"started_at": datetime.now(timezone.utc).isoformat(), "image_sha256": digest,
               "game_data_root": str(root), "command": command, "time_limit_seconds": args.seconds}
-    print(f"Run evidence: {run_dir}", flush=True)
+    print(f"Run log: {log_file}", flush=True)
     started = time.monotonic()
     process = None
     try:
-        with (run_dir / "stdout.txt").open("wb") as out, (run_dir / "stderr.txt").open("wb") as err:
+        with stdout_file.open("wb") as out, stderr_file.open("wb") as err:
             process = subprocess.Popen(command, cwd=binary.parent, stdout=out, stderr=err)
             record["pid"] = process.pid
             while True:
@@ -101,14 +106,15 @@ def main():
         record["exit_code"] = process.returncode if process else None
         record["elapsed_seconds"] = round(time.monotonic() - started, 2)
         record["finished_at"] = datetime.now(timezone.utc).isoformat()
-        text = "\n".join(p.read_text(encoding="utf-8", errors="replace") for p in sorted(run_dir.glob("runtime*.log")))
+        text = log_file.read_text(encoding="utf-8", errors="replace") if log_file.exists() else ""
         record["observed_stages"] = list(dict.fromkeys(re.findall(r"SYLPHEED_STAGE ([a-z_]+)", text)))
-        record["run_directory"] = str(run_dir)
-        (run_dir / "result.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        record["log_file"] = str(log_file)
+        record["stdout_file"] = str(stdout_file)
+        record["stderr_file"] = str(stderr_file)
         (REPO.parent / "logs/development-last-run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Outcome: {record['outcome']}; process exit: {record['exit_code']}; "
           f"elapsed: {record['elapsed_seconds']}s", flush=True)
-    print("Read runtime.log for load/guest stages. A living process or exit 0 is not proof of gameplay.")
+    print("Read run-development.log for load/guest stages. A living process or exit 0 is not proof of gameplay.")
     return 0 if record["outcome"] == "exited" and record["exit_code"] == 0 else 1
 
 

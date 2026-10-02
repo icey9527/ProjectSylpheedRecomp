@@ -24,7 +24,7 @@ game_data_root = "<完整资源目录>"
 
 当前正式资源的包内启动表同样指定 `GP_TEST`，但缺少它的调试表。因此开发主程序搭配这些资源的首轮验证使用 `GP_TITLE`，不是运行正式版主程序。`trace_resource_bootstrap = true` 可记录启动表打开返回值与原/实际入口；默认关闭。完整任务、存档及正式资源下的调试菜单尚未由此验收。
 
-宿主现在会在未显式设置 `initial_game_part`、默认入口仍为 `game`，且资源目录没有散装 `dat/GP_TEST` 目录时自动回退到 `GP_TITLE`。这只处理缺少开发调试表的正式/试玩资源；开发目录有 `dat/GP_TEST` 时仍进入原调试菜单。显式设置 `initial_game_part = "GP_TEST"` 或其他入口时不会被覆盖。该回退不补造缺失的任务包，进入后续场景仍可能因资源不完整报告读盘错误。
+宿主现在会在未显式设置 `initial_game_part`、默认入口仍为 `game`，且资源目录既没有散装 `dat/GP_TEST`，也没有完整的 `dat/GP_TEST.pak` + `dat/GP_TEST.p00` 时自动回退到 `GP_TITLE`。根目录散装资源优先；缺少散装文件时仍由原游戏加载器尝试 PAK 内部文件。显式设置 `initial_game_part = "GP_TEST"` 或其他入口时不会被覆盖。该回退不补造缺失的任务包，进入后续场景仍可能因资源不完整报告读盘错误。
 
 开发版 Release 搭配正式资源的受控测试已由用户确认能显示并响应，随后正常退出（退出码 0）。Debug/Release 配置、编译和链接通过，入口补丁 ABI 测试通过；实际运行验收限于此次标题入口，不代表第一关或完整资源兼容。
 
@@ -33,6 +33,8 @@ game_data_root = "<完整资源目录>"
 ## 输入与已知问题
 
 键盘/手柄菜单操作和基本音效已有实际验证。补齐键盘事件并移除不安全诊断采样后，用户重复菜单移动、确认/返回和长按复测未出现原 vector 断言。教程初始化的 JPEG 回调遗漏与非局部返回崩溃已修复，用户确认已看到飞船与太空的 3D 场景；完整任务、飞行操作、场景切换和存档尚未验证。修复依据见 [生成与运行配置修复](build-fixes.md)。
+
+F7 是 ReXGlue 宿主的成就覆盖层快捷键，不是 Xbox 游戏内菜单。宿主已将它改为延迟创建/销毁，避免按键回调在 ImGui 绘制期间直接修改对话框列表；成就数据仍由本地 SDK 成就管理器提供。若资源缺失弹窗出现，它来自游戏的 `XamShowDirtyDiscErrorUI`，与 F7 覆盖层是两条独立路径。
 
 默认键盘映射：Enter/空格=A，Backspace=B，方向键=D-pad，WASD=左摇杆，数字小键盘 8/2/4/6=右摇杆，X=Start。鼠标摇杆默认关闭。玩家改键见 [键盘配置](keyboard-events.md#玩家自定义按键)。
 
@@ -60,7 +62,7 @@ python scripts/run_development.py --game-data-root "D:/ProjectSylpheedDemoTest" 
 {"game_data_root": "<完整资源目录>"}
 ```
 
-诊断输出位于仓库同级 `logs/run-development-<时间>/`；用户数据位于 `logs/runtime-user-data/development/`，禁止游戏写入原资源映射。
+诊断输出固定为仓库同级 `logs/run-development.log`，每次受控启动前清空；标准输出、错误输出和最近一次结果分别写入同级固定文件。用户数据位于 `logs/runtime-user-data/development/`，禁止游戏写入原资源映射。
 
 `image_loaded` 只说明镜像加载完成，`guest_thread_prepared` 发生于主线程恢复之前。进程退出 0、窗口存在或资源开始加载，均不能证明任务可玩。
 
