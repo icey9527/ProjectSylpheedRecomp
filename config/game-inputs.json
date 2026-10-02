@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "edition": "development",
+  "files": [
+    {
+      "name": "Xacalite_ScriptTeam.exe",
+      "role": "image",
+      "size": 3739648,
+      "sha256": "a8fd9273e37a3930f3d1d4e8614f3b487f583d7d3335347b47fbf67f80972699"
+    },
+    {
+      "name": "Xacalite_ScriptTeam.map",
+      "role": "map",
+      "size": 7145076,
+      "sha256": "0a51438c81bd1cba00459de777161674013eba7d64da762d26f1e72c4d2e115f"
+    },
+    {
+      "name": "Xacalite_ScriptTeam.pdb",
+      "role": "pdb",
+      "size": 45534208,
+      "sha256": "456cf990831a64ed30a689c8400702ce4fde23a3be81656d10f3401869528fd3"
+    }
+  ],
+  "pdb": {
+    "guid": "26463ca1-88c8-48df-85e2-a7e8c0eb4d8d",
+    "age": 2,
+    "machine": "0x01F2"
+  },
+  "image_pdb_codeview_verified": false
+}

@@ -8,7 +8,6 @@ repo/
   config/                 函数发现等分析修复
   scripts/                生成、检查、符号查询工具
   docs/                   结构、构建、维护及路线图
-  progress/               面板里程碑与验收记录（不含本机绝对路径）
   generated/              自动生成的 PPC 转译代码（忽略，不手改）
   out/                    CMake 构建结果（忽略）
   CMakeLists.txt
@@ -16,7 +15,7 @@ repo/
   project_sylpheed_manifest.toml
 ```
 
-外层 `assets/`、`symbols/`、`plans/`、`logs/`、`tools/` 以及 AI 手册和交接文件均只保存在本机。
+游戏输入与完整符号索引放在仓库外；生成代码和构建结果由工具重建。
 手写宿主入口已移到 `src/app/`，CMake 已同步源文件路径。
 
 ## 怎样按模块组织
@@ -42,7 +41,7 @@ MAP 的 `2DGrpLib` 可作为 UI 调查线索，`xaudio/xact` 可作为音频线�
 这些是“检索分组”，不等于已证实的修改范围；实际补丁目录要在检查调用关系后决定。
 新增源码时同时更新 CMake 源文件列表；通过 SDK 官方注册/替换接口接入，不能仅增加一个未调用的函数。
 现有 config 根目录中的两个修复文件属于当前开发输入；未来零售分析配置独立放 `config/retail/`。
-不为了形式创建空目录；出现实际代码/配置再添加。跨版本修复和功能迁移见 [version-maintenance.md](version-maintenance.md)。
+不为了形式创建空目录；出现实际代码/配置再添加。不同镜像的地址接入分别维护，共用逻辑只在验证行为一致后复用。
 名字分类属于检索视图，不能替代调用关系和地址认证；没有零售符号也可以按已确认功能职责组织手写代码。
 
 ## Xbox 依赖如何运行在 Windows

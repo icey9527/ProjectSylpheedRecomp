@@ -1,106 +1,38 @@
 # Project Sylpheed Recomp
 
-使用 ReXGlue v0.10.0 的 Project Sylpheed Xbox 360 静态重编译初始工程。
-Windows x64 Debug 宿主已编译，开发版已实际显示 `GP_TEST` 调试菜单。
-XAudio 缺失入口与 Fiber 访问异常已修复；三次 30 秒受控测试通过原崩溃点。
-当前仅推进开发版代码，零售主程序无限期延后。用户已反馈手柄 UI 交互及音效正确；键盘仍待修复。
-进入教程触发 `abort()`，任务和存档尚未验收。零售资源可与开发代码搭配试跑，见运行说明。
+使用 [ReXGlue v0.10.0](https://github.com/rexglue/rexglue-sdk) 将 Project Sylpheed 的 Xbox 360 开发版静态重编译为 Windows 程序。
 
-日常可双击构建目录中的 `project_sylpheed.exe`；同目录 `project_sylpheed.toml` 配置资源路径，
-默认 1280×720 窗口和键盘手柄映射。Enter/空格确认、Backspace 返回、方向键导航。
-配置和验证限制见 [运行说明](docs/running-development.md)。
-原版 INI 语言设置的接入和键盘调查见 [语言与输入](docs/language-and-input.md)。
+目前已验证 Windows x64 Debug 构建、调试菜单画面、手柄菜单操作和音效。键盘输入尚不可用，进入教程会触发 `abort()`；任务与存档尚未验证。零售版主程序不在当前支持范围内。
 
-双击 `Start-Progress.bat` 打开本地实时进度面板（Python 3.11+，无需额外依赖）。
-显示实际 Git 提交、当前阶段、文件中的验收清单完成率、外层计划与 AI 交接，每 5 秒刷新。
-详细说明见 [进度面板](docs/progress-dashboard.md)。
+## 构建
 
-## 本地目录
+需要 Clang、MSVC 工具集、Windows SDK、CMake、Ninja、完整 ReXGlue v0.10.0 开发 SDK，以及匹配的游戏输入。仓库不包含游戏或符号原件。
 
-将仓库克隆到工作区的 `repo/`，在同级 `assets/` 放置自己的游戏输入：
+在仓库同级的 `assets/` 放置 `Xacalite_ScriptTeam.exe`；符号分析另外需要同版 MAP/PDB。文件清单与匹配信息见 [输入文件说明](docs/game-inputs.md)。
 
-```text
-workspace/
-  assets/
-    Xacalite_ScriptTeam.exe
-    Xacalite_ScriptTeam.map
-    Xacalite_ScriptTeam.pdb
-  repo/
-    config/
-    scripts/
-    src/
-    project_sylpheed_manifest.toml
-```
-
-源码、manifest、分析修复和脚本使用 Git 管理。游戏输入、符号原件、生成代码和构建产物不纳入仓库。
-本地符号索引已读取 MAP 和 PDB 公共/模块函数及标签，并连接生成代码位置。
-生成函数仍使用地址名字，符号名字通过索引查询；没有将 PDB 全量灌入生成器。
-原始符号和完整索引留在仓库外层。
-
-## 代码生成
-
-安装 ReXGlue v0.10.0，并将 rexglue.exe 所在目录加入 PATH。在仓库目录执行：
+在仓库目录执行：
 
 ```powershell
-./scripts/Codegen.ps1
+python scripts/verify_game_inputs.py --image-only
+./scripts/Codegen.ps1 -ReXGlue "<完整 SDK 目录>/bin/rexglue.exe"
+./scripts/Build.ps1 -SdkRoot "<完整 SDK 目录>"
 ```
 
-`generated/` 可重新生成，不直接修改。官方 init 生成的 CMakeLists、presets 和宿主入口保存在仓库中。
-Codegen.ps1 默认保存外层日志、检查未解析调用致命占位，并在有 Python/MAP/PDB 时刷新符号索引。
+构建结果为 `out/build/win-amd64-debug/project_sylpheed.exe`。安装和工具链配置见 [Windows 构建说明](docs/building-windows.md)。
 
-## 分析修复
+## 运行
 
-原始分析报告出现 53 条 UnresolvedCall，涉及 43 个不同目标地址。
-生成阶段另发现 XapiFiberSwapContext (0x8233AB90) 未解析。合计 44 个入口全部在原始 MAP 的函数符号中找到，因此在
-`config/map-functions.toml` 添加函数入口。未设置猜测的函数长度，也没有绕过错误校验。
-该配置由以下脚本从本地日志和 MAP 生成：
+双击构建出的 EXE，在同目录 `project_sylpheed.toml` 中设置 `game_data_root`，指向含匹配开发镜像、`config.ini` 和 `dat/` 的资源目录。默认窗口为 1280×720，目前请使用手柄。
 
-```powershell
-./scripts/Import-UnresolvedMapFunctions.ps1 -LogPath ../logs/map-import-input.txt
-```
+配置模板在 `config/project_sylpheed.example.toml`。详细配置和诊断启动见 [运行说明](docs/running-development.md)。
 
-导入脚本只接受 MAP 标记为函数的精确地址；任一地址不匹配则拒绝写入。
-原日志和 MAP 留在本地，已生成的入口配置已纳入 Git。
+## 开发
 
-## 宿主构建
+- [代码结构](docs/architecture.md)：生成代码、宿主适配和补丁的边界。
+- [符号索引](docs/symbols.md)：按地址或名字定位函数。
+- [贡献说明](docs/contributing.md)：验证和提交要求。
+- [语言与输入](docs/language-and-input.md)、[Fiber 修复](docs/fiber-fix.md)、[生成边界修复](docs/build-fixes.md)：现有适配依据与限制。
 
-还需要包含开发文件与 CMake package 的完整 ReXGlue SDK、CMake、Ninja、Clang 和 Windows 开发环境。
-通过本地 CMakeUserPresets.json 或 CMAKE_PREFIX_PATH 配置 SDK，不将本机绝对路径写进共享配置。
+`generated/` 由 ReXGlue 重建，不直接编辑。游戏输入和构建产物不纳入 Git。
 
-日常编译入口：`./scripts/Build.ps1`。脚本自动加载 VS x64 环境；优先发现外层 tools 中的完整 SDK，
-其他位置可用 `-SdkRoot` 指定。详细步骤见下面的 Windows 教程。
-
-```powershell
-cmake --preset win-amd64-debug -DCMAKE_PREFIX_PATH="<SDK安装目录>"
-cmake --build --preset win-amd64-debug
-```
-
-本机安装后的工具已核实：Clang 19.1.5、CMake 3.31.6、Ninja 1.12.1、MSVC 14.44、Windows SDK 10.0.26100.0。
-完整官方 SDK 已补齐，CMake 配置通过。现有 32 位 TDM-GCC 不作为本项目编译器。
-
-## 项目文档
-
-- [Windows 安装与编译入门](docs/building-windows.md)
-- [开发版受控启动与首次运行修复](docs/running-development.md)
-- [Fiber 访问异常修复与首个菜单画面](docs/fiber-fix.md)
-- [符号对应、验证范围与查询方法](docs/symbols.md)
-- [代码结构与模块目录规则](docs/architecture.md)
-- [修改、返工、验证和 Git 提交规则](docs/contributing.md)
-- [分阶段实施路线](docs/roadmap.md)
-- [首次编译的异常处理边界修复](docs/build-fixes.md)
-- [三版本比较、符号基线与运行阶段](docs/versions.md)
-- [双版本修复、调试能力与新增功能](docs/version-maintenance.md)
-- [本地进度面板与验收记录维护](docs/progress-dashboard.md)
-
-快速查询：`python scripts/symbols.py query TextObj`。完整索引生成命令：`python scripts/symbols.py build`。
-手写宿主代码位于 `src/app/`；后续补丁按职责分模块，生成代码保持由 ReXGlue 管理。
-
-最新验证：codegen 成功，生成 269 个文件；生成 C++ 中未解析调用的致命占位代码为 0。
-首次构建还修复了 17 个重新抛出异常的 catch funclet 边界，并检查函数内 goto 标签完整性。
-Windows x64 Debug 编译、链接已通过；输出为 `out/build/win-amd64-debug/project_sylpheed.exe`。
-实际启动后又发现 XAudio 共享入口 `0x82546298` 未注册，已通过 MAP/PDB 核实并在
-`config/runtime-functions.toml` 补充，重新生成/编译后越过该阻塞。
-随后在 `DeleteFiber` 捕获空指针访问，通过 `config/fiber-rexcrt.toml` 将完整五函数接入 SDK 原生 Fiber。
-生成函数索引现为 34,575 个；这五个改为原生接入而不再有独立生成定义，属于预期变化。
-仍有 30 条 `Unexpected float16_4 pack instruction` 警告，待核对 SDK 指令语义；
-下一步验证调试菜单输入、声音播放与场景。新增问题先捕获现场再定位，不按时间邻近的日志猜测原因。
+项目原创代码使用 [BSD-3-Clause](LICENSE)；第三方声明见 [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt)。

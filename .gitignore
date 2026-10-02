@@ -18,3 +18,9 @@
 __pycache__/
 *.pyc
 /symbols/
+/progress/
+/plans/
+/tools/
+/HANDOFF.md
+/AGENTS.md
+/Start-Progress.bat

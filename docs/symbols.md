@@ -46,10 +46,10 @@ EXE 是 XEX2，尚未从加载后的镜像核对 CodeView GUID/age；因此没�
 在仓库目录执行：
 
 ```powershell
-python scripts/symbols.py build
-python scripts/symbols.py query 82786D78
-python scripts/symbols.py query TextObj
-python scripts/symbols.py query XAUDIO --limit 10
+python scripts/symbol_index.py build
+python scripts/symbol_index.py query 82786D78
+python scripts/symbol_index.py query TextObj
+python scripts/symbol_index.py query XAUDIO --limit 10
 ```
 
 输出到仓库同级的 `symbols/functions.csv` 和 `symbols/functions.summary.json`，仅本地保存。
@@ -60,7 +60,7 @@ CSV 保留原始名字、可读名字、对象文件、粗分组、PDB 状态、
 代码重新生成后文件编号和行号可能变化，必须刷新索引。
 `scripts/Codegen.ps1` 在有 Python 与本地 MAP/PDB 时会自动刷新；缺少工具时明确提示。
 生成入口比较只识别 `sub_ADDRESS` 定义；`xstart`、导入函数、命名辅助函数和内部块需另外核对。
-当前 265 个 MAP 地址没有独立 `sub_ADDRESS` 定义，不能由这个数字直接判定遗漏。
+当前索引中 269 个 MAP 地址没有独立 `sub_ADDRESS` 定义，不能由这个数字直接判定遗漏；其中包含原生接入函数。
 
 ## 维护定位规则
 
