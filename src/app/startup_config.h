@@ -55,6 +55,18 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   paths.update_data_root = resolve("update_data_root", paths.update_data_root);
   paths.cache_root = resolve("cache_root", paths.user_data_root / "cache");
   paths.metadata_root = resolve("metadata_root", paths.metadata_root);
+  // Retail/trial packed resources commonly keep the files.tbl entry as
+  // GP_TEST even though the matching debug table was removed. If the user
+  // did not explicitly choose an entry and no loose GP_TEST table exists,
+  // start at the title instead of opening a missing debug part and showing a
+  // misleading disc-read failure. Explicit initial_game_part remains the
+  // authority, and development resources with dat/GP_TEST are unchanged.
+  if (rex::cvar::GetFlagSource("initial_game_part") == rex::cvar::Source::kDefault &&
+      rex::cvar::GetFlagByName("initial_game_part") == "game" &&
+      !std::filesystem::is_directory(paths.game_data_root / "dat" / "GP_TEST")) {
+    rex::cvar::SetFlagByName("initial_game_part", "GP_TITLE");
+    REXLOG_INFO("SYLPHEED_BOOTSTRAP no loose dat/GP_TEST table; defaulting initial_game_part=GP_TITLE");
+  }
   // XTLGetLanguage reads this SDK flag via ExGetXConfigSetting. Keep explicit
   // TOML/environment/CLI overrides, otherwise use the game's own default.
   if (const auto language = ReadDefaultLanguage(paths.game_data_root)) {
