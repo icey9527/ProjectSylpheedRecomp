@@ -13,6 +13,7 @@ include(generated/rexglue.cmake)
 # Sources
 set(PROJECTSYLPHEED_SOURCES
     src/app/main.cpp
+    src/input/keyboard_keystroke_driver.cpp
 )
 
 if(WIN32)

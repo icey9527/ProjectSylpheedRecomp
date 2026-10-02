@@ -8,10 +8,15 @@
 #include <rex/logging.h>
 #include "startup_config.h"
 #include "input_diagnostics.h"
+#include "input/keyboard_keystroke_driver.h"
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
   using rex::ReXApp::ReXApp;
+
+  void OnPreSetup(rex::RuntimeConfig& config) override {
+    config.input_factory = REX_INPUT_BACKEND(sylpheed::input::CreateInputSystem);
+  }
 
   void OnConfigurePaths(rex::PathConfig& paths) override {
     sylpheed::ConfigureStartup(paths);
@@ -37,8 +42,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
     REXLOG_INFO("SYLPHEED_CONFIG user_language={} mnk_mode={}",
                 rex::cvar::GetFlagByName("user_language"),
                 rex::cvar::GetFlagByName("mnk_mode"));
-    input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>(
-        static_cast<rex::input::InputSystem*>(runtime()->input_system()));
+    input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>();
     window()->AddInputListener(input_diagnostics_.get(), 1);
   }
 
