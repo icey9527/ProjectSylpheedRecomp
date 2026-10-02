@@ -52,6 +52,16 @@ python scripts/debug_development.py --game-data-root "<完整资源目录>" --ca
 
 证据保存在仓库同级 `logs/crash-probe-<时间>/`：`launch.json`、`runtime.log`、`capture.json`（异常与各线程的宿主栈）、`host.dmp` 和 `result.json`。转储包含线程栈及部分关联内存，不是完整 Xbox 内存快照。宿主寄存器不能直接当作 PPC 寄存器；SDK DLL 缺少匹配 PDB 时，部分栈帧只能显示地址或导出名。
 
+调查持续震动时可增加 `--trace-vibration`，或在宿主 TOML 中设置 `trace_vibration = true`。日志记录玩家、左右马达强度、返回值和调用地址；相同命令合并计数。此开关默认关闭，启用时仍执行原函数，不改变马达命令。频繁变化的命令会增加日志量，诊断结束后关闭。
+
+## 已定位的标题与震动问题
+
+调试菜单的“进入标题”会进入电影模块，当前开发资源中缺少其请求的 `dat/GP_MOVIE/ADV.wmv`。已捕获的路径是 `GamePart_Movie::Impl::OnStart` → 电影创建失败 → 游戏 `Throw` → SDK `HandleCppException` 的调试中断。v0.10.0 在此入口尚未实现 C++ 异常展开。完整标题流程尚未通过；补电影文件后还需验证播放器，不能用忽略断点代替修复。
+
+教程中已记录到游戏持续发送变化的非零震动命令，SDK 返回成功；这次观察未确认回菜单或关闭后的停止时机。持续震动尚未修复，也未判定为正常效果。
+
+目前性能仅在 Debug 下观察。少于六个逻辑核时，SDK `XThread::SetActiveCpu` 会反复输出调度警告；是否影响帧时间需以相同场景的 Release 测量确认。尚无与模拟器的有效性能对比。
+
 ## 其他版本资源实验
 
 开发代码配合零售资源仅验证过镜像加载，完整兼容性未知。需要尝试时可使用 `scripts/Prepare-ResourceTest.ps1 -GameDataRoot "<资源目录>"`，仅补入缺少的开发镜像，保留已有文件。它不会把宿主转换为零售版；故障诊断优先使用配套开发版资源。

@@ -162,6 +162,8 @@ def main():
     parser.add_argument('--game-data-root',type=pathlib.Path)
     parser.add_argument('--capture-breakpoints',action='store_true',
                         help='Capture breakpoints after the initial loader stop. For a CRT abort dialog, select Retry.')
+    parser.add_argument('--trace-vibration',action='store_true',
+                        help='Log guest motor command changes without changing vibration behavior.')
     args=parser.parse_args()
     if not 1 <= args.seconds <= 600: parser.error('Time limit must be 1..600 seconds.')
     if not 0 <= args.fault_address < 2**64: parser.error('Fault address must fit uint64.')
@@ -180,6 +182,7 @@ def main():
     (ROOT/'logs/runtime-user-data/development').mkdir(parents=True,exist_ok=True)
     command=[str(binary),f'--game_data_root={root}',f'--user_data_root={ROOT}/logs/runtime-user-data/development',
              '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log','--log_level=debug','--log_flush_interval=1','--allow_game_relative_writes=false']
+    if args.trace_vibration: command.append('--trace_vibration=true')
     (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,
         'seconds':args.seconds,'fault_address':hex(args.fault_address),
         'capture_breakpoints':args.capture_breakpoints},indent=2),encoding='utf-8')
