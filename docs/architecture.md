@@ -67,4 +67,6 @@ Fiber 生命周期通过配置接入 SDK 原生实现，见 fiber-fix.md；下�
 
 `src/patches/graphics/development/frame_probe.cpp` 透传 `D3DDevice_Swap`（`0x8235CD78`），正常返回后记录时间戳。平台菜单与指标显示独立于游戏地址，见 [性能显示](performance-display.md)。
 
+`src/patches/resources/development/bootstrap.cpp` 在 `OnInit` 精确入口查询位置接入 `initial_game_part`，复用原名称表、任务工厂与加载器；默认遵循原表。包内表诊断和资源兼容边界见 [打包资源](packed-resources.md)。该接入只适用于当前开发镜像；不改 generated 或据资源目录切换函数地址。
+
 `src/patches/movie/development/movie_fallback.cpp` 同样保留原入口，处理当前不可用电影的跳过和创建失败。它复用原游戏结束清理与场景通知，原播放器仍未完整支持；地址和开关见 [电影与标题](title-and-vibration.md)。
