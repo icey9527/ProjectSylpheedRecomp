@@ -6,6 +6,8 @@
 
 #include <rex/rex_app.h>
 #include <rex/logging.h>
+#include <rex/filesystem.h>
+#include <rex/filesystem/devices/host_path_device.h>
 #include "startup_config.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
@@ -72,8 +74,25 @@ class ProjectSylpheedApp : public rex::ReXApp {
   }
 
   void OnLoadXexImage(std::string& xex_image) override {
-    // This host was generated for the development image, not retail default.xex.
-    xex_image = "game:\\BaseLib.dll";
+    // Keep the game data root dedicated to game resources. The matching XEX2
+    // image is a read-only file beside the host executable, exposed through a
+    // separate VFS device without changing the official SDK.
+    const auto image_root = rex::filesystem::GetExecutableFolder();
+    const auto image_path = image_root / "BaseLib.dll";
+    if (std::filesystem::is_regular_file(image_path)) {
+      auto image_device = std::make_unique<rex::filesystem::HostPathDevice>(
+          image_root.string(), image_root, true);
+      if (image_device->Initialize()) {
+        runtime()->file_system()->RegisterDevice(std::move(image_device));
+        xex_image = image_path.string();
+      } else {
+        xex_image = image_path.string();
+        REXLOG_ERROR("SYLPHEED_STAGE image_device_failed: {}", image_root.string());
+      }
+    } else {
+      xex_image = image_path.string();
+      REXLOG_ERROR("SYLPHEED_STAGE image_missing: {}", image_path.string());
+    }
     REXLOG_INFO("SYLPHEED_STAGE image_selected: {}", xex_image);
   }
 

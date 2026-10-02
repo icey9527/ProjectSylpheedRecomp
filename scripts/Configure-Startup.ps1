@@ -10,6 +10,9 @@ if (Test-Path -LiteralPath $destination) {
     return
 }
 if (!(Test-Path -LiteralPath $outputDirectory)) { throw 'Build the host first.' }
+if (!(Test-Path -LiteralPath (Join-Path $outputDirectory 'BaseLib.dll'))) {
+    throw 'BaseLib.dll is missing beside the host executable; rebuild or run Prepare-ResourceTest.ps1.'
+}
 if (!$GameDataRoot) {
     $localConfig = "$PSScriptRoot/../../assets/runtime.local.json"
     if (Test-Path -LiteralPath $localConfig) {
@@ -19,8 +22,9 @@ if (!$GameDataRoot) {
 $content = [IO.File]::ReadAllText("$PSScriptRoot/../config/project_sylpheed.example.toml")
 if ($GameDataRoot) {
     $resolved = (Resolve-Path -LiteralPath $GameDataRoot).Path.Replace('\', '/')
-    if (!(Test-Path -LiteralPath "$resolved/BaseLib.dll")) {
-        throw 'Development image BaseLib.dll is missing.'
+    if (!(Test-Path -LiteralPath "$resolved/config.ini") -or
+        !(Test-Path -LiteralPath "$resolved/dat" -PathType Container)) {
+        throw 'Resource directory must contain config.ini and dat/.'
     }
     # JSON string escaping is compatible with a TOML basic string here.
     $encodedPath = ConvertTo-Json -InputObject $resolved -Compress

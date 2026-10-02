@@ -33,16 +33,16 @@ def main():
             local = json.loads(args.config.read_text(encoding="utf-8-sig"))
             root = Path(local["game_data_root"])
         root = root.resolve(strict=True)
-        image = root / "BaseLib.dll"
+        binary = REPO / "out/build/win-amd64-debug/project_sylpheed.exe"
+        if not binary.is_file():
+            raise ValueError("Debug host is missing; run scripts/Build.ps1 first")
+        image = binary.parent / "BaseLib.dll"
         with image.open("rb") as stream:
             digest = hashlib.file_digest(stream, "sha256").hexdigest()
         if digest != DEVELOPMENT_SHA256:
             raise ValueError("Image SHA256 does not match this development host; refusing to run")
         if not (root / "config.ini").is_file() or not (root / "dat").is_dir():
             raise ValueError("Expected config.ini and dat/ in the selected resource root")
-        binary = REPO / "out/build/win-amd64-debug/project_sylpheed.exe"
-        if not binary.is_file():
-            raise ValueError("Debug host is missing; run scripts/Build.ps1 first")
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.exit(1, f"Preflight failed: {error}\n")
 

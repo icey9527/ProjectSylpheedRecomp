@@ -40,10 +40,7 @@ int main() {
     const auto root_utf8 = root.generic_u8string();
     Require(sylpheed::ResolveResourcePath(std::string(root_utf8.begin(), root_utf8.end()), dir) == root, "absolute path retained");
     Require(!sylpheed::ResourceDirectoryError(dir).empty(), "missing essential resources reported");
-    { std::ofstream file(dir / "Xacalite_ScriptTeam.exe"); file << "legacy fixture"; }
-    Require(!sylpheed::ResourceDirectoryError(dir).empty(), "legacy image name is not accepted");
-    std::filesystem::remove(dir / "Xacalite_ScriptTeam.exe");
-    for (const auto* path : {"BaseLib.dll", "config.ini", "dat/tables.pak", "dat/tables.p00"}) { std::ofstream file(dir / path); file << "fixture"; }
+    for (const auto* path : {"config.ini", "dat/tables.pak", "dat/tables.p00"}) { std::ofstream file(dir / path); file << "fixture"; }
     Require(!std::filesystem::exists(dir / "dat/files.tbl"), "packed-only fixture has no loose table");
     Require(sylpheed::ResourceDirectoryError(dir).empty(), "packed resource layout must reach the original guest loader");
     std::filesystem::remove(dir / "dat/tables.pak");

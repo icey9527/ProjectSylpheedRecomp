@@ -1,5 +1,6 @@
 param(
     [Parameter(Mandatory = $true)][string]$GameDataRoot,
+    [string]$HostDirectory,
     [string]$DevelopmentImage
 )
 $ErrorActionPreference = 'Stop'
@@ -9,7 +10,10 @@ if (!$DevelopmentImage) {
 }
 $DevelopmentImage = (Resolve-Path -LiteralPath $DevelopmentImage).Path
 $root = (Resolve-Path -LiteralPath $GameDataRoot).Path
-$destination = Join-Path $root 'BaseLib.dll'
+$HostDirectory = if ($HostDirectory) { (Resolve-Path -LiteralPath $HostDirectory).Path } else {
+    (Resolve-Path -LiteralPath (Join-Path $scriptRoot '..\out\build\win-amd64-debug')).Path
+}
+$destination = Join-Path $HostDirectory 'BaseLib.dll'
 if (Test-Path -LiteralPath $destination) {
     Write-Host "[OK] Existing development image preserved: $destination"
     return
@@ -22,6 +26,6 @@ if (!(Test-Path -LiteralPath (Join-Path $root 'dat') -PathType Container) -or
 # BaseLib.dll is the development XEX with the project runtime filename; its
 # XEX2 header is unchanged. Do not substitute retail default.xex for this code.
 Copy-Item -LiteralPath $DevelopmentImage -Destination $destination -ErrorAction Stop
-Write-Host "[OK] Development image added for resource testing: $destination"
-Write-Host 'Set game_data_root in the EXE-adjacent TOML to this directory.'
+Write-Host "[OK] Development image placed beside the host executable: $destination"
+Write-Host 'Set game_data_root in the EXE-adjacent TOML to the resource directory.'
 Write-Host 'This tests development code with these resources; it does not recompile retail code.'

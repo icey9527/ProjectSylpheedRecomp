@@ -37,3 +37,12 @@ endif()
 
 # The GPU plugin is loaded at runtime, so request explicit DLL deployment.
 rexglue_setup_target(project_sylpheed GPU_PLUGINS xenos)
+
+# The matching development XEX2 is an external runtime dependency. Keep it
+# beside the host executable while leaving the selected game resources under
+# game_data_root.
+add_custom_command(TARGET project_sylpheed POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/assets/Xacalite_ScriptTeam.exe"
+        "$<TARGET_FILE_DIR:project_sylpheed>/BaseLib.dll"
+    VERBATIM)

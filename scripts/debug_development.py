@@ -184,10 +184,10 @@ def main():
     if root is None:
         root=pathlib.Path(json.loads(args.config.read_text(encoding='utf-8-sig'))['game_data_root'])
     root=root.resolve(strict=True)
-    with (root/'BaseLib.dll').open('rb') as stream:
+    binary=REPO/f'out/build/win-amd64-{args.configuration.lower()}/project_sylpheed.exe'
+    with (binary.parent/'BaseLib.dll').open('rb') as stream:
         if hashlib.file_digest(stream,'sha256').hexdigest()!=DEVELOPMENT_SHA256:
             parser.exit(1,'Image does not match this development host; refusing to run.\n')
-    binary=REPO/f'out/build/win-amd64-{args.configuration.lower()}/project_sylpheed.exe'
     if not (root/'config.ini').is_file() or not (root/'dat').is_dir() or not binary.is_file():
         parser.exit(1,f'Missing development resources or {args.configuration} host.\n')
     OUT=ROOT/'logs'/('crash-probe-'+datetime.now().strftime('%Y%m%d-%H%M%S-%f'))

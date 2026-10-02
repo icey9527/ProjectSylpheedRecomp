@@ -19,8 +19,6 @@ std::string ResourceDirectoryError(const std::filesystem::path& root) {
   std::error_code ec;
   if (root.empty() || !std::filesystem::is_directory(root, ec))
     return "请选择完整游戏资源目录。";
-  if (!std::filesystem::is_regular_file(root / "BaseLib.dll", ec))
-    return "所选目录缺少必需文件：BaseLib.dll（开发版 XEX）";
   if (!std::filesystem::is_regular_file(root / "config.ini", ec))
     return "所选目录缺少必需文件：config.ini";
   // Loose tables are optional: the guest owns PAK lookup and decompression.
