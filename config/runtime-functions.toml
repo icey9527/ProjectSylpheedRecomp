@@ -8,3 +8,8 @@
 # jpeg_std_error stores this callback at +16; tutorial JPEG loading calls it
 # from reset_input_controller. The original entry was not discovered.
 "0x8241C748" = {}
+# XAUDIO::CPCMSourceEffect::SetFrequencyScale adjustor{16}
+# (?SetFrequencyScale@CPCMSourceEffect@XAUDIO@@WBA@AAJM@Z,
+# xaudio:pcmsourceeffect.obj). XMedia audio setup reaches this vtable thunk.
+# MAP/PDB public symbols agree; let codegen discover its body.
+"0x82555F58" = {}

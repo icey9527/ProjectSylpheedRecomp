@@ -55,3 +55,13 @@ Debug 构建后使用同版资源复测，用户确认已看到飞船与太空�
 随后的 JPEG 空指针异常，到时限由调试器结束，未验证自然退出。
 JPEG 解码为何返回错误、是否选择了其他图片格式尚未单独验证；此次修复恢复原有
 错误返回流程，完整任务、飞行操作与存档仍须另行验收。
+
+## 电影初始化遗漏音频调整入口
+
+补齐电影资源后，原播放器初始化在 `0x82552B5C` 间接调用未注册的 `0x82555F58`。
+MAP/PDB 公共符号精确对应 `XAUDIO::CPCMSourceEffect::SetFrequencyScale adjustor{16}`，
+对象 `xaudio:pcmsourceeffect.obj`；模块同位置符号缺失。
+`config/runtime-functions.toml` 补充实际入口，官方生成 `r3 -= 16` 后跳转到已有
+`0x82555E18` 的原始 thunk。其他函数主体未修改，不从邻近符号猜长度。
+Debug 构建与运行已恢复实际视频画面和声音，流畅度和正常结束仍须验收，
+详见 [电影与标题](title-and-vibration.md)。

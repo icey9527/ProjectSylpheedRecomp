@@ -17,11 +17,13 @@
 
 官方 v0.10.0 的 `src/kernel/xboxkrnl/xboxkrnl_debug.cpp` 中，`HandleCppException` 读取抛出信息后直接调用 `rex::debug::Break()`，尚未完成异常展开。没有通过放行此断点或把抛出函数改为空函数来绕过故障。
 
-用户补齐视频后的新现场为播放器初始化中的未注册目标 `0x82555F58`，调用点 `0x82552B5C`。该目标是 `XAUDIO::CPCMSourceEffect::SetFrequencyScale` 的 `adjustor{16}` thunk，原名 `?SetFrequencyScale@CPCMSourceEffect@XAUDIO@@WBA@AAJM@Z`，对象 `xaudio:pcmsourceeffect.obj`；MAP/PDB 公共原名及位置一致，模块同位置符号缺失，尚无生成入口。它不是再次找不到视频；完整原播放器支持仍待后续调查。
+用户补齐视频后的新现场为播放器初始化中的未注册目标 `0x82555F58`，调用点 `0x82552B5C`。该目标是 `XAUDIO::CPCMSourceEffect::SetFrequencyScale` 的 `adjustor{16}` thunk，原名 `?SetFrequencyScale@CPCMSourceEffect@XAUDIO@@WBA@AAJM@Z`，对象 `xaudio:pcmsourceeffect.obj`；MAP/PDB 公共原名及位置一致，模块同位置符号缺失。
+
+`config/runtime-functions.toml` 现补充该入口，由官方生成器恢复两条原始指令：将 `r3` 减去 16，跳转到已有的 `0x82555E18` 本体。没有猜测长度、改写音频逻辑或手改生成代码。Debug 构建后关闭跳过，玩家确认已有实际视频画面和声音，但报告卡顿，尤其切换到其他窗口时；自然结束尚待确认。补入口不等于所有视频和播放器功能都已验证。
 
 ## 跳过与创建失败兜底
 
-当前 `skip_movies = true` 默认跳过电影，`skip_failed_movies = true` 默认处理负 HRESULT 的创建失败。关闭前者可尝试原播放器，关闭两者恢复原启动行为。创建成功且没有配置跳过时仍使用原更新函数；兜底不能恢复 `abort()`、硬件异常或任意解码故障。
+当前 `skip_movies = false` 默认播放电影，`skip_failed_movies = true` 默认处理负 HRESULT 的创建失败。设 `skip_movies = true` 可使用已验证的跳过路径；关闭两者恢复原启动行为。创建成功且没有配置跳过时仍使用原更新函数；兜底不能恢复 `abort()`、硬件异常或任意解码故障。已有本机 TOML 若显式写了旧值 `true`，需要手动改为 `false`，构建脚本会保留玩家配置。
 
 手写补丁在 `src/patches/movie/development/movie_fallback.cpp`，不修改生成函数。通过官方弱别名接入：
 
@@ -60,6 +62,8 @@ Debug 构建及 ABI 测试通过后，实际复测已记录跳过、完成状态
 
 ## 性能边界
 
-当前是宿主 Debug 构建，尚无同场景 Release 或模拟器基准。四个逻辑核的诊断运行中反复出现 SDK 少于六核的调度警告；日志开销和 Debug 开销是调查线索，未证实为全部性能原因。
+Debug 实际电影播放期间，原游戏的 `System UI Framerate` 警告记录了 91 个 66–144 毫秒样本，中位数 73 毫秒；这不是精确视频 FPS。Windows x64 Release 首次全量构建及最终增量构建已通过，使用 `-O3 -DNDEBUG` 和匹配的 Release SDK 库；同资源、按键、日志级别的受控运行记录到电影启动、清理和返回标题，没有捕获异常。清理日志无法区分自然结束与按键跳过，流畅度对比也仍待玩家确认。
+
+四个逻辑核的运行中仍反复出现 SDK 少于六核的调度警告。Debug、日志和焦点切换是后续性能调查线索，尚无与模拟器的有效基准；没有为此改游戏时间步长或屏蔽读盘错误。
 
 v0.10.0 源码虽定义 `perf_log_csv`，本次启用后没有生成 CSV，源码中也未找到帧循环调用 `SetCsvLogPath`/`WriteCsvFrame`，不能把这个选项当作已可用的帧率测量方案。

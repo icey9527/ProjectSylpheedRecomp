@@ -33,6 +33,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/Build.ps1 -SdkRoot
 
 代码生成、configure 和 compile 日志保存到仓库同级 `logs/`。构建后输出位于 `out/build/win-amd64-debug/`，已有启动配置会保留。
 
+运行性能对比使用优化构建：`./scripts/Build.ps1 -Configuration Release`，输出位于
+`out/build/win-amd64-release/`。它与 Debug 分别保留各自的 EXE 旁配置；
+Release 仍运行同一份开发版游戏，不会转换成零售版。首次构建需要编译全部生成代码。
+
 ## 手动构建
 
 先打开 VS 的 x64 开发者终端，或在 PowerShell 点源 `. ./scripts/Initialize-WindowsToolchain.ps1`：

@@ -18106,6 +18106,15 @@ loc_8253F5AC:
 	return;
 }
 
+DEFINE_REX_FUNC(sub_82555F58) {
+	REX_FUNC_PROLOGUE();
+	// addi r3,r3,-16
+	ctx.r3.s64 = ctx.r3.s64 + -16;
+	// b 0x82555e18
+	sub_82555E18(ctx, base);
+	return;
+}
+
 DEFINE_REX_FUNC(sub_825669D8) {
 	REX_FUNC_PROLOGUE();
 	PPCRegister temp{};

@@ -10,9 +10,9 @@ gpu_plugin = "xenos"
 allow_game_relative_writes = false
 mnk_mode = true
 mnk_mouse = false
-# Current development player has unresolved callbacks. Skip with normal cleanup.
-# false attempts original playback; failed creation still completes the movie.
-skip_movies = true
+# Play movies by default; true skips them with normal cleanup.
+# Failed player creation can still complete the movie without throwing.
+skip_movies = false
 skip_failed_movies = true
 # Controller mappings; comma separates alternatives. Restart after editing.
 keybind_a = "Return,Space"

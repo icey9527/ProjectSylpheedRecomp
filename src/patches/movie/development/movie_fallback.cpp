@@ -5,8 +5,7 @@
 #include <mutex>
 #include <unordered_set>
 
-REXCVAR_DEFINE_BOOL(skip_movies, true, "Game",
-                   "Skip movies until the development XMedia player is supported");
+REXCVAR_DEFINE_BOOL(skip_movies, false, "Game", "Skip movie playback");
 REXCVAR_DEFINE_BOOL(skip_failed_movies, true, "Game",
                    "Complete movies whose player creation returns a failure");
 

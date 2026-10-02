@@ -18014,6 +18014,7 @@ void project_sylpheed_RegisterFunctions(rex::runtime::IModuleRegistrar* registra
   registrar->SetFunction(0x82555F40, sub_82555F40);
   registrar->SetFunction(0x82555F48, sub_82555F48);
   registrar->SetFunction(0x82555F50, sub_82555F50);
+  registrar->SetFunction(0x82555F58, sub_82555F58);
   registrar->SetFunction(0x82555F60, sub_82555F60);
   registrar->SetFunction(0x82555F68, sub_82555F68);
   registrar->SetFunction(0x82555F70, sub_82555F70);

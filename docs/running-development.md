@@ -58,13 +58,22 @@ python scripts/debug_development.py --game-data-root "<完整资源目录>" --ca
 
 调试菜单的“进入标题”会进入电影模块。缺少 `dat/GP_MOVIE/ADV.wmv` 时，原版会抛出 SDK 尚不能展开的 C++ 异常；补齐电影后又确认播放器调用了未注册的音频回调 `0x82555F58`。
 
-当前默认 `skip_movies = true`，在创建播放器前跳过电影，并走原游戏的结束清理与场景继续流程。可在 EXE 旁的 TOML 设置 `skip_movies = false` 尝试原播放器；此路径仍有上述未解决回调，不能保证播放。`skip_failed_movies = true` 会在播放器创建返回失败时自动结束该电影，避免缺文件导致原版抛异常；它不会捕获 `abort()` 或所有运行错误。补丁接入和验证说明见 [电影与标题](title-and-vibration.md)。
+该回调现已通过官方 codegen 补齐，关闭跳过后已实际显示视频。当前默认 `skip_movies = false` 播放电影，设为 `true` 可使用已验证的跳过路径。已有 EXE 旁 TOML 若显式写了旧值 `true`，需改为 `false`；构建不会覆盖玩家配置。`skip_failed_movies = true` 会在播放器创建返回失败时自动结束该电影，避免缺文件导致原版抛异常；它不会捕获 `abort()` 或所有运行错误。补丁接入和验证说明见 [电影与标题](title-and-vibration.md)。
 
-默认跳过路径已实际进入标题，玩家确认正常。第一关电影准备阶段仍出现读盘错误：字幕、字体及 `.prt` 请求的目录与现有资源位置不一致，发生在播放器创建之前；该问题尚未修复，原视频播放也未验收。
+跳过路径已实际进入标题，玩家确认正常。第一关曾在播放器创建之前因字幕、字体及 `.prt` 目录不一致出现读盘错误；本地资源布局现已按表对齐，但第一关尚未完整复测。实际电影画面和声音已确认，流畅度与正常结束仍须验收。
+
+视频性能对比可使用优化构建，宿主 Release 仍对应开发版游戏：
+
+```powershell
+./scripts/Build.ps1 -Configuration Release
+python scripts/debug_development.py --configuration Release --game-data-root "<完整资源目录>" --capture-breakpoints --seconds 600
+```
+
+诊断脚本默认仍运行 Debug；`--log-level info` 可减少调试日志。构建配置与日志级别写入 `launch.json`，对比时应记录并尽量保持一致。Release 与 Debug 各自使用 EXE 同目录 TOML，先核对 `skip_movies` 和资源路径。
 
 教程中已记录到游戏持续发送变化的非零震动命令，SDK 返回成功；这次观察未确认回菜单或关闭后的停止时机。持续震动尚未修复，也未判定为正常效果。
 
-目前性能仅在 Debug 下观察。少于六个逻辑核时，SDK `XThread::SetActiveCpu` 会反复输出调度警告；是否影响帧时间需以相同场景的 Release 测量确认。尚无与模拟器的有效性能对比。
+Release 构建与受控运行已通过，视频流畅度对比和切换窗口时的卡顿仍待确认。少于六个逻辑核时，SDK `XThread::SetActiveCpu` 会反复输出调度警告；它是否影响帧时间仍需测量。尚无与模拟器的有效性能对比。
 
 ## 其他版本资源实验
 

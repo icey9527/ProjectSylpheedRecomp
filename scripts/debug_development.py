@@ -156,6 +156,10 @@ def main():
     global OUT
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seconds',type=int,default=45)
+    parser.add_argument('--configuration',choices=('Debug','Release','RelWithDebInfo'),default='Debug',
+                        help='Host build configuration to run (default: Debug).')
+    parser.add_argument('--log-level',choices=('debug','info','warn','error'),default='debug',
+                        help='SDK logging threshold (default: debug).')
     parser.add_argument('--fault-address',type=lambda value:int(value,0),default=0x10000000C,
                         help='First-chance host fault address to capture (default: guest 0xC at base 0x100000000).')
     parser.add_argument('--config',type=pathlib.Path,default=ROOT/'assets/runtime.local.json')
@@ -174,17 +178,17 @@ def main():
     with (root/'Xacalite_ScriptTeam.exe').open('rb') as stream:
         if hashlib.file_digest(stream,'sha256').hexdigest()!=DEVELOPMENT_SHA256:
             parser.exit(1,'Image does not match this development host; refusing to run.\n')
-    binary=REPO/'out/build/win-amd64-debug/project_sylpheed.exe'
+    binary=REPO/f'out/build/win-amd64-{args.configuration.lower()}/project_sylpheed.exe'
     if not (root/'config.ini').is_file() or not (root/'dat').is_dir() or not binary.is_file():
-        parser.exit(1,'Missing development resources or Debug host.\n')
+        parser.exit(1,f'Missing development resources or {args.configuration} host.\n')
     OUT=ROOT/'logs'/('crash-probe-'+datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
     OUT.mkdir(parents=True)
     (ROOT/'logs/runtime-user-data/development').mkdir(parents=True,exist_ok=True)
     command=[str(binary),f'--game_data_root={root}',f'--user_data_root={ROOT}/logs/runtime-user-data/development',
-             '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log','--log_level=debug','--log_flush_interval=1','--allow_game_relative_writes=false']
+             '--gpu_plugin=xenos',f'--log_file={OUT}/runtime.log',f'--log_level={args.log_level}','--log_flush_interval=1','--allow_game_relative_writes=false']
     if args.trace_vibration: command.append('--trace_vibration=true')
     (OUT/'launch.json').write_text(json.dumps({'command':command,'image_sha256':DEVELOPMENT_SHA256,
-        'seconds':args.seconds,'fault_address':hex(args.fault_address),
+        'seconds':args.seconds,'configuration':args.configuration,'log_level':args.log_level,'fault_address':hex(args.fault_address),
         'capture_breakpoints':args.capture_breakpoints},indent=2),encoding='utf-8')
     si=STARTUPINFO();si.cb=C.sizeof(si);pi=PROCESS_INFORMATION()
     assert C.sizeof(DEBUG_EVENT)==176 and C.sizeof(STACKFRAME64)==264 and C.sizeof(SYMBOL_INFO)==88
