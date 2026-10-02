@@ -15,6 +15,7 @@ set(PROJECTSYLPHEED_SOURCES
     src/app/main.cpp
     src/input/keyboard_keystroke_driver.cpp
     src/patches/input/development/vibration_trace.cpp
+    src/patches/movie/development/movie_fallback.cpp
 )
 
 if(WIN32)

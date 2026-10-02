@@ -10,6 +10,10 @@ gpu_plugin = "xenos"
 allow_game_relative_writes = false
 mnk_mode = true
 mnk_mouse = false
+# Current development player has unresolved callbacks. Skip with normal cleanup.
+# false attempts original playback; failed creation still completes the movie.
+skip_movies = true
+skip_failed_movies = true
 # Controller mappings; comma separates alternatives. Restart after editing.
 keybind_a = "Return,Space"
 keybind_b = "Backspace"
