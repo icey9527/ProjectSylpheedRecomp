@@ -8,6 +8,7 @@
 #include <rex/logging.h>
 #include <rex/filesystem.h>
 #include <rex/filesystem/devices/host_path_device.h>
+#include <rex/ui/keybinds.h>
 #include "startup_config.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
@@ -120,6 +121,20 @@ class ProjectSylpheedApp : public rex::ReXApp {
 
   void OnCreateDialogs(rex::ui::ImGuiDrawer* drawer) override {
     performance_display_ = std::make_unique<sylpheed::performance::PerformanceDisplay>(drawer);
+    // The SDK's default F7 callback destroys the dialog immediately from the
+    // key event. ImGui may still be iterating the dialog vector in that frame,
+    // so defer both creation and destruction to the next UI turn.
+    rex::ui::UnregisterBind("bind_achievements");
+    rex::ui::RegisterBind("bind_achievements", "F7", "Toggle achievements overlay",
+                          [this] {
+                            app_context().CallInUIThreadDeferred([this] {
+                              if (achievements_overlay_safe_) {
+                                achievements_overlay_safe_.reset();
+                              } else {
+                                achievements_overlay_safe_ = CreateAchievementsOverlay();
+                              }
+                            });
+                          });
   }
 
   void OnShutdown() override {
@@ -148,6 +163,7 @@ class ProjectSylpheedApp : public rex::ReXApp {
   // void OnConfigurePaths(rex::PathConfig& paths) override {}
  private:
   std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
+  std::unique_ptr<rex::ui::ImGuiDialog> achievements_overlay_safe_;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
   std::filesystem::path startup_config_path_;
   bool auto_language_ = true;
