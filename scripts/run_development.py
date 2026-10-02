@@ -53,6 +53,10 @@ def main():
     # The host owns one log beside the executable and truncates it during
     # startup. Do not create per-run log directories or override that path.
     log_file = binary.parent / f"{binary.stem}.log"
+    # The host normally truncates this file during startup. Clear it here too
+    # so a launch that fails before logging initialization cannot be mistaken
+    # for a successful read of the previous run's evidence.
+    log_file.write_text("", encoding="utf-8")
     user_dir = logs_root / "runtime-user-data/development"
     user_dir.mkdir(parents=True, exist_ok=True)
     command = [str(binary), f"--game_data_root={root}", f"--user_data_root={user_dir}",
@@ -103,6 +107,8 @@ def main():
         record["elapsed_seconds"] = round(time.monotonic() - started, 2)
         record["finished_at"] = datetime.now(timezone.utc).isoformat()
         text = log_file.read_text(encoding="utf-8", errors="replace") if log_file.exists() else ""
+        record["log_bytes"] = len(text.encode("utf-8"))
+        record["log_fresh"] = bool(text.strip())
         record["observed_stages"] = list(dict.fromkeys(re.findall(r"SYLPHEED_STAGE ([a-z_]+)", text)))
         record["log_file"] = str(log_file)
         (REPO.parent / "logs/development-last-run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
