@@ -20,7 +20,7 @@ game_data_root = "<完整资源目录>"
 
 支持打包读取并不等于普通散文件路径会自动搜索包。开发镜像搭配正式资源时的启动表入口问题和原 `包+文件` 路线见 [打包资源说明](packed-resources.md)。
 
-`initial_game_part = "game"` 默认遵循 `files.tbl` 的 `[SYSTEM] ENTRY_POINT`。需要直接进入标题时设 `initial_game_part = "GP_TITLE"`；原开发调试菜单可用 `"GP_TEST"`，但仍需配套调试表。修改后重启生效，不修改原表或自动识别游戏资源版本。未知名字或镜像名称布局不符时记录错误，保留原表入口。
+省略 `initial_game_part` 时默认遵循 `files.tbl` 的 `[SYSTEM] ENTRY_POINT`；需要直接进入标题时设 `initial_game_part = "GP_TITLE"`；原开发调试菜单可用 `"GP_TEST"`，但仍需配套调试表。修改后重启生效，不修改原表或自动识别游戏资源版本。未知名字或镜像名称布局不符时记录错误，保留原表入口。显式写 `initial_game_part = "game"` 会关闭宿主的入口回退，适合你明确要保留原始入口的情况。
 
 当前正式资源的包内启动表同样指定 `GP_TEST`，但缺少它的调试表。因此开发主程序搭配这些资源的首轮验证使用 `GP_TITLE`，不是运行正式版主程序。`trace_resource_bootstrap = true` 可记录启动表打开返回值与原/实际入口；默认关闭。完整任务、存档及正式资源下的调试菜单尚未由此验收。
 

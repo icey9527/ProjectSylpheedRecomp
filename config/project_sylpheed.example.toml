@@ -7,9 +7,9 @@ window_height = 720
 video_mode_width = 1280
 video_mode_height = 720
 gpu_plugin = "xenos"
-# game follows SYSTEM/ENTRY_POINT in files.tbl. GP_TITLE starts at the title;
-# GP_TEST selects the original debug menu and needs its matching debug tables.
-initial_game_part = "game"
+# Omit this option to follow SYSTEM/ENTRY_POINT in files.tbl. The host falls
+# back to GP_TITLE when the selected resources have no GP_TEST table. Set
+# GP_TEST explicitly only when the matching debug tables are present.
 trace_resource_bootstrap = false
 allow_game_relative_writes = false
 mnk_mode = true
