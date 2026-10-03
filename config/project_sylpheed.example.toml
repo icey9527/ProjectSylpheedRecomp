@@ -13,11 +13,8 @@ gpu_plugin = "xenos"
 trace_resource_bootstrap = false
 allow_game_relative_writes = false
 mnk_mode = true
-mnk_mouse = false
-# Play movies by default; true skips them with normal cleanup.
-# Failed player creation can still complete the movie without throwing.
-skip_movies = false
-skip_failed_movies = true
+# Mouse look is enabled by default through the host; no manual switch is
+# needed. The SDK converts relative motion into the emulated right stick.
 # Optional movie-start subtitle gate / parsed-count diagnostics.
 trace_movie_subtitles = false
 # on/off overrides the movie instance; game follows the original user profile.
@@ -39,8 +36,10 @@ keybind_start = "X"
 keybind_back = "Z,Tab"
 keybind_left_shoulder = "1"
 keybind_right_shoulder = "3"
-keybind_left_trigger = "Q,I"
-keybind_right_trigger = "E,O"
+# PC defaults: right mouse button = left trigger (missiles), left mouse
+# button = right trigger (guns). Keyboard alternatives remain available.
+keybind_left_trigger = "RMB,Q,I"
+keybind_right_trigger = "LMB,E,O"
 keybind_lstick_up = "W"
 keybind_lstick_down = "S"
 keybind_lstick_left = "A"

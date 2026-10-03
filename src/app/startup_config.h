@@ -28,7 +28,10 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   DefaultFlag("window_width", "1280");
   DefaultFlag("window_height", "720");
   DefaultFlag("mnk_mode", "true");
-  DefaultFlag("mnk_mouse", "false");
+  // Mouse look is the normal PC input path. The SDK already converts relative
+  // mouse motion to the emulated right stick; keep this enabled by default so
+  // a fresh build works without hand-editing the TOML file.
+  DefaultFlag("mnk_mouse", "true");
   DefaultFlag("gpu_plugin", "xenos");
   const auto log_path = paths.config_path.parent_path() /
                         (paths.config_path.stem().string() + ".log");
@@ -41,6 +44,9 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   DefaultFlag("allow_game_relative_writes", "false");
   DefaultFlag("keybind_a", "Return,Space");
   DefaultFlag("keybind_b", "Backspace");
+  // Match the intended mouse controls while retaining the Xbox trigger model.
+  DefaultFlag("keybind_left_trigger", "RMB");
+  DefaultFlag("keybind_right_trigger", "LMB");
   DefaultFlag("keybind_start", "X");
   DefaultFlag("keybind_dpad_up", "Up");
   DefaultFlag("keybind_dpad_down", "Down");

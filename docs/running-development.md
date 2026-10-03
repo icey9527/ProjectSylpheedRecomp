@@ -24,7 +24,7 @@ game_data_root = "<完整资源目录>"
 
 当前正式资源的包内启动表同样指定 `GP_TEST`，但缺少它的调试表。因此开发主程序搭配这些资源的首轮验证使用 `GP_TITLE`，不是运行正式版主程序。`trace_resource_bootstrap = true` 可记录启动表打开返回值与原/实际入口；默认关闭。完整任务、存档及正式资源下的调试菜单尚未由此验收。
 
-如果资源副本主动删除了 `dat/movie/`，请在该副本对应的 TOML 中设置 `skip_movies = true`；否则某些过场可能在播放器创建成功后才因视频文件缺失触发游戏自己的 `Disc Read Error`。完整资源默认保持 `skip_movies = false`，不影响正常播放电影。
+电影资源按存在性处理：文件存在时保留原播放，播放器创建因缺失视频失败时由宿主完成电影结束并继续流程。`dat/movie/jpn.pak` 和 `jpn.p00` 是日语电影/字幕索引包，即使不保留视频也应保留；删除整个 `dat/movie/` 会在播放器之前触发游戏自己的 `Disc Read Error`。不需要为此手动修改 TOML。
 
 宿主现在会在未显式设置 `initial_game_part`、默认入口仍为 `game`，且资源目录既没有散装 `dat/GP_TEST`，也没有完整的 `dat/GP_TEST.pak` + `dat/GP_TEST.p00` 时自动回退到 `GP_TITLE`。根目录散装资源优先；缺少散装文件时仍由原游戏加载器尝试 PAK 内部文件。显式设置 `initial_game_part = "GP_TEST"` 或其他入口时不会被覆盖。该回退不补造缺失的任务包，进入后续场景仍可能因资源不完整报告读盘错误。
 
