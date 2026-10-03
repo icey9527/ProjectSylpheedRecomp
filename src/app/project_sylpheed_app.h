@@ -43,6 +43,9 @@ class ProjectSylpheedApp : public rex::ReXApp {
     auto_language_ = rex::cvar::GetFlagSource("user_language") == rex::cvar::Source::kDefault;
     sylpheed::ConfigureStartup(paths);
     startup_config_path_ = paths.config_path;
+    std::error_code ec;
+    image_is_game_root_ = std::filesystem::equivalent(
+        rex::filesystem::GetExecutableFolder(), paths.game_data_root, ec);
   }
 
   std::optional<rex::PathConfig> OnFinalizePaths(const rex::PathConfig& defaults,
@@ -86,6 +89,14 @@ class ProjectSylpheedApp : public rex::ReXApp {
     const auto image_root = rex::filesystem::GetExecutableFolder();
     const auto image_path = image_root / "BaseLib.dll";
     if (std::filesystem::is_regular_file(image_path)) {
+      // A distribution keeps the matching XEX beside the resources. Use the
+      // SDK's game device in that case; absolute host paths are retained for
+      // development runs where the resource root is separate from the EXE.
+      if (image_is_game_root_) {
+        xex_image = "game:\\BaseLib.dll";
+        REXLOG_INFO("SYLPHEED_STAGE image_selected: {}", xex_image);
+        return;
+      }
       auto image_device = std::make_unique<rex::filesystem::HostPathDevice>(
           image_root.string(), image_root, true);
       if (image_device->Initialize()) {
@@ -207,4 +218,5 @@ class ProjectSylpheedApp : public rex::ReXApp {
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
   std::filesystem::path startup_config_path_;
   bool auto_language_ = true;
+  bool image_is_game_root_ = false;
 };
