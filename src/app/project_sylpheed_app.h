@@ -11,6 +11,8 @@
 #include <rex/ui/keybinds.h>
 #include <rex/system.h>
 #include <fstream>
+#include <string>
+#include <thread>
 #include <vector>
 #include "startup_config.h"
 #include "input_diagnostics.h"
@@ -115,6 +117,22 @@ class ProjectSylpheedApp : public rex::ReXApp {
 #ifdef _WIN32
       sylpheed::BeginResourceDirectoryChange(
           static_cast<HWND>(window()->GetNativeWindowHandle()), startup_config_path_);
+#endif
+    }, [this](double rate) {
+#ifdef _WIN32
+      // The refresh rate cvar requires a restart: save it into the startup
+      // TOML and relaunch, mirroring the resource directory change. The worker
+      // owns only the HWND and a path copy; no App objects cross threads.
+      auto* hwnd = static_cast<HWND>(window()->GetNativeWindowHandle());
+      auto config = startup_config_path_;
+      std::thread([hwnd, config, rate] {
+        std::string error;
+        if (!sylpheed::SaveVideoModeRefreshRate(config, rate, error)) {
+          sylpheed::ResourceMessage(hwnd, "帧率保存失败：" + error, true);
+          return;
+        }
+        sylpheed::RestartHostForConfigChange(hwnd);
+      }).detach();
 #endif
     });
     SetGuestFrameStats([] {

@@ -23,6 +23,7 @@ set(PROJECTSYLPHEED_SOURCES
     src/features/performance/frame_metrics.cpp
     src/features/performance/affinity_warning_filter.cpp
     src/features/performance/performance_display.cpp
+    src/features/performance/frame_rate_dialog.cpp
     src/features/input/mouse_settings.cpp
     src/patches/graphics/development/frame_probe.cpp
 )

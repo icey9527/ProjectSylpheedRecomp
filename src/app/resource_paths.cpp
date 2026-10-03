@@ -46,6 +46,62 @@ size_t Offset(std::string_view text, toml::source_position pos) {
 }
 }
 
+bool SaveVideoModeRefreshRate(const std::filesystem::path& config, double rate,
+                              std::string& error) {
+  std::filesystem::path temporary;
+  try {
+    if (rate < 24.0 || rate > 240.0) throw std::runtime_error("Refresh rate out of supported range");
+    std::string text;
+    if (std::filesystem::exists(config)) {
+      std::ifstream input(config, std::ios::binary);
+      if (!input) throw std::runtime_error("Cannot read startup TOML");
+      text.assign(std::istreambuf_iterator<char>(input), {});
+    }
+    auto table = toml::parse(text);
+    std::ostringstream output;
+    output << toml::toml_formatter{toml::value{rate}};
+    const auto replacement = output.str();
+    if (auto* node = table.get("video_mode_refresh_rate")) {
+      if (!node->is_number()) throw std::runtime_error("video_mode_refresh_rate must be a TOML number");
+      const auto region = node->source();
+      const auto begin = Offset(text, region.begin), end = Offset(text, region.end);
+      text.replace(begin, end - begin, replacement);
+    } else {
+      text.insert(0, "video_mode_refresh_rate = " + replacement + "\n");
+    }
+    // Validate the edited document and the exact winning value before saving.
+    const double saved = toml::parse(text)["video_mode_refresh_rate"].value_or(0.0);
+    if (std::abs(saved - rate) > 1e-9) throw std::runtime_error("TOML update verification failed");
+#ifdef _WIN32
+    wchar_t name[MAX_PATH];
+    if (!GetTempFileNameW(config.parent_path().c_str(), L"psr", 0, name))
+      throw std::runtime_error("Cannot create configuration temporary file");
+    temporary = name;
+#else
+    temporary = config;
+    temporary += ".tmp";
+#endif
+    {
+      std::ofstream file(temporary, std::ios::binary | std::ios::trunc);
+      file.write(text.data(), text.size());
+      file.close();
+      if (!file) throw std::runtime_error("Cannot write startup TOML");
+    }
+#ifdef _WIN32
+    if (!MoveFileExW(temporary.c_str(), config.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+      throw std::runtime_error("Cannot replace startup TOML");
+#else
+    std::filesystem::rename(temporary, config);
+#endif
+    return true;
+  } catch (const std::exception& e) {
+    error = e.what();
+    std::error_code ignored;
+    if (!temporary.empty()) std::filesystem::remove(temporary, ignored);
+    return false;
+  }
+}
+
 bool SaveResourceDirectory(const std::filesystem::path& config,
                            const std::filesystem::path& root, std::string& error) {
   std::filesystem::path temporary;

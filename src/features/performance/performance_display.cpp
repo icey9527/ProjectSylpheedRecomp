@@ -1,5 +1,6 @@
 #include "performance_display.h"
 #include "frame_metrics.h"
+#include "frame_rate_dialog.h"
 
 #include <rex/cvar.h>
 #include <rex/logging.h>
@@ -112,8 +113,10 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
     constexpr auto window_flags = ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings |
         // The overlay hugs the screen corner; dragging it by accident while
-        // aiming with the mouse must not undock or resize it.
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+        // aiming with the mouse must not undock or resize it. Inputs pass
+        // through entirely, so hovering the plot cannot pop the value tooltip
+        // card into the gameplay area.
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs;
     FrameSnapshot frames;
     ProcessSample process;
     if (flags[0]) frames = Frames().Snapshot();
@@ -186,10 +189,13 @@ PerformanceDisplay::PerformanceDisplay(rex::ui::ImGuiDrawer* drawer) : drawer_(d
   // Created once for the drawer's lifetime; the Tools menu only toggles its
   // visibility, never creating or destroying ImGui state from the menu thread.
   mouse_settings_ = std::make_unique<sylpheed::input::MouseSettingsDialog>(drawer);
+  frame_rate_ = std::make_unique<FrameRateDialog>(drawer, [](double) {});
   Refresh();
 }PerformanceDisplay::~PerformanceDisplay() = default;
 
-void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<void()> change_resources) {
+void PerformanceDisplay::AttachWindow(rex::ui::Window* window,
+                                      std::function<void()> change_resources,
+                                      std::function<void(double)> apply_frame_rate) {
 #ifdef _WIN32
   menu_ = std::make_unique<ToolsMenu>(static_cast<HWND>(window->GetNativeWindowHandle()),
                                       [this] { Toggle(); }, std::move(change_resources),
@@ -197,7 +203,11 @@ void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<voi
                                         if (mouse_settings_)
                                           mouse_settings_->SetVisible(
                                               !mouse_settings_->Visible());
+                                      },
+                                      [this] {
+                                        if (frame_rate_) frame_rate_->SetVisible(true);
                                       });
+  if (frame_rate_) frame_rate_->SetApply(std::move(apply_frame_rate));
   if (!menu_->attached()) REXLOG_ERROR("SYLPHEED_PERF native menu could not be attached");
   else REXLOG_INFO("SYLPHEED_PERF native tools menu attached");
   menu_->Update(checked_[0]);

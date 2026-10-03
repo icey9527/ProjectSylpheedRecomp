@@ -95,6 +95,8 @@ bool RestartHost(HWND owner) {
 }
 }  // namespace
 
+bool RestartHostForConfigChange(HWND owner) { return RestartHost(owner); }
+
 void BeginResourceDirectoryChange(HWND owner, const std::filesystem::path& config) {
   static std::atomic<bool> active{false};
   if (active.exchange(true)) return;

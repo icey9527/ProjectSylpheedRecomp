@@ -13,4 +13,8 @@ std::string ResourceDirectoryError(const std::filesystem::path& root);
 // Preserve all other TOML values and comments. Atomic replacement on Windows.
 bool SaveResourceDirectory(const std::filesystem::path& config,
                            const std::filesystem::path& root, std::string& error);
+// Writes the guest refresh rate (video_mode_refresh_rate) into the startup
+// TOML with the same preserve-and-verify editing as SaveResourceDirectory.
+bool SaveVideoModeRefreshRate(const std::filesystem::path& config, double rate,
+                              std::string& error);
 }  // namespace sylpheed
