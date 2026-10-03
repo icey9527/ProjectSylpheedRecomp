@@ -4,6 +4,7 @@
 #include <rex/logging.h>
 #include <rex/ui/keybinds.h>
 #include <rex/ui/window.h>
+#include <imgui.h>
 
 #include <string_view>
 #include <algorithm>
@@ -50,6 +51,11 @@ constexpr size_t kButtonCount = std::size(kButtons);
 constexpr size_t kKeyCount = kButtonCount + std::size(kStickKeys);
 VK PadKey(size_t index) {
   return index < kButtonCount ? kButtons[index].pad : kStickKeys[index - kButtonCount];
+}
+// True when the pointer is over a host ImGui window (sensitivity slider, frame
+// rates, F3 overlay). Without an ImGui context (unit tests) nothing captures.
+bool CapturedByHostUi() {
+  return ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse;
 }
 X_INPUT_KEYSTROKE Stroke(size_t index, uint16_t flags) {
   X_INPUT_KEYSTROKE result{};
@@ -271,6 +277,11 @@ void KeyboardKeystrokeDriver::OnKeyUp(rex::ui::KeyEvent& event) {
   ChangeKey(static_cast<uint16_t>(event.virtual_key()), false);
 }
 void KeyboardKeystrokeDriver::OnMouseDown(rex::ui::MouseEvent& event) {
+  // ImGui windows (sensitivity slider, frame rates, F3 overlay) keep the
+  // system cursor usable. The SDK does not mark their mouse events handled,
+  // so check ImGui's capture flag here: interacting with a host dialog must
+  // not hide the cursor through the mouse-look capture or steer the ship.
+  if (ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse) return;
   ChangeKey(MouseKey(event.button()), true);
   if (event.button() == rex::ui::MouseEvent::Button::kLeft ||
       event.button() == rex::ui::MouseEvent::Button::kRight ||
@@ -279,7 +290,8 @@ void KeyboardKeystrokeDriver::OnMouseDown(rex::ui::MouseEvent& event) {
   }
 }
 void KeyboardKeystrokeDriver::OnMouseMove(rex::ui::MouseEvent& event) {
-  if (!Enabled() || !focused_.load(std::memory_order_acquire) || !is_active() ||
+  if (!Enabled() || CapturedByHostUi() ||
+      !focused_.load(std::memory_order_acquire) || !is_active() ||
       (!mouse_capture_active_.load(std::memory_order_acquire) &&
        !mouse_capture_requested_.load(std::memory_order_acquire))) return;
   const auto add_saturated = [](std::atomic<int32_t>& target, float delta) {

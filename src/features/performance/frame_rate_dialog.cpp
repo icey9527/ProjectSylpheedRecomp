@@ -41,17 +41,25 @@ void FrameRateDialog::OnDraw(ImGuiIO&) {
   if (ImGui::Begin("Frame rate", nullptr, flags)) {
     const double current = rex::cvar::Query<double>("video_mode_refresh_rate");
     const int active = Selected(current);
+    ImGui::Text("Effective now: %.0f Hz", current);
+    ImGui::Separator();
     for (int i = 0; i < int(std::size(kRates)); ++i) {
       char label[16];
       std::snprintf(label, sizeof(label), "%d Hz", kRates[i]);
+      const bool active_selected = i == active;
+      if (active_selected) ImGui::BeginDisabled();
       if (ImGui::RadioButton(label, selected_ == i)) selected_ = i;
-      if (active == i) ImGui::SameLine(), ImGui::TextUnformatted("(current)");
+      if (active_selected) ImGui::EndDisabled();
+      if (active_selected) ImGui::SameLine(), ImGui::TextUnformatted("<- in effect");
     }
     ImGui::TextUnformatted(
-        "The selected rate applies on the next restart; the game logic speed is");
+        "Applying restarts the host; the selection above is pending until then.");
     ImGui::TextUnformatted(
-        "time-based, but higher rates are still experimental and may show issues.");
-    if (ImGui::Button("Apply and restart")) {
+        "Higher rates are experimental: time-based logic is unaffected, but");
+    ImGui::TextUnformatted("frame-dependent behavior may show issues.");
+    char button[48];
+    std::snprintf(button, sizeof(button), "Apply %d Hz and restart", kRates[selected_]);
+    if (ImGui::Button(button)) {
       if (apply_) apply_(kRates[selected_]);
     }
   }
