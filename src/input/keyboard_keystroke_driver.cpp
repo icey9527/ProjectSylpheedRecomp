@@ -229,6 +229,10 @@ X_RESULT KeyboardKeystrokeDriver::GetDeviceKeystroke(DeviceId id, uint32_t,
   return X_ERROR_SUCCESS;
 }
 void KeyboardKeystrokeDriver::OnKeyDown(rex::ui::KeyEvent& event) {
+  if (event.virtual_key() == VK::kEscape) {
+    QueueMouseCapture(false);
+    return;
+  }
   if (!event.is_handled()) ChangeKey(static_cast<uint16_t>(event.virtual_key()), true);
 }
 void KeyboardKeystrokeDriver::OnKeyUp(rex::ui::KeyEvent& event) {
@@ -236,9 +240,16 @@ void KeyboardKeystrokeDriver::OnKeyUp(rex::ui::KeyEvent& event) {
 }
 void KeyboardKeystrokeDriver::OnMouseDown(rex::ui::MouseEvent& event) {
   ChangeKey(MouseKey(event.button()), true);
+  if (event.button() == rex::ui::MouseEvent::Button::kLeft ||
+      event.button() == rex::ui::MouseEvent::Button::kRight ||
+      event.button() == rex::ui::MouseEvent::Button::kMiddle) {
+    QueueMouseCapture(true);
+  }
 }
 void KeyboardKeystrokeDriver::OnMouseMove(rex::ui::MouseEvent& event) {
-  if (!Enabled() || !focused_.load(std::memory_order_acquire) || !is_active()) return;
+  if (!Enabled() || !focused_.load(std::memory_order_acquire) || !is_active() ||
+      (!mouse_capture_active_.load(std::memory_order_acquire) &&
+       !mouse_capture_requested_.load(std::memory_order_acquire))) return;
   const auto add_saturated = [](std::atomic<int32_t>& target, float delta) {
     const int32_t rounded = static_cast<int32_t>(delta);
     if (!rounded) return;
@@ -259,11 +270,14 @@ void KeyboardKeystrokeDriver::OnMouseUp(rex::ui::MouseEvent& event) {
   ChangeKey(MouseKey(event.button()), false);
 }
 void KeyboardKeystrokeDriver::OnLostFocus(rex::ui::UISetupEvent&) {
-  std::lock_guard lock(mutex_);
-  focused_.store(false, std::memory_order_release);
-  ReleaseKeys();
-  mouse_dx_.store(0, std::memory_order_release);
-  mouse_dy_.store(0, std::memory_order_release);
+  {
+    std::lock_guard lock(mutex_);
+    focused_.store(false, std::memory_order_release);
+    ReleaseKeys();
+    mouse_dx_.store(0, std::memory_order_release);
+    mouse_dy_.store(0, std::memory_order_release);
+  }
+  QueueMouseCapture(false);
 }
 void KeyboardKeystrokeDriver::OnGotFocus(rex::ui::UISetupEvent&) {
   std::lock_guard lock(mutex_);
@@ -271,17 +285,76 @@ void KeyboardKeystrokeDriver::OnGotFocus(rex::ui::UISetupEvent&) {
 }
 void KeyboardKeystrokeDriver::OnWindowAvailable(rex::ui::Window* window) {
   DetachWindow();
-  attached_ = window;
+  {
+    std::lock_guard lock(mutex_);
+    attached_ = window;
+  }
   if (window) {
     window->AddInputListener(this, window_z_order());
     window->AddListener(this);
   }
 }
-void KeyboardKeystrokeDriver::DetachWindow() {
-  auto* window = attached_;
+void KeyboardKeystrokeDriver::QueueMouseCapture(bool capture) {
+  mouse_capture_requested_.store(capture, std::memory_order_release);
+  rex::ui::Window* window = nullptr;
+  {
+    std::lock_guard lock(mutex_);
+    window = attached_;
+  }
   if (!window) return;
-  attached_ = nullptr;
+  bool expected = false;
+  if (!mouse_capture_queued_.compare_exchange_strong(expected, true,
+                                                     std::memory_order_acq_rel)) return;
+  window->app_context().CallInUIThreadDeferred([this, window] {
+    mouse_capture_queued_.store(false, std::memory_order_release);
+    ApplyMouseCaptureOnUIThread(window);
+  });
+}
+void KeyboardKeystrokeDriver::ApplyMouseCaptureOnUIThread(rex::ui::Window* window) {
+  if (!window) return;
+  const bool should_capture = mouse_capture_requested_.load(std::memory_order_acquire);
+  if (should_capture == mouse_captured_on_ui_) return;
+  if (!should_capture) {
+    window->SetRelativeMouseMode(false);
+    if (mouse_captured_on_ui_) window->ReleaseMouse();
+    window->SetCursorVisibility(cursor_visibility_before_capture_);
+    mouse_captured_on_ui_ = false;
+    mouse_capture_active_.store(false, std::memory_order_release);
+    mouse_dx_.store(0, std::memory_order_release);
+    mouse_dy_.store(0, std::memory_order_release);
+    return;
+  }
+  cursor_visibility_before_capture_ = window->GetCursorVisibility();
+  window->SetCursorVisibility(rex::ui::Window::CursorVisibility::kHidden);
+  window->CaptureMouse();
+  if (!window->SetRelativeMouseMode(true)) {
+    window->ReleaseMouse();
+    window->SetCursorVisibility(cursor_visibility_before_capture_);
+    REXLOG_WARN("SYLPHEED_INPUT relative mouse mode unavailable");
+    mouse_capture_active_.store(false, std::memory_order_release);
+    return;
+  }
+  mouse_captured_on_ui_ = true;
+  mouse_capture_active_.store(true, std::memory_order_release);
+  mouse_dx_.store(0, std::memory_order_release);
+  mouse_dy_.store(0, std::memory_order_release);
+}
+void KeyboardKeystrokeDriver::DetachWindow() {
+  rex::ui::Window* window = nullptr;
+  {
+    std::lock_guard lock(mutex_);
+    window = attached_;
+    attached_ = nullptr;
+  }
+  if (!window) return;
+  mouse_capture_requested_.store(false, std::memory_order_release);
   window->app_context().CallInUIThreadSynchronous([this, window] {
+    // Detach first so no new callback can target this window, then drain a
+    // callback that was queued before detachment and release on the UI thread.
+    if (mouse_capture_queued_.load(std::memory_order_acquire)) {
+      window->app_context().ExecutePendingFunctionsFromUIThread();
+    }
+    ApplyMouseCaptureOnUIThread(window);
     window->RemoveInputListener(this);
     window->RemoveListener(this);
   });

@@ -51,6 +51,8 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   void ChangeKey(uint16_t key, bool down);
   void UpdatePadKeys(uint64_t mask);
   void ReleaseKeys();
+  void QueueMouseCapture(bool capture);
+  void ApplyMouseCaptureOnUIThread(rex::ui::Window* window);
   void DetachWindow();
 
   std::mutex mutex_;
@@ -61,6 +63,9 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   // transient left-stick signal to XInputGetState.
   std::atomic<int32_t> mouse_dx_{0};
   std::atomic<int32_t> mouse_dy_{0};
+  std::atomic<bool> mouse_capture_requested_{false};
+  std::atomic<bool> mouse_capture_queued_{false};
+  std::atomic<bool> mouse_capture_active_{false};
   uint32_t packet_number_ = 0;
   uint64_t held_ = 0;
   int repeat_key_ = -1;
@@ -69,6 +74,9 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   std::atomic<bool> focused_{true};
   unsigned logged_ = 0;
   rex::ui::Window* attached_ = nullptr;
+  bool mouse_captured_on_ui_ = false;
+  rex::ui::Window::CursorVisibility cursor_visibility_before_capture_ =
+      rex::ui::Window::CursorVisibility::kVisible;
 };
 
 std::unique_ptr<rex::input::InputSystem> CreateInputSystem(bool tool_mode);

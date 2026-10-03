@@ -130,6 +130,10 @@ int main() {
 
     // Visible-cursor mouse input is exposed as a transient left-stick state,
     // then consumed by the next guest poll.
+    rex::ui::MouseEvent mouse_down(nullptr, rex::ui::MouseEvent::Button::kLeft,
+                                   100, 100, 0, 0, 0.0f, 0.0f);
+    events->OnMouseDown(mouse_down);
+    events->OnMouseUp(mouse_down);
     rex::ui::MouseEvent mouse_move(nullptr, rex::ui::MouseEvent::Button::kNone,
                                    100, 100, 0, 0, 3.0f, -2.0f);
     events->OnMouseMove(mouse_move);
