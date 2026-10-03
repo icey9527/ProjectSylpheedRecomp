@@ -24,6 +24,8 @@ REXCVAR_DEFINE_BOOL(show_game_fps, false, "Performance", "Show game Swap rate an
 REXCVAR_DEFINE_BOOL(show_process_cpu, false, "Performance", "Show process CPU usage");
 REXCVAR_DEFINE_BOOL(show_process_memory, false, "Performance", "Show working set and private memory");
 REXCVAR_DEFINE_BOOL(show_runtime_info, false, "Performance", "Show the collapsible runtime information panel");
+REXCVAR_DEFINE_BOOL(trace_perf_samples, false, "Performance",
+                    "Log Swap FPS samples every 5 seconds while the panel is open");
 
 namespace sylpheed::performance {
 namespace {
@@ -153,12 +155,25 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
                   flags[2] ? process.working_mib : -1, flags[2] ? process.private_mib : -1);
       logged_sample_ = true;
     }
+    // Optional 5-second cadence for controlled FPS experiments (A/B pacing).
+    if (REXCVAR_GET(trace_perf_samples) && flags[0] && frames.recent) {
+      const auto now = FrameMetrics::Clock::now();
+      if (!traced_once_ || now - last_trace_ >= std::chrono::seconds(5)) {
+        last_trace_ = now;
+        traced_once_ = true;
+        REXLOG_INFO("SYLPHEED_PERF trace fps={} ms={} swaps={} cpu={}",
+                    frames.fps, frames.frame_time_ms, frames.frame_count,
+                    process.cpu_valid ? process.cpu : -1.0);
+      }
+    }
   }
 
  private:
   std::atomic<uint8_t> flags_mask_{0};
   ProcessSampler process_;
   bool logged_sample_ = false;
+  FrameMetrics::Clock::time_point last_trace_{};
+  bool traced_once_ = false;
 };
 }
 
