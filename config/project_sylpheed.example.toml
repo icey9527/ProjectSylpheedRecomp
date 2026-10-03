@@ -1,6 +1,9 @@
 # Copy beside project_sylpheed.exe as project_sylpheed.toml.
 # Use forward slashes. Relative paths are relative to the EXE directory.
 game_data_root = "game-data"
+# Saves are stored below the selected resource directory by default.
+# Set an absolute or EXE-relative path here to keep them elsewhere.
+# user_data_root = "C:/Games/ProjectSylpheed/save"
 fullscreen = false
 window_width = 1280
 window_height = 720

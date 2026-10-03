@@ -66,7 +66,13 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
     return path.lexically_normal();
   };
   paths.game_data_root = resolve("game_data_root", paths.game_data_root);
-  paths.user_data_root = resolve("user_data_root", paths.user_data_root);
+  // Keep saves with the selected resource set by default. An explicit TOML,
+  // environment, or command-line user_data_root still wins through resolve.
+  if (rex::cvar::GetFlagSource("user_data_root") == rex::cvar::Source::kDefault) {
+    const auto save_root = (paths.game_data_root / "save").lexically_normal();
+    rex::cvar::SetFlagByName("user_data_root", save_root.generic_string());
+  }
+  paths.user_data_root = resolve("user_data_root", paths.game_data_root / "save");
   paths.update_data_root = resolve("update_data_root", paths.update_data_root);
   paths.cache_root = resolve("cache_root", paths.user_data_root / "cache");
   paths.metadata_root = resolve("metadata_root", paths.metadata_root);
