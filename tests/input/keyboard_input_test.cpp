@@ -178,6 +178,16 @@ int main() {
                 state.gamepad.thumb_ly == 0,
             "Mouse motion was not consumed");
 
+    // The mouse-look scale is a cvar so the Tools menu slider can adjust it
+    // live; the guest poll must reflect the new value immediately.
+    rex::cvar::SetFlagByName("mouse_look_scale", "16384");
+    rex::ui::MouseEvent scaled_move(nullptr, rex::ui::MouseEvent::Button::kNone,
+                                    100, 100, 0, 0, 1.0f, 0.0f);
+    events->OnMouseMove(scaled_move);
+    Require(input.GetState(0, &state) == 0, "Scaled mouse state unavailable");
+    Require(state.gamepad.thumb_lx == 16384, "Mouse scale cvar was not applied");
+    rex::cvar::SetFlagByName("mouse_look_scale", "8192");
+
     rex::cvar::SetFlagByName("keybind_dpad_up", "Shift+Up");
     key(VK::kUp, true); empty();
     key(VK::kShift, true); next(VK::kXInputPadDpadUp, down);

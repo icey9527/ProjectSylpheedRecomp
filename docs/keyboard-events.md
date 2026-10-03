@@ -47,6 +47,10 @@ keybind_start = "Return"
 
 鼠标镜头由本项目的输入驱动合成左摇杆，不要同时把 `mnk_mouse` 设为 `true`：SDK 的 `MnkInputDriver` 会自行消费鼠标并做相对捕获，两路输入会叠加，且两个模块争用同一窗口的相对鼠标模式。保持默认 `mnk_mouse=false`。
 
+## 鼠标灵敏度
+
+顶部"工具 → 鼠标灵敏度…"打开滑条窗口，拖动后立即生效（当次运行），也有"恢复默认"按钮。数值是鼠标位移到左摇杆的换算倍率，默认 8192，范围 1024–65536；越大越灵敏。要跨启动保留，在 EXE 旁 `project_sylpheed.toml` 写 `mouse_look_scale`（见 `config/project_sylpheed.example.toml`），菜单调整不自动写回。
+
 ## 独立验证
 
 测试不需要游戏或符号原件，使用真实 SDK MnK 驱动与可控物理手柄替身，验证事件、状态合并、能力、振动和玩家分配。从配置好 Clang/MSVC 的终端执行：
@@ -57,7 +61,7 @@ cmake --build out/tests/input --parallel 2
 ctest --test-dir out/tests/input --output-on-failure
 ```
 
-测试包含别名同时按下、两次轮询之间点按、重复时序、组合键切换、对角线转换、重复失焦、覆盖层捕获和禁用模式。测试用最小 `WindowedAppContext`/`Window` 替身驱动真实的待执行队列，覆盖点击后延迟捕获、Escape/失焦释放、关窗排空并在 UI 线程分离监听、非 UI 线程析构不阻塞也不触达窗口。
+测试包含别名同时按下、两次轮询之间点按、重复时序、组合键切换、对角线转换、重复失焦、覆盖层捕获和禁用模式。测试用最小 `WindowedAppContext`/`Window` 替身驱动真实的待执行队列，覆盖点击后延迟捕获、Escape/失焦释放、关窗排空并在 UI 线程分离监听、非 UI 线程析构不阻塞也不触达窗口；鼠标灵敏度 cvar 的即时生效也有用例。
 
 Debug 宿主已编译链接。补齐事件后用户确认键盘可以移动和确认菜单，重复操作曾出现 SDK 的 vector 迭代器断言。
 

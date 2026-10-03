@@ -9,6 +9,11 @@
 #include <algorithm>
 #include <limits>
 
+// Mouse motion to left-stick conversion scale. Runtime-adjustable from the
+// Tools menu slider (mouse_settings.cpp); clamped when read.
+REXCVAR_DEFINE_INT32(mouse_look_scale, 8192, "Input",
+                     "Mouse motion to left-stick scale; higher is more sensitive");
+
 namespace sylpheed::input {
 namespace {
 using VK = rex::ui::VirtualKey;
@@ -130,19 +135,20 @@ X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId id, X_INPUT_STATE* out
         int32_t(std::numeric_limits<int16_t>::min()),
         int32_t(std::numeric_limits<int16_t>::max())));
   };
-  // SDL reports physical-pixel deltas. A fixed host scale gives ordinary
-  // mouse movement useful camera range without enabling the SDK's hidden
+  // SDL reports physical-pixel deltas. A host scale gives ordinary mouse
+  // movement useful camera range without enabling the SDK's hidden
   // relative-mouse mode. One poll consumes the accumulated motion so a
-  // stopped mouse does not keep moving the game.
-  // Four times the initial baseline: ordinary desktop motion should produce
-  // a clearly visible in-game response without requiring pointer capture.
-  constexpr int32_t kMouseScale = 8192;
+  // stopped mouse does not keep moving the game. Four times the initial
+  // baseline by default; the Tools menu slider adjusts it live.
+  constexpr int32_t kMinMouseScale = 1024, kMaxMouseScale = 65536;
+  const int32_t mouse_scale =
+      std::clamp(REXCVAR_GET(mouse_look_scale), kMinMouseScale, kMaxMouseScale);
   const int32_t dx = mouse_dx_.exchange(0, std::memory_order_acq_rel);
   const int32_t dy = mouse_dy_.exchange(0, std::memory_order_acq_rel);
   *out_state = {};
   out_state->packet_number = ++packet_number_;
-  out_state->gamepad.thumb_lx = clamp_axis(dx * kMouseScale);
-  out_state->gamepad.thumb_ly = clamp_axis(-dy * kMouseScale);
+  out_state->gamepad.thumb_lx = clamp_axis(dx * mouse_scale);
+  out_state->gamepad.thumb_ly = clamp_axis(-dy * mouse_scale);
   return X_ERROR_SUCCESS;
 }
 X_RESULT KeyboardKeystrokeDriver::GetDeviceCapabilities(DeviceId, uint32_t,

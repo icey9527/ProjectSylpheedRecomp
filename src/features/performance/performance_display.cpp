@@ -7,6 +7,8 @@
 #include <rex/ui/window.h>
 #include <imgui.h>
 
+#include <features/input/mouse_settings.h>
+
 #include <algorithm>
 #include <atomic>
 #include <cfloat>
@@ -106,7 +108,10 @@ class PerformancePanel final : public rex::ui::ImGuiDialog {
         ImGuiCond_Always, ImVec2(1, 0));
     ImGui::SetNextWindowBgAlpha(0.75f);
     constexpr auto window_flags = ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings;
+        ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoSavedSettings |
+        // The overlay hugs the screen corner; dragging it by accident while
+        // aiming with the mouse must not undock or resize it.
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
     FrameSnapshot frames;
     ProcessSample process;
     if (flags[0]) frames = Frames().Snapshot();
@@ -163,14 +168,21 @@ PerformanceDisplay::PerformanceDisplay(rex::ui::ImGuiDrawer* drawer) : drawer_(d
   if (rex::cvar::GetFlagSource("show_runtime_info") == rex::cvar::Source::kDefault &&
       (REXCVAR_GET(show_game_fps) || REXCVAR_GET(show_process_cpu) || REXCVAR_GET(show_process_memory)))
     rex::cvar::SetFlagByName("show_runtime_info", "true");
+  // Created once for the drawer's lifetime; the Tools menu only toggles its
+  // visibility, never creating or destroying ImGui state from the menu thread.
+  mouse_settings_ = std::make_unique<sylpheed::input::MouseSettingsDialog>(drawer);
   Refresh();
-}
-PerformanceDisplay::~PerformanceDisplay() = default;
+}PerformanceDisplay::~PerformanceDisplay() = default;
 
 void PerformanceDisplay::AttachWindow(rex::ui::Window* window, std::function<void()> change_resources) {
 #ifdef _WIN32
   menu_ = std::make_unique<ToolsMenu>(static_cast<HWND>(window->GetNativeWindowHandle()),
-                                          [this] { Toggle(); }, std::move(change_resources));
+                                      [this] { Toggle(); }, std::move(change_resources),
+                                      [this] {
+                                        if (mouse_settings_)
+                                          mouse_settings_->SetVisible(
+                                              !mouse_settings_->Visible());
+                                      });
   if (!menu_->attached()) REXLOG_ERROR("SYLPHEED_PERF native menu could not be attached");
   else REXLOG_INFO("SYLPHEED_PERF native tools menu attached");
   menu_->Update(checked_[0]);

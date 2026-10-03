@@ -8,7 +8,8 @@ namespace sylpheed::performance {
 class ToolsMenu {
  public:
   ToolsMenu(HWND window, std::function<void()> toggle,
-            std::function<void()> change_resources);
+            std::function<void()> change_resources,
+            std::function<void()> mouse_settings);
   ~ToolsMenu();
   bool attached() const { return attached_; }
   void Update(bool checked);
@@ -21,6 +22,7 @@ class ToolsMenu {
   bool attached_ = false;
   std::function<void()> toggle_;
   std::function<void()> change_resources_;
+  std::function<void()> mouse_settings_;
 };
 
 }  // namespace sylpheed::performance

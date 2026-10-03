@@ -15,6 +15,9 @@ allow_game_relative_writes = false
 mnk_mode = true
 # The cursor remains visible by default. Mouse-look capture is intentionally
 # off until a visible-cursor camera path is implemented.
+# Mouse motion to left-stick scale (1024-65536). Tools -> Mouse sensitivity
+# adjusts it live for the current run; this key keeps the value across restarts.
+mouse_look_scale = 8192
 # Optional movie-start subtitle gate / parsed-count diagnostics.
 trace_movie_subtitles = false
 # on/off overrides the movie instance; game follows the original user profile.

@@ -9,10 +9,12 @@ constexpr UINT_PTR subclass_id = 0x53595050;
 }
 
 ToolsMenu::ToolsMenu(HWND window, std::function<void()> toggle,
-                                 std::function<void()> change_resources)
+                                 std::function<void()> change_resources,
+                                 std::function<void()> mouse_settings)
     : window_(window),
       toggle_(std::move(toggle)),
-      change_resources_(std::move(change_resources)) {
+      change_resources_(std::move(change_resources)),
+      mouse_settings_(std::move(mouse_settings)) {
   // Preserve any future SDK-owned menu instead of silently replacing it.
   if (!window_ || GetMenu(window_)) return;
   RECT client{};
@@ -23,6 +25,7 @@ ToolsMenu::ToolsMenu(HWND window, std::function<void()> toggle,
   if (!AppendMenuW(popup_, MF_STRING, first_id, L"运行信息")) return;
   if (!AppendMenuW(popup_, MF_SEPARATOR, 0, nullptr)) return;
   if (!AppendMenuW(popup_, MF_STRING, first_id + 1, L"更改资源目录…")) return;
+  if (!AppendMenuW(popup_, MF_STRING, first_id + 2, L"鼠标灵敏度…")) return;
   if (!AppendMenuW(menu_, MF_POPUP, reinterpret_cast<UINT_PTR>(popup_), L"工具")) return;
   // Keep SDL's event / presentation loop running while the menu is open.
   // A modal Win32 menu otherwise blocks that loop while audio keeps running.
@@ -73,11 +76,13 @@ LRESULT CALLBACK ToolsMenu::WindowProc(HWND window, UINT message, WPARAM wp, LPA
                                             UINT_PTR, DWORD_PTR data) {
   auto* self = reinterpret_cast<ToolsMenu*>(data);
   if (message == WM_COMMAND && lp == 0 && HIWORD(wp) == 0 &&
-      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 2) {
+      LOWORD(wp) >= first_id && LOWORD(wp) < first_id + 3) {
     if (LOWORD(wp) == first_id) {
       self->toggle_();
     } else if (LOWORD(wp) == first_id + 1) {
       if (self->change_resources_) self->change_resources_();
+    } else if (LOWORD(wp) == first_id + 2) {
+      if (self->mouse_settings_) self->mouse_settings_();
     }
     return 0;
   }

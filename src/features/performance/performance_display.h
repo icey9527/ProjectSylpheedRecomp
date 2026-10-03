@@ -10,6 +10,10 @@ class ImGuiDialog;
 class Window;
 }
 
+namespace sylpheed::input {
+class MouseSettingsDialog;
+}
+
 namespace sylpheed::performance {
 class ToolsMenu;
 
@@ -25,6 +29,7 @@ class PerformanceDisplay {
   rex::ui::ImGuiDrawer* drawer_;
   std::array<bool, 3> checked_{};
   std::unique_ptr<rex::ui::ImGuiDialog> panel_;
+  std::unique_ptr<sylpheed::input::MouseSettingsDialog> mouse_settings_;
 #ifdef _WIN32
   std::unique_ptr<ToolsMenu> menu_;
 #endif
