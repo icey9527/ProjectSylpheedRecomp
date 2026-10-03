@@ -6,6 +6,8 @@
 #include <rex/ui/window.h>
 
 #include <string_view>
+#include <algorithm>
+#include <limits>
 
 namespace sylpheed::input {
 namespace {
@@ -86,9 +88,34 @@ void KeyboardKeystrokeDriver::EnumerateDevices(std::vector<DeviceInfo>& out) {
   info.synthetic = true;
   out.push_back(info);
 }
-// Do not contribute another state or become the active capabilities device.
-X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId, X_INPUT_STATE*) {
-  return X_ERROR_DEVICE_NOT_CONNECTED;
+// Contribute a synthetic state for mouse look, while leaving capabilities and
+// vibration ownership to the physical controller/SDK driver.
+X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId id, X_INPUT_STATE* out_state) {
+  if (id != kDevice || !Enabled()) return X_ERROR_DEVICE_NOT_CONNECTED;
+  if (!out_state) return X_ERROR_BAD_ARGUMENTS;
+  if (!focused_.load(std::memory_order_acquire) || !is_active()) {
+    mouse_dx_.store(0, std::memory_order_release);
+    mouse_dy_.store(0, std::memory_order_release);
+    return X_ERROR_DEVICE_NOT_CONNECTED;
+  }
+
+  const auto clamp_axis = [](int32_t value) {
+    return static_cast<int16_t>(std::clamp(value,
+        int32_t(std::numeric_limits<int16_t>::min()),
+        int32_t(std::numeric_limits<int16_t>::max())));
+  };
+  // SDL reports physical-pixel deltas. A fixed host scale gives ordinary
+  // mouse movement useful camera range without enabling the SDK's hidden
+  // relative-mouse mode. One poll consumes the accumulated motion so a
+  // stopped mouse does not keep turning the camera.
+  constexpr int32_t kMouseScale = 2048;
+  const int32_t dx = mouse_dx_.exchange(0, std::memory_order_acq_rel);
+  const int32_t dy = mouse_dy_.exchange(0, std::memory_order_acq_rel);
+  *out_state = {};
+  out_state->packet_number = ++packet_number_;
+  out_state->gamepad.thumb_rx = clamp_axis(dx * kMouseScale);
+  out_state->gamepad.thumb_ry = clamp_axis(-dy * kMouseScale);
+  return X_ERROR_SUCCESS;
 }
 X_RESULT KeyboardKeystrokeDriver::GetDeviceCapabilities(DeviceId, uint32_t,
                                                         X_INPUT_CAPABILITIES*) {
@@ -175,7 +202,7 @@ void KeyboardKeystrokeDriver::ReleaseKeys() {
 void KeyboardKeystrokeDriver::ChangeKey(uint16_t key, bool down) {
   if (key == 0 || key >= keys_.size() || !Enabled()) return;
   std::lock_guard lock(mutex_);
-  if (down && (!focused_ || !is_active())) return;
+  if (down && (!focused_.load(std::memory_order_acquire) || !is_active())) return;
   keys_[key] = down;
   UpdatePadKeys(PadKeys());
 }
@@ -184,7 +211,7 @@ X_RESULT KeyboardKeystrokeDriver::GetDeviceKeystroke(DeviceId id, uint32_t,
   if (id != kDevice || !Enabled()) return X_ERROR_DEVICE_NOT_CONNECTED;
   if (!out) return X_ERROR_BAD_ARGUMENTS;
   std::lock_guard lock(mutex_);
-  if (held_ && (!focused_ || !is_active())) ReleaseKeys();
+  if (held_ && (!focused_.load(std::memory_order_acquire) || !is_active())) ReleaseKeys();
   if (!events_.empty()) {
     *out = events_.front();
     events_.pop_front();
@@ -208,17 +235,37 @@ void KeyboardKeystrokeDriver::OnKeyUp(rex::ui::KeyEvent& event) {
 void KeyboardKeystrokeDriver::OnMouseDown(rex::ui::MouseEvent& event) {
   ChangeKey(MouseKey(event.button()), true);
 }
+void KeyboardKeystrokeDriver::OnMouseMove(rex::ui::MouseEvent& event) {
+  if (!Enabled() || !focused_.load(std::memory_order_acquire) || !is_active()) return;
+  const auto add_saturated = [](std::atomic<int32_t>& target, float delta) {
+    const int32_t rounded = static_cast<int32_t>(delta);
+    if (!rounded) return;
+    int32_t current = target.load(std::memory_order_relaxed);
+    for (;;) {
+      const int64_t next64 = int64_t(current) + rounded;
+      const int32_t next = static_cast<int32_t>(std::clamp(next64,
+          int64_t(std::numeric_limits<int32_t>::min()),
+          int64_t(std::numeric_limits<int32_t>::max())));
+      if (target.compare_exchange_weak(current, next, std::memory_order_release,
+                                       std::memory_order_relaxed)) return;
+    }
+  };
+  add_saturated(mouse_dx_, event.dx());
+  add_saturated(mouse_dy_, event.dy());
+}
 void KeyboardKeystrokeDriver::OnMouseUp(rex::ui::MouseEvent& event) {
   ChangeKey(MouseKey(event.button()), false);
 }
 void KeyboardKeystrokeDriver::OnLostFocus(rex::ui::UISetupEvent&) {
   std::lock_guard lock(mutex_);
-  focused_ = false;
+  focused_.store(false, std::memory_order_release);
   ReleaseKeys();
+  mouse_dx_.store(0, std::memory_order_release);
+  mouse_dy_.store(0, std::memory_order_release);
 }
 void KeyboardKeystrokeDriver::OnGotFocus(rex::ui::UISetupEvent&) {
   std::lock_guard lock(mutex_);
-  focused_ = true;
+  focused_.store(true, std::memory_order_release);
 }
 void KeyboardKeystrokeDriver::OnWindowAvailable(rex::ui::Window* window) {
   DetachWindow();

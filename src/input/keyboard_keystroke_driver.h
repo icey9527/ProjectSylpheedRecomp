@@ -4,6 +4,7 @@
 #include <rex/ui/window_listener.h>
 
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <deque>
 #include <functional>
@@ -40,6 +41,7 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   void OnKeyDown(rex::ui::KeyEvent& event) override;
   void OnKeyUp(rex::ui::KeyEvent& event) override;
   void OnMouseDown(rex::ui::MouseEvent& event) override;
+  void OnMouseMove(rex::ui::MouseEvent& event) override;
   void OnMouseUp(rex::ui::MouseEvent& event) override;
 
  private:
@@ -54,11 +56,17 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   std::mutex mutex_;
   std::array<bool, 256> keys_{};
   std::deque<rex::input::X_INPUT_KEYSTROKE> events_;
+  // Mouse motion is accumulated on the UI thread and consumed by the guest
+  // input poll. This keeps the OS cursor visible while exposing a real
+  // transient right-stick signal to XInputGetState.
+  std::atomic<int32_t> mouse_dx_{0};
+  std::atomic<int32_t> mouse_dy_{0};
+  uint32_t packet_number_ = 0;
   uint64_t held_ = 0;
   int repeat_key_ = -1;
   Clock::time_point repeat_at_{};
   Now now_;
-  bool focused_ = true;
+  std::atomic<bool> focused_{true};
   unsigned logged_ = 0;
   rex::ui::Window* attached_ = nullptr;
 };

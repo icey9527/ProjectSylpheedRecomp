@@ -128,6 +128,18 @@ int main() {
     key(VK::kNumpad8, true); next(VK::kXInputPadRThumbUp, down);
     key(VK::kNumpad8, false); next(VK::kXInputPadRThumbUp, up);
 
+    // Visible-cursor mouse look is exposed as a transient right-stick state,
+    // then consumed by the next guest poll.
+    rex::ui::MouseEvent mouse_move(nullptr, rex::ui::MouseEvent::Button::kNone,
+                                   100, 100, 0, 0, 3.0f, -2.0f);
+    events->OnMouseMove(mouse_move);
+    Require(input.GetState(0, &state) == 0, "Mouse state unavailable");
+    Require(state.gamepad.thumb_rx > 0 && state.gamepad.thumb_ry > 0,
+            "Mouse motion did not map to right stick");
+    Require(input.GetState(0, &state) == 0 && state.gamepad.thumb_rx == 0 &&
+                state.gamepad.thumb_ry == 0,
+            "Mouse motion was not consumed");
+
     rex::cvar::SetFlagByName("keybind_dpad_up", "Shift+Up");
     key(VK::kUp, true); empty();
     key(VK::kShift, true); next(VK::kXInputPadDpadUp, down);
