@@ -88,7 +88,7 @@ void KeyboardKeystrokeDriver::EnumerateDevices(std::vector<DeviceInfo>& out) {
   info.synthetic = true;
   out.push_back(info);
 }
-// Contribute a synthetic state for mouse look, while leaving capabilities and
+  // Contribute a synthetic state for mouse control, while leaving capabilities and
 // vibration ownership to the physical controller/SDK driver.
 X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId id, X_INPUT_STATE* out_state) {
   if (id != kDevice || !Enabled()) return X_ERROR_DEVICE_NOT_CONNECTED;
@@ -107,14 +107,14 @@ X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId id, X_INPUT_STATE* out
   // SDL reports physical-pixel deltas. A fixed host scale gives ordinary
   // mouse movement useful camera range without enabling the SDK's hidden
   // relative-mouse mode. One poll consumes the accumulated motion so a
-  // stopped mouse does not keep turning the camera.
+  // stopped mouse does not keep moving the game.
   constexpr int32_t kMouseScale = 2048;
   const int32_t dx = mouse_dx_.exchange(0, std::memory_order_acq_rel);
   const int32_t dy = mouse_dy_.exchange(0, std::memory_order_acq_rel);
   *out_state = {};
   out_state->packet_number = ++packet_number_;
-  out_state->gamepad.thumb_rx = clamp_axis(dx * kMouseScale);
-  out_state->gamepad.thumb_ry = clamp_axis(-dy * kMouseScale);
+  out_state->gamepad.thumb_lx = clamp_axis(dx * kMouseScale);
+  out_state->gamepad.thumb_ly = clamp_axis(-dy * kMouseScale);
   return X_ERROR_SUCCESS;
 }
 X_RESULT KeyboardKeystrokeDriver::GetDeviceCapabilities(DeviceId, uint32_t,

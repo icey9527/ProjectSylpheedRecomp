@@ -38,7 +38,7 @@ game_data_root = "<完整资源目录>"
 
 F7 是 ReXGlue 宿主的成就覆盖层快捷键，不是 Xbox 游戏内菜单。宿主已将它改为延迟创建/销毁，避免按键回调在 ImGui 绘制期间直接修改对话框列表；成就数据仍由本地 SDK 成就管理器提供。若资源缺失弹窗出现，它来自游戏的 `XamShowDirtyDiscErrorUI`，与 F7 覆盖层是两条独立路径。
 
-默认键盘映射：Enter/空格=A，Backspace=B，方向键=D-pad，WASD=左摇杆，数字小键盘 8/2/4/6=右摇杆，X=Start。鼠标摇杆默认关闭。玩家改键见 [键盘配置](keyboard-events.md#玩家自定义按键)。
+默认键盘映射：Enter/空格=A，Backspace=B，方向键=D-pad，WASD=左摇杆，数字小键盘 8/2/4/6=右摇杆，X=Start。可见光标鼠标移动会适配为左摇杆瞬时输入；SDK 隐藏式相对鼠标捕获仍关闭。玩家改键见 [键盘配置](keyboard-events.md#玩家自定义按键)。
 
 ## 受控诊断
 

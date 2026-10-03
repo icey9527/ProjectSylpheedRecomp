@@ -58,7 +58,7 @@ class KeyboardKeystrokeDriver final : public rex::input::InputDriver,
   std::deque<rex::input::X_INPUT_KEYSTROKE> events_;
   // Mouse motion is accumulated on the UI thread and consumed by the guest
   // input poll. This keeps the OS cursor visible while exposing a real
-  // transient right-stick signal to XInputGetState.
+  // transient left-stick signal to XInputGetState.
   std::atomic<int32_t> mouse_dx_{0};
   std::atomic<int32_t> mouse_dy_{0};
   uint32_t packet_number_ = 0;
