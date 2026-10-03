@@ -68,7 +68,33 @@ uint16_t MouseKey(rex::ui::MouseEvent::Button button) {
 
 KeyboardKeystrokeDriver::KeyboardKeystrokeDriver(Now now)
     : InputDriver(nullptr, 0), now_(std::move(now)) {}
-KeyboardKeystrokeDriver::~KeyboardKeystrokeDriver() { DetachWindow(); }
+KeyboardKeystrokeDriver::~KeyboardKeystrokeDriver() {
+  // Window callbacks and runtime teardown run on the UI thread, where draining
+  // pending callbacks and releasing the capture is safe. From any other thread
+  // the SDK may refuse to queue the release, or accept it and never execute it
+  // once the loop has exited, which would block a synchronous wait forever.
+  // Drop local state there instead; the platform releases the capture together
+  // with the window.
+  rex::ui::Window* window = nullptr;
+  {
+    std::lock_guard lock(mutex_);
+    window = attached_;
+  }
+  if (window && !window->app_context().IsInUIThread()) {
+    mouse_capture_requested_.store(false, std::memory_order_release);
+    mouse_capture_queued_.store(false, std::memory_order_release);
+    mouse_capture_active_.store(false, std::memory_order_release);
+    mouse_dx_.store(0, std::memory_order_release);
+    mouse_dy_.store(0, std::memory_order_release);
+    {
+      std::lock_guard lock(mutex_);
+      attached_ = nullptr;
+    }
+    REXLOG_WARN("SYLPHEED_INPUT window detached off the UI thread; capture release skipped");
+    return;
+  }
+  DetachWindow();
+}
 X_STATUS KeyboardKeystrokeDriver::Setup() { return X_STATUS_SUCCESS; }
 bool KeyboardKeystrokeDriver::Enabled() {
   return rex::cvar::GetFlagByName("mnk_mode") == "true";
