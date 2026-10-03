@@ -55,8 +55,11 @@ void FrameRateDialog::OnDraw(ImGuiIO&) {
     ImGui::TextUnformatted(
         "Applying restarts the host; the selection above is pending until then.");
     ImGui::TextUnformatted(
-        "Higher rates are experimental: time-based logic is unaffected, but");
-    ImGui::TextUnformatted("frame-dependent behavior may show issues.");
+        "Known issue at higher rates: this game's logic follows the rendered");
+    ImGui::TextUnformatted(
+        "frame count, so effects and camera move faster (~2x at 120 Hz).");
+    ImGui::TextUnformatted(
+        "60 Hz keeps the original speed; higher rates are for experiments.");
     char button[48];
     std::snprintf(button, sizeof(button), "Apply %d Hz and restart", kRates[selected_]);
     if (ImGui::Button(button)) {
