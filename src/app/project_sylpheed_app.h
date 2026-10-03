@@ -13,7 +13,6 @@
 #include <fstream>
 #include <vector>
 #include "startup_config.h"
-#include "missing_resource_notifier.h"
 #include "input_diagnostics.h"
 #include "input/keyboard_keystroke_driver.h"
 #include "features/performance/performance_display.h"
@@ -24,9 +23,6 @@
 #ifdef _WIN32
 #include "platform/windows/resource_picker.h"
 #endif
-
-REXCVAR_DEFINE_BOOL(show_missing_resource_errors, false, "Diagnostics",
-                    "Show a debug popup for missing game files");
 
 class ProjectSylpheedApp : public rex::ReXApp {
  public:
@@ -115,27 +111,12 @@ class ProjectSylpheedApp : public rex::ReXApp {
                 rex::cvar::GetFlagByName("mnk_mode"));
     input_diagnostics_ = std::make_unique<sylpheed::InputDiagnostics>();
     window()->AddInputListener(input_diagnostics_.get(), 1);
-    missing_resource_notifier_ = std::make_shared<sylpheed::MissingResourceNotifier>(
-        [this](std::string path) {
-          if (!REXCVAR_GET(show_missing_resource_errors)) return;
-          app_context().CallInUIThreadDeferred([path = std::move(path)] {
-            rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error,
-                "游戏资源缺失或无法读取：\n" + path +
-                "\n\n请确认资源包、files.tbl 和当前 XEX 属于同一版本。\n详细信息已写入程序同名 .log。");
-          });
-        });
-    rex::AddSink(missing_resource_notifier_);
     if (performance_display_) performance_display_->AttachWindow(window(), [this] {
 #ifdef _WIN32
       sylpheed::BeginResourceDirectoryChange(
           static_cast<HWND>(window()->GetNativeWindowHandle()), startup_config_path_);
 #endif
-    }, [this] {
-      const bool enabled = REXCVAR_GET(show_missing_resource_errors);
-      rex::cvar::SetFlagByName("show_missing_resource_errors", enabled ? "false" : "true");
-      REXLOG_INFO("SYLPHEED_DIAGNOSTICS missing_resource_errors={}",
-                  !enabled);
-    }, [] { return REXCVAR_GET(show_missing_resource_errors); });
+    });
     SetGuestFrameStats([] {
       const auto sample = sylpheed::performance::Frames().Snapshot();
       return rex::ui::FrameStats{sample.frame_time_ms, sample.fps, sample.frame_count};
@@ -163,10 +144,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
   }
 
   void OnShutdown() override {
-    if (missing_resource_notifier_) {
-      rex::RemoveSink(missing_resource_notifier_);
-      missing_resource_notifier_.reset();
-    }
     performance_display_.reset();
     if (input_diagnostics_) {
       window()->RemoveInputListener(input_diagnostics_.get());
@@ -210,7 +187,6 @@ class ProjectSylpheedApp : public rex::ReXApp {
   std::unique_ptr<sylpheed::performance::PerformanceDisplay> performance_display_;
   std::unique_ptr<rex::ui::ImGuiDialog> achievements_overlay_safe_;
   std::unique_ptr<sylpheed::InputDiagnostics> input_diagnostics_;
-  std::shared_ptr<sylpheed::MissingResourceNotifier> missing_resource_notifier_;
   std::filesystem::path startup_config_path_;
   bool auto_language_ = true;
 };
