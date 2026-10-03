@@ -28,10 +28,10 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   DefaultFlag("window_width", "1280");
   DefaultFlag("window_height", "720");
   DefaultFlag("mnk_mode", "true");
-  // Mouse look is the normal PC input path. The SDK already converts relative
-  // mouse motion to the emulated right stick; keep this enabled by default so
-  // a fresh build works without hand-editing the TOML file.
-  DefaultFlag("mnk_mouse", "true");
+  // Keep the OS cursor visible by default. The SDK's relative mouse mode
+  // captures and hides it; a visible-cursor camera driver will be added
+  // separately after the debug-menu path is stable.
+  DefaultFlag("mnk_mouse", "false");
   DefaultFlag("gpu_plugin", "xenos");
   const auto log_path = paths.config_path.parent_path() /
                         (paths.config_path.stem().string() + ".log");
@@ -44,9 +44,9 @@ inline void ConfigureStartup(rex::PathConfig& paths) {
   DefaultFlag("allow_game_relative_writes", "false");
   DefaultFlag("keybind_a", "Return,Space");
   DefaultFlag("keybind_b", "Backspace");
-  // Match the intended mouse controls while retaining the Xbox trigger model.
-  DefaultFlag("keybind_left_trigger", "RMB");
-  DefaultFlag("keybind_right_trigger", "LMB");
+  // Mouse buttons mirror the existing shoulder-key actions: right=1, left=3.
+  DefaultFlag("keybind_left_shoulder", "RMB,1");
+  DefaultFlag("keybind_right_shoulder", "LMB,3");
   DefaultFlag("keybind_start", "X");
   DefaultFlag("keybind_dpad_up", "Up");
   DefaultFlag("keybind_dpad_down", "Down");
