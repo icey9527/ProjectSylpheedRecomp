@@ -108,7 +108,9 @@ X_RESULT KeyboardKeystrokeDriver::GetDeviceState(DeviceId id, X_INPUT_STATE* out
   // mouse movement useful camera range without enabling the SDK's hidden
   // relative-mouse mode. One poll consumes the accumulated motion so a
   // stopped mouse does not keep moving the game.
-  constexpr int32_t kMouseScale = 2048;
+  // Four times the initial baseline: ordinary desktop motion should produce
+  // a clearly visible in-game response without requiring pointer capture.
+  constexpr int32_t kMouseScale = 8192;
   const int32_t dx = mouse_dx_.exchange(0, std::memory_order_acq_rel);
   const int32_t dy = mouse_dy_.exchange(0, std::memory_order_acq_rel);
   *out_state = {};
