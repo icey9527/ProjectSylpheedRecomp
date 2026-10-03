@@ -29,7 +29,8 @@ set(PROJECTSYLPHEED_SOURCES
 )
 
 if(WIN32)
-    add_executable(project_sylpheed WIN32 ${PROJECTSYLPHEED_SOURCES})
+    add_executable(project_sylpheed WIN32 ${PROJECTSYLPHEED_SOURCES}
+        src/platform/windows/project_sylpheed.rc)
     target_sources(project_sylpheed PRIVATE src/platform/windows/tools_menu.cpp
         src/platform/windows/resource_picker.cpp)
     target_link_libraries(project_sylpheed PRIVATE comctl32 psapi ole32 shell32 uuid)
